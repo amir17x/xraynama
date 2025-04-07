@@ -27,7 +27,9 @@ import {
   Favorite as FavoriteModel,
   WatchHistory,
   Playlist as PlaylistModel,
-  PlaylistItem
+  PlaylistItem,
+  VerificationCode,
+  ResetToken
 } from '../models/mongoose';
 
 import mongoose, { Schema, Document } from 'mongoose';
@@ -1092,5 +1094,117 @@ export class MongoDBStorage implements IStorage {
       createdAt: mongoPlaylist.createdAt,
       updatedAt: mongoPlaylist.updatedAt
     };
+  }
+  
+  // Password reset operations
+  async createVerificationCode(email: string): Promise<string> {
+    try {
+      // Generate a random 6-digit code
+      const code = Math.floor(100000 + Math.random() * 900000).toString();
+      
+      // Set expiration time (10 minutes from now)
+      const expiresAt = new Date();
+      expiresAt.setMinutes(expiresAt.getMinutes() + 10);
+      
+      // Delete any existing verification codes for this email
+      await VerificationCode.deleteMany({ email });
+      
+      // Create a new verification code
+      const verificationCode = new VerificationCode({
+        email,
+        code,
+        expiresAt
+      });
+      
+      await verificationCode.save();
+      return code;
+    } catch (error) {
+      console.error('Error creating verification code:', error);
+      throw error;
+    }
+  }
+  
+  async verifyCode(email: string, code: string): Promise<boolean> {
+    try {
+      // Find the verification code
+      const verificationCode = await VerificationCode.findOne({ 
+        email,
+        code,
+        expiresAt: { $gt: new Date() } // Check if not expired
+      });
+      
+      // If code is valid, return true
+      return !!verificationCode;
+    } catch (error) {
+      console.error('Error verifying code:', error);
+      return false;
+    }
+  }
+  
+  async createResetToken(email: string): Promise<string> {
+    try {
+      // Generate a random token
+      const token = Math.random().toString(36).substring(2, 15) + 
+                   Math.random().toString(36).substring(2, 15);
+      
+      // Set expiration time (1 hour from now)
+      const expiresAt = new Date();
+      expiresAt.setHours(expiresAt.getHours() + 1);
+      
+      // Delete any existing reset tokens for this email
+      await ResetToken.deleteMany({ email });
+      
+      // Create a new reset token
+      const resetToken = new ResetToken({
+        email,
+        token,
+        expiresAt
+      });
+      
+      await resetToken.save();
+      return token;
+    } catch (error) {
+      console.error('Error creating reset token:', error);
+      throw error;
+    }
+  }
+  
+  async verifyResetToken(email: string, token: string): Promise<boolean> {
+    try {
+      // Find the reset token
+      const resetToken = await ResetToken.findOne({ 
+        email,
+        token,
+        expiresAt: { $gt: new Date() } // Check if not expired
+      });
+      
+      // If token is valid, return true
+      return !!resetToken;
+    } catch (error) {
+      console.error('Error verifying reset token:', error);
+      return false;
+    }
+  }
+  
+  async resetPassword(email: string, newPassword: string): Promise<boolean> {
+    try {
+      // Find the user by email
+      const user = await UserModel.findOne({ email });
+      if (!user) return false;
+      
+      // Update the user's password
+      user.password = newPassword;
+      user.updatedAt = new Date();
+      await user.save();
+      
+      // Delete any verification codes and reset tokens for this email
+      await VerificationCode.deleteMany({ email });
+      await ResetToken.deleteMany({ email });
+      
+      return true;
+    } catch (error) {
+      console.error('Error resetting password:', error);
+      return false;
+    }
   }
 }

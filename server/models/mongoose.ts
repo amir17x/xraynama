@@ -1,6 +1,19 @@
 import mongoose, { Document, Schema } from 'mongoose';
 import { contentTypeEnum, qualityEnum } from '@shared/schema';
 
+// Define Password Reset interfaces
+export interface VerificationCodeDocument extends Document {
+  email: string;
+  code: string;
+  expiresAt: Date;
+}
+
+export interface ResetTokenDocument extends Document {
+  email: string;
+  token: string;
+  expiresAt: Date;
+}
+
 // Define interfaces for Mongoose documents
 export interface UserDocument extends Document {
   username: string;
@@ -283,6 +296,19 @@ const playlistItemSchema = new Schema<PlaylistItemDocument>({
   updatedAt: { type: Date, default: Date.now }
 });
 
+// Password Reset schemas
+const verificationCodeSchema = new Schema<VerificationCodeDocument>({
+  email: { type: String, required: true },
+  code: { type: String, required: true },
+  expiresAt: { type: Date, required: true },
+});
+
+const resetTokenSchema = new Schema<ResetTokenDocument>({
+  email: { type: String, required: true },
+  token: { type: String, required: true },
+  expiresAt: { type: Date, required: true },
+});
+
 // Create Mongoose models
 export const User = mongoose.model<UserDocument>('User', userSchema);
 export const Content = mongoose.model<ContentDocument>('Content', contentSchema);
@@ -301,6 +327,8 @@ export const Favorite = mongoose.model<FavoriteDocument>('Favorite', favoriteSch
 export const WatchHistory = mongoose.model('WatchHistory', watchHistorySchema);
 export const Playlist = mongoose.model<PlaylistDocument>('Playlist', playlistSchema);
 export const PlaylistItem = mongoose.model<PlaylistItemDocument>('PlaylistItem', playlistItemSchema);
+export const VerificationCode = mongoose.model<VerificationCodeDocument>('VerificationCode', verificationCodeSchema);
+export const ResetToken = mongoose.model<ResetTokenDocument>('ResetToken', resetTokenSchema);
 
 // Add unique compound index for ContentGenre
 ContentGenre.schema.index({ contentId: 1, genreId: 1 }, { unique: true });

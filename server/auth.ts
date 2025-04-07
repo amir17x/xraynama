@@ -6,6 +6,7 @@ import { scrypt, randomBytes, timingSafeEqual } from "crypto";
 import { promisify } from "util";
 import { storage } from "./storage";
 import { User as SelectUser } from "@shared/schema";
+import { MailerSend, EmailParams, Sender, Recipient } from "mailersend";
 
 declare global {
   namespace Express {
@@ -14,6 +15,53 @@ declare global {
 }
 
 const scryptAsync = promisify(scrypt);
+const mailerSend = new MailerSend({
+  apiKey: process.env.MAILERSEND_API_KEY || '',
+});
+
+// تابع ارسال ایمیل با کد تایید
+async function sendVerificationEmail(email: string, code: string): Promise<boolean> {
+  try {
+    const sender = new Sender("no-reply@xraynama.ir", "XrayNama");
+    const recipients = [new Recipient(email)];
+    
+    const emailParams = new EmailParams()
+      .setFrom(sender)
+      .setTo(recipients)
+      .setSubject("کد تایید برای بازیابی رمز عبور")
+      .setHtml(`
+        <div dir="rtl" style="font-family: Tahoma, Arial; line-height: 1.6; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f0f7ff; border-radius: 10px;">
+          <h2 style="color: #1e3a8a; border-bottom: 2px solid #3b82f6; padding-bottom: 10px;">بازیابی رمز عبور XrayNama</h2>
+          <p style="color: #334155;">کاربر گرامی،</p>
+          <p style="color: #334155;">درخواست بازیابی رمز عبور شما دریافت شد. کد تایید شما برای بازیابی رمز عبور:</p>
+          <div style="background-color: #dbeafe; padding: 15px; border-radius: 5px; text-align: center; margin: 20px 0;">
+            <h3 style="color: #1e40af; font-size: 24px; margin: 0;">${code}</h3>
+          </div>
+          <p style="color: #334155;">این کد تا 10 دقیقه معتبر است. در صورتی که شما درخواست بازیابی رمز عبور نداده‌اید، می‌توانید این ایمیل را نادیده بگیرید.</p>
+          <p style="color: #334155;">با احترام،<br>تیم XrayNama</p>
+        </div>
+      `)
+      .setText(`
+        بازیابی رمز عبور XrayNama
+        
+        کاربر گرامی،
+        درخواست بازیابی رمز عبور شما دریافت شد. کد تایید شما برای بازیابی رمز عبور:
+        
+        ${code}
+        
+        این کد تا 10 دقیقه معتبر است. در صورتی که شما درخواست بازیابی رمز عبور نداده‌اید، می‌توانید این ایمیل را نادیده بگیرید.
+        
+        با احترام،
+        تیم XrayNama
+      `);
+
+    await mailerSend.email.send(emailParams);
+    return true;
+  } catch (error) {
+    console.error("Error sending verification email:", error);
+    return false;
+  }
+}
 
 async function hashPassword(password: string) {
   const salt = randomBytes(16).toString("hex");
