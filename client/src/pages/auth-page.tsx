@@ -171,6 +171,16 @@ export default function AuthPage() {
                         )}
                       />
                       
+                      <div className="flex items-center justify-between mb-2">
+                        <button
+                          type="button"
+                          className="text-sm text-primary hover:underline"
+                          onClick={() => navigate('/forgot-password')}
+                        >
+                          رمز عبور را فراموش کرده‌اید؟
+                        </button>
+                      </div>
+                      
                       <Button 
                         type="submit" 
                         className="w-full"

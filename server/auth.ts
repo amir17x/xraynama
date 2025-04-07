@@ -131,4 +131,88 @@ export function setupAuth(app: Express) {
     if (!req.isAuthenticated()) return res.sendStatus(401);
     res.json(req.user);
   });
+  
+  // Password reset routes
+  app.post("/api/forgot-password", async (req, res, next) => {
+    try {
+      const { email } = req.body;
+      
+      if (!email) {
+        return res.status(400).json({ message: "ایمیل الزامی است" });
+      }
+      
+      // Check if user exists with this email
+      const user = await storage.getUserByEmail(email);
+      if (!user) {
+        return res.status(404).json({ message: "کاربری با این ایمیل وجود ندارد" });
+      }
+      
+      // Generate and save verification code
+      const code = await storage.createVerificationCode(email);
+      
+      // In a real application, we would send an email with the code here
+      // For demo purposes, we'll just return a success message and log the code
+      console.log(`Verification code for ${email}: ${code}`);
+      
+      return res.status(200).json({ 
+        message: "کد تأیید با موفقیت ارسال شد. لطفاً ایمیل خود را بررسی کنید."
+      });
+    } catch (error) {
+      next(error);
+    }
+  });
+  
+  app.post("/api/verify-code", async (req, res, next) => {
+    try {
+      const { email, code } = req.body;
+      
+      if (!email || !code) {
+        return res.status(400).json({ message: "ایمیل و کد الزامی هستند" });
+      }
+      
+      // Verify the code
+      const isValid = await storage.verifyCode(email, code);
+      if (!isValid) {
+        return res.status(400).json({ message: "کد وارد شده نامعتبر یا منقضی شده است" });
+      }
+      
+      // Generate a reset token
+      const token = await storage.createResetToken(email);
+      
+      return res.status(200).json({ 
+        message: "کد تأیید صحیح است", 
+        token 
+      });
+    } catch (error) {
+      next(error);
+    }
+  });
+  
+  app.post("/api/reset-password", async (req, res, next) => {
+    try {
+      const { email, token, password } = req.body;
+      
+      if (!email || !token || !password) {
+        return res.status(400).json({ message: "ایمیل، توکن و رمز عبور جدید الزامی هستند" });
+      }
+      
+      // Verify the token
+      const isValid = await storage.verifyResetToken(email, token);
+      if (!isValid) {
+        return res.status(400).json({ message: "توکن نامعتبر یا منقضی شده است" });
+      }
+      
+      // Reset the password
+      const success = await storage.resetPassword(email, password);
+      if (!success) {
+        return res.status(500).json({ message: "خطا در تغییر رمز عبور" });
+      }
+      
+      return res.status(200).json({ 
+        message: "رمز عبور با موفقیت تغییر یافت" 
+      });
+    } catch (error) {
+      next(error);
+    }
+  });
 }

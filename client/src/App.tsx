@@ -18,6 +18,9 @@ import RequestPage from "@/pages/request-page";
 import TermsPage from "@/pages/terms-page";
 import FAQPage from "@/pages/faq-page";
 import TopIMDBPage from "@/pages/top-imdb-page";
+import ForgotPasswordPage from "@/pages/forgot-password";
+import VerifyCodePage from "@/pages/verify-code";
+import ResetPasswordPage from "@/pages/reset-password";
 
 function Router() {
   return (
@@ -29,6 +32,11 @@ function Router() {
       <Route path="/search" component={SearchPage} />
       <Route path="/top-imdb" component={TopIMDBPage} />
       <ProtectedRoute path="/profile" component={ProfilePage} />
+      
+      {/* Password reset pages */}
+      <Route path="/forgot-password" component={ForgotPasswordPage} />
+      <Route path="/verify-code" component={VerifyCodePage} />
+      <Route path="/reset-password" component={ResetPasswordPage} />
       
       {/* Support pages */}
       <Route path="/contact" component={ContactPage} />

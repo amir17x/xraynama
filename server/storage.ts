@@ -10,8 +10,31 @@ import {
 } from "@shared/schema";
 import session from "express-session";
 import createMemoryStore from "memorystore";
+import { scrypt, randomBytes, timingSafeEqual } from "crypto";
+import { promisify } from "util";
+
+const scryptAsync = promisify(scrypt);
+
+export async function hashPassword(password: string) {
+  const salt = randomBytes(16).toString("hex");
+  const buf = (await scryptAsync(password, salt, 64)) as Buffer;
+  return `${buf.toString("hex")}.${salt}`;
+}
 
 const MemoryStore = createMemoryStore(session);
+
+// Interface for password reset
+export interface ResetToken {
+  email: string;
+  token: string;
+  expiresAt: Date;
+}
+
+export interface VerificationCode {
+  email: string;
+  code: string;
+  expiresAt: Date;
+}
 
 // Interface for the storage operations
 export interface IStorage {
@@ -21,6 +44,13 @@ export interface IStorage {
   getUserByEmail(email: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
   updateUser(id: number, user: Partial<User>): Promise<User | undefined>;
+  
+  // Password reset operations
+  createVerificationCode(email: string): Promise<string>;
+  verifyCode(email: string, code: string): Promise<boolean>;
+  createResetToken(email: string): Promise<string>;
+  verifyResetToken(email: string, token: string): Promise<boolean>;
+  resetPassword(email: string, newPassword: string): Promise<boolean>;
 
   // Content operations
   getAllContent(limit?: number, offset?: number): Promise<Content[]>;
@@ -121,6 +151,10 @@ export class MemStorage implements IStorage {
   private playlistsMap: Map<number, Playlist>;
   private playlistItemsMap: Map<number, { playlistId: number, contentId: number, order: number }>;
   
+  // Maps for password reset
+  private verificationCodesMap: Map<string, VerificationCode>;
+  private resetTokensMap: Map<string, ResetToken>;
+  
   public sessionStore: any; // Using any instead of session.SessionStore due to type issues
   private currentIds: {
     users: number;
@@ -160,6 +194,10 @@ export class MemStorage implements IStorage {
     this.watchHistoryMap = new Map();
     this.playlistsMap = new Map();
     this.playlistItemsMap = new Map();
+    
+    // Initialize password reset maps
+    this.verificationCodesMap = new Map();
+    this.resetTokensMap = new Map();
     
     this.sessionStore = new MemoryStore({
       checkPeriod: 86400000 // 24 hours
@@ -764,6 +802,104 @@ export class MemStorage implements IStorage {
     if (item) {
       this.playlistItemsMap.delete(item[0]);
     }
+  }
+  
+  // Password reset methods
+  async createVerificationCode(email: string): Promise<string> {
+    // Generate a random 6-digit code
+    const code = Math.floor(100000 + Math.random() * 900000).toString();
+    
+    // Set expiration time (15 minutes from now)
+    const expiresAt = new Date();
+    expiresAt.setMinutes(expiresAt.getMinutes() + 15);
+    
+    // Store the verification code
+    this.verificationCodesMap.set(email, {
+      email,
+      code,
+      expiresAt
+    });
+    
+    return code;
+  }
+  
+  async verifyCode(email: string, code: string): Promise<boolean> {
+    const verificationData = this.verificationCodesMap.get(email);
+    
+    if (!verificationData) {
+      return false;
+    }
+    
+    // Check if code is expired
+    if (new Date() > verificationData.expiresAt) {
+      this.verificationCodesMap.delete(email);
+      return false;
+    }
+    
+    // Check if code matches
+    if (verificationData.code !== code) {
+      return false;
+    }
+    
+    // Code is valid, remove it and create a reset token
+    this.verificationCodesMap.delete(email);
+    return true;
+  }
+  
+  async createResetToken(email: string): Promise<string> {
+    // Generate a random token
+    const token = Array.from(Array(32), () => Math.floor(Math.random() * 36).toString(36)).join('');
+    
+    // Set expiration time (1 hour from now)
+    const expiresAt = new Date();
+    expiresAt.setHours(expiresAt.getHours() + 1);
+    
+    // Store the reset token
+    this.resetTokensMap.set(email, {
+      email,
+      token,
+      expiresAt
+    });
+    
+    return token;
+  }
+  
+  async verifyResetToken(email: string, token: string): Promise<boolean> {
+    const resetData = this.resetTokensMap.get(email);
+    
+    if (!resetData) {
+      return false;
+    }
+    
+    // Check if token is expired
+    if (new Date() > resetData.expiresAt) {
+      this.resetTokensMap.delete(email);
+      return false;
+    }
+    
+    // Check if token matches
+    if (resetData.token !== token) {
+      return false;
+    }
+    
+    return true;
+  }
+  
+  async resetPassword(email: string, newPassword: string): Promise<boolean> {
+    const user = await this.getUserByEmail(email);
+    
+    if (!user) {
+      return false;
+    }
+    
+    // Hash the new password and update user's password
+    const hashedPassword = await hashPassword(newPassword);
+    await this.updateUser(user.id, { password: hashedPassword });
+    
+    // Remove the reset token
+    this.resetTokensMap.delete(email);
+    
+    return true;
   }
 }
 
