@@ -11,6 +11,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Textarea } from "@/components/ui/textarea";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Badge } from "@/components/ui/badge";
 import {
   Heart,
   Download,
@@ -25,7 +26,11 @@ import {
   User,
   Info,
   Film,
-  Monitor
+  Languages,
+  Hash,
+  Users,
+  Globe,
+  Shield
 } from "lucide-react";
 import { 
   Select, 
@@ -48,13 +53,15 @@ export default function ContentPage() {
   const [selectedQuality, setSelectedQuality] = useState<string>("1080p");
   const [commentText, setCommentText] = useState("");
   const [isFavorite, setIsFavorite] = useState(false);
+  const [viewMode, setViewMode] = useState<"trailer" | "details">("details");
   
-  // Fake data for demonstration
+  // Mock data for demonstration
   const mockContent = {
     id: id,
     title: "پرستیژ",
     englishTitle: "The Prestige",
     description: "دو شعبده‌باز رقیب در لندن اواخر قرن نوزدهم تلاش می‌کنند تا بهترین ترفند را ارائه دهند و در این راه به مبارزه خطرناکی کشیده می‌شوند.",
+    fullDescription: "در سال ۱۸۹۰ میلادی در لندن، دو شعبده‌باز حرفه‌ای و رقیب به نام‌های روبرت آنجیر (هیو جکمن) و آلفرد بوردن (کریستین بیل) سعی می‌کنند با ارائه بهترین و خیره‌کننده‌ترین شعبده یکدیگر را شکست دهند. این رقابت حرفه‌ای رفته رفته به دشمنی شخصی و وسواس‌گونه تبدیل می‌شود و هر دو حاضرند برای پیروزی دست به هر کاری بزنند. با ورود نیکولا تسلا (دیوید بووی) و ماشین عجیبش، این رقابت ابعاد خطرناک‌تری به خود می‌گیرد.",
     year: 2006,
     duration: 130,
     type: "movie",
@@ -62,8 +69,13 @@ export default function ContentPage() {
     director: "کریستوفر نولان",
     actors: ["کریستین بیل", "هیو جکمن", "اسکارلت جوهانسون", "مایکل کین"],
     genres: ["درام", "معمایی", "علمی تخیلی"],
-    poster: "https://image.tmdb.org/t/p/w500/5i02FP2ljLlOfhYYvfuVQCQTrO8.jpg",
-    backdrop: "https://image.tmdb.org/t/p/original/cD9b7DzVbwsiMUDIzARCQRnGYYL.jpg",
+    tags: ["جایزه اسکار", "جنایی", "شعبده‌بازی", "بهترین‌های IMDb"],
+    country: "آمریکا، انگلستان",
+    languages: "انگلیسی",
+    subtitles: ["فارسی", "انگلیسی"],
+    ageRating: "+13",
+    poster: "https://m.media-amazon.com/images/M/MV5BMjA4NDI0MTIxNF5BMl5BanBnXkFtZTYwNTM0MzY2._V1_.jpg",
+    backdrop: "https://m.media-amazon.com/images/M/MV5BMTY4MzQ3NzQzOV5BMl5BanBnXkFtZTcwNjYwMzc1MQ@@._V1_.jpg",
     trailer: "https://www.youtube.com/watch?v=ijXruSzfGEc"
   };
   
@@ -135,7 +147,8 @@ export default function ContentPage() {
   // Handle play button click
   const handlePlay = () => {
     setShowPlayer(true);
-    // Auto-scroll to player
+    setViewMode("trailer");
+    // Auto-scroll to top
     setTimeout(() => {
       window.scrollTo({ top: 0, behavior: "smooth" });
     }, 100);
@@ -200,291 +213,249 @@ export default function ContentPage() {
     <>
       <Header />
       
-      <main>
-        {/* Hero Banner */}
+      <main className="bg-black/60 min-h-screen">
+        {/* Content Header with Background */}
         <div 
-          className="relative h-[500px] bg-cover bg-center"
+          className="relative bg-cover bg-center"
           style={{ 
-            backgroundImage: `linear-gradient(to bottom, rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.9)), url(${mockContent.backdrop})` 
+            backgroundImage: `linear-gradient(to bottom, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.9) 90%), url(${mockContent.backdrop})`,
+            backgroundPosition: "top center",
+            backgroundSize: "cover"
           }}
         >
-          <div className="container mx-auto px-4 h-full flex flex-col justify-end pb-8">
-            <div className="flex flex-col md:flex-row md:items-end gap-6">
-              <div className="w-full max-w-[200px] -mb-20 z-10">
-                <img 
-                  src={mockContent.poster} 
-                  alt={mockContent.title} 
-                  className="w-full rounded-lg shadow-lg"
-                />
-              </div>
-              
-              <div className="flex-1">
-                <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mb-2">
-                  <span className="bg-primary/20 text-primary text-xs px-2 py-1 rounded">
-                    {mockContent.type === "movie" ? "فیلم" : 
-                     mockContent.type === "series" ? "سریال" : 
-                     mockContent.type === "animation" ? "انیمیشن" : "مستند"}
-                  </span>
-                  
-                  <span className="flex items-center">
-                    <Star className="h-4 w-4 text-yellow-500 fill-current" />
-                    <span className="text-yellow-500 font-bold mx-1">{mockContent.imdbRating}</span>
-                    <span className="text-xs text-muted-foreground">IMDB</span>
-                  </span>
-                  
-                  <span className="flex items-center text-muted-foreground">
-                    <Calendar className="h-4 w-4 mr-1" />
-                    <span>{mockContent.year}</span>
-                  </span>
-                  
-                  <span className="flex items-center text-muted-foreground">
-                    <Clock className="h-4 w-4 mr-1" />
-                    <span>{mockContent.duration} دقیقه</span>
-                  </span>
-                </div>
-                
-                <h1 className="text-3xl font-bold mb-1">{mockContent.title}</h1>
-                <h2 className="text-lg text-muted-foreground mb-4">{mockContent.englishTitle}</h2>
-                
-                <p className="text-sm text-muted-foreground mb-6 max-w-2xl">
-                  {mockContent.description}
-                </p>
-                
-                <div className="flex flex-wrap gap-2">
-                  <Button
-                    onClick={handlePlay}
-                    className="flex items-center"
-                  >
-                    <Play className="h-4 w-4 mr-2" />
-                    پخش آنلاین
-                  </Button>
-                  
-                  <Select
-                    value={selectedQuality}
-                    onValueChange={(value) => handleDownload(value)}
-                  >
-                    <SelectTrigger className="w-[140px] bg-black/40">
-                      <Download className="h-4 w-4 mr-2" />
-                      <SelectValue placeholder="دانلود" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {mockQualities.map((quality) => (
-                        <SelectItem key={quality.value} value={quality.value}>
-                          <span className="flex justify-between w-full">
-                            <span>{quality.label}</span>
-                            <span className="text-muted-foreground text-xs">{quality.size}</span>
-                          </span>
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    onClick={handleToggleFavorite}
-                    className={isFavorite ? "text-red-500" : ""}
-                  >
-                    <Heart className={`h-4 w-4 ${isFavorite ? "fill-current" : ""}`} />
-                  </Button>
-                  
-                  <Button variant="outline" size="icon">
-                    <Share2 className="h-4 w-4" />
-                  </Button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        <div className="container mx-auto px-4 mt-24 mb-12">
-          {/* Media Player */}
-          {showPlayer && (
-            <div className="mb-8 rounded-lg overflow-hidden shadow-lg glass-effect">
-              <div className="aspect-video bg-black relative">
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="text-center">
-                    <Film className="h-16 w-16 mx-auto mb-4 text-muted-foreground opacity-50" />
-                    <h3 className="text-xl font-medium mb-2">پخش فیلم پرستیژ</h3>
-                    <p className="text-muted-foreground mb-4">در نسخه دمو، ویدیو واقعی بارگذاری نشده است</p>
-                    <div className="flex justify-center gap-4">
-                      <Button 
-                        variant="outline"
-                        onClick={() => setShowPlayer(false)}
-                      >
-                        بستن پلیر
-                      </Button>
-                      <Button>
-                        <Monitor className="h-4 w-4 mr-2" />
-                        تماشای تریلر
-                      </Button>
+          <div className="container mx-auto px-4 pt-6 pb-10">
+            {viewMode === "trailer" ? (
+              // Video Player Section
+              <div className="mt-6 mb-6">
+                <div className="aspect-video bg-black/80 rounded-lg relative overflow-hidden shadow-2xl">
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="text-center p-6">
+                      <Film className="h-16 w-16 mx-auto mb-4 text-primary/50 opacity-70" />
+                      <h3 className="text-xl font-medium mb-3 text-white">پخش تریلر فیلم {mockContent.title}</h3>
+                      <p className="text-gray-300 mb-6 max-w-md mx-auto">در نسخه دمو، ویدیو واقعی بارگذاری نشده است. این بخش نمایشی از محل قرارگیری پلیر است.</p>
+                      <div className="flex justify-center gap-4">
+                        <Button 
+                          variant="outline"
+                          onClick={() => setViewMode("details")}
+                        >
+                          بازگشت به جزئیات
+                        </Button>
+                        <Button onClick={() => window.open(mockContent.trailer, "_blank")}>
+                          تماشا در یوتیوب
+                        </Button>
+                      </div>
                     </div>
                   </div>
                 </div>
                 
-                {/* Uncomment to use actual video player
-                <video
-                  ref={videoRef}
-                  className="w-full h-full object-contain"
-                  controls
-                  autoPlay
-                  poster={mockContent.backdrop}
-                >
-                  <source src="YOUR_VIDEO_URL" type="video/mp4" />
-                  مرورگر شما از پخش ویدیو پشتیبانی نمی‌کند
-                </video> */}
-              </div>
-              
-              <div className="p-4">
-                <div className="flex justify-between items-center">
-                  <h3 className="font-bold">
-                    {mockContent.title} ({mockContent.year})
-                  </h3>
+                {/* Video Info Bar */}
+                <div className="flex justify-between items-center mt-4 bg-black/30 p-3 rounded-lg">
+                  <div className="flex items-center">
+                    <img 
+                      src={mockContent.poster} 
+                      alt={mockContent.title} 
+                      className="w-12 h-16 object-cover rounded mr-3"
+                    />
+                    <div>
+                      <h3 className="font-bold text-white">
+                        {mockContent.title}
+                      </h3>
+                      <p className="text-sm text-gray-300">{mockContent.englishTitle} ({mockContent.year})</p>
+                    </div>
+                  </div>
                   
                   <div className="flex gap-2">
-                    <Select
-                      value={selectedQuality}
-                      onValueChange={setSelectedQuality}
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={handleToggleFavorite}
+                      className={isFavorite ? "text-red-500" : ""}
                     >
-                      <SelectTrigger className="w-[100px]">
-                        <SelectValue placeholder="کیفیت" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="1080p">1080p</SelectItem>
-                        <SelectItem value="720p">720p</SelectItem>
-                        <SelectItem value="480p">480p</SelectItem>
-                      </SelectContent>
-                    </Select>
+                      <Heart className={`h-4 w-4 mr-1 ${isFavorite ? "fill-current" : ""}`} />
+                      علاقه‌مندی‌ها
+                    </Button>
                     
                     <Button variant="outline" size="sm">
-                      <Share2 className="h-4 w-4 mr-2" />
+                      <Share2 className="h-4 w-4 mr-1" />
                       اشتراک‌گذاری
                     </Button>
                   </div>
                 </div>
               </div>
-            </div>
-          )}
-          
-          {/* Content Details */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="md:col-span-2">
-              <Tabs value={selectedTab} onValueChange={(v) => setSelectedTab(v as "info" | "comments")}>
-                <TabsList className="w-full mb-6">
-                  <TabsTrigger value="info" className="flex-1">
-                    <Info className="h-4 w-4 mr-2" />
-                    اطلاعات و جزئیات
-                  </TabsTrigger>
-                  <TabsTrigger value="comments" className="flex-1">
-                    <MessageSquare className="h-4 w-4 mr-2" />
-                    دیدگاه‌ها
-                  </TabsTrigger>
-                </TabsList>
+            ) : (
+              // Content Details View
+              <div className="grid grid-cols-1 md:grid-cols-12 gap-8 py-8">
+                {/* Poster Column */}
+                <div className="md:col-span-3 order-1 flex flex-col items-center md:items-start">
+                  <div className="relative">
+                    <img 
+                      src={mockContent.poster} 
+                      alt={mockContent.title} 
+                      className="w-full max-w-[240px] md:max-w-full rounded-lg shadow-2xl"
+                    />
+                    {mockContent.ageRating && (
+                      <div className="absolute top-2 left-2 bg-black/70 text-white px-2 py-1 rounded text-xs font-bold flex items-center">
+                        <Shield className="h-3 w-3 mr-1" />
+                        {mockContent.ageRating}
+                      </div>
+                    )}
+                  </div>
+                  
+                  <div className="flex flex-col w-full max-w-[240px] md:max-w-full gap-3 mt-4">
+                    <Button
+                      onClick={handlePlay}
+                      className="w-full"
+                      size="lg"
+                    >
+                      <Play className="h-4 w-4 mr-2" />
+                      پخش تریلر
+                    </Button>
+                    
+                    <Select
+                      value={selectedQuality}
+                      onValueChange={(value) => handleDownload(value)}
+                    >
+                      <SelectTrigger className="w-full bg-black/40">
+                        <Download className="h-4 w-4 mr-2" />
+                        <SelectValue placeholder="دانلود" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {mockQualities.map((quality) => (
+                          <SelectItem key={quality.value} value={quality.value}>
+                            <div className="flex justify-between w-full">
+                              <span>{quality.label}</span>
+                              <span className="text-muted-foreground text-xs">{quality.size}</span>
+                            </div>
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    
+                    <div className="flex gap-2">
+                      <Button
+                        variant="outline"
+                        className="flex-1"
+                        onClick={handleToggleFavorite}
+                      >
+                        <Heart className={`h-4 w-4 mr-1 ${isFavorite ? "fill-current text-red-500" : ""}`} />
+                        {isFavorite ? "حذف از علاقه‌مندی‌ها" : "افزودن به علاقه‌مندی‌ها"}
+                      </Button>
+                    </div>
+                  </div>
+                </div>
                 
-                <TabsContent value="info" className="space-y-6">
-                  <div className="glass-effect rounded-lg p-6">
-                    <h3 className="text-xl font-bold mb-4">درباره فیلم</h3>
-                    <p className="text-muted-foreground leading-7">
-                      در سال ۱۸۹۰ میلادی در لندن، دو شعبده‌باز حرفه‌ای و رقیب به نام‌های روبرت آنجیر (هیو جکمن) و آلفرد بوردن (کریستین بیل) سعی می‌کنند با ارائه بهترین و خیره‌کننده‌ترین شعبده یکدیگر را شکست دهند. این رقابت حرفه‌ای رفته رفته به دشمنی شخصی و وسواس‌گونه تبدیل می‌شود و هر دو حاضرند برای پیروزی دست به هر کاری بزنند. با ورود نیکولا تسلا (دیوید بووی) و ماشین عجیبش، این رقابت ابعاد خطرناک‌تری به خود می‌گیرد...
-                      <br/><br/>
-                      پرستیژ یکی از آثار درخشان کریستوفر نولان است که با روایت غیرخطی و پایان غافلگیرکننده، به یکی از محبوب‌ترین فیلم‌های ژانر معمایی تبدیل شده است. فیلم به موضوعات عمیقی همچون وسواس، فداکاری برای هنر و هزینه‌های موفقیت می‌پردازد.
+                {/* Content Details Column */}
+                <div className="md:col-span-9 order-2">
+                  <div className="flex flex-wrap gap-2 mb-3">
+                    <Badge variant="outline" className="bg-primary/10 text-primary border-primary/30">
+                      {mockContent.type === "movie" ? "فیلم" : 
+                      mockContent.type === "series" ? "سریال" : 
+                      mockContent.type === "animation" ? "انیمیشن" : "مستند"}
+                    </Badge>
+                    
+                    <Badge variant="outline" className="bg-yellow-500/10 text-yellow-500 border-yellow-500/30 flex items-center">
+                      <Star className="h-3 w-3 fill-current mr-1" />
+                      {mockContent.imdbRating} / 10
+                    </Badge>
+                    
+                    <Badge variant="outline" className="bg-black/40">
+                      {mockContent.year}
+                    </Badge>
+                    
+                    <Badge variant="outline" className="bg-black/40 flex items-center">
+                      <Clock className="h-3 w-3 mr-1" />
+                      {mockContent.duration} دقیقه
+                    </Badge>
+                  </div>
+                  
+                  <h1 className="text-3xl md:text-4xl font-bold text-white mb-1">{mockContent.title}</h1>
+                  <h2 className="text-lg text-gray-300 mb-6">{mockContent.englishTitle}</h2>
+                  
+                  <div className="prose prose-invert max-w-none mb-8">
+                    <p className="text-gray-300 leading-relaxed text-base">
+                      {mockContent.fullDescription}
                     </p>
                   </div>
                   
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="glass-effect rounded-lg p-6">
-                      <h3 className="text-lg font-bold mb-4">مشخصات فیلم</h3>
-                      <ul className="space-y-3">
-                        <li className="flex justify-between">
-                          <span className="text-muted-foreground">کارگردان:</span>
-                          <span className="font-medium">{mockContent.director}</span>
-                        </li>
-                        <li className="flex justify-between">
-                          <span className="text-muted-foreground">سال انتشار:</span>
-                          <span className="font-medium">{mockContent.year}</span>
-                        </li>
-                        <li className="flex justify-between">
-                          <span className="text-muted-foreground">مدت زمان:</span>
-                          <span className="font-medium">{mockContent.duration} دقیقه</span>
-                        </li>
-                        <li className="flex justify-between">
-                          <span className="text-muted-foreground">امتیاز IMDB:</span>
-                          <span className="font-medium flex items-center">
-                            <Star className="h-4 w-4 text-yellow-500 fill-current mr-1" />
-                            {mockContent.imdbRating}
-                          </span>
-                        </li>
-                        <li className="flex justify-between">
-                          <span className="text-muted-foreground">ژانر:</span>
-                          <span className="font-medium">{mockContent.genres.join('، ')}</span>
-                        </li>
-                      </ul>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-y-4 gap-x-8 mb-8 text-sm">
+                    <div className="flex">
+                      <div className="w-28 text-gray-400">کارگردان:</div>
+                      <div className="flex-1 text-white">{mockContent.director}</div>
                     </div>
                     
-                    <div className="glass-effect rounded-lg p-6">
-                      <h3 className="text-lg font-bold mb-4">بازیگران اصلی</h3>
-                      <ul className="space-y-3">
-                        {mockContent.actors.map((actor, index) => (
-                          <li key={index} className="flex items-center">
-                            <Avatar className="h-8 w-8 mr-3">
-                              <AvatarFallback>{actor.charAt(0)}</AvatarFallback>
-                            </Avatar>
-                            <span>{actor}</span>
-                          </li>
-                        ))}
-                      </ul>
+                    <div className="flex">
+                      <div className="w-28 text-gray-400">بازیگران:</div>
+                      <div className="flex-1 text-white">{mockContent.actors.join('، ')}</div>
+                    </div>
+                    
+                    <div className="flex">
+                      <div className="w-28 text-gray-400">ژانر:</div>
+                      <div className="flex-1 text-white">{mockContent.genres.join('، ')}</div>
+                    </div>
+                    
+                    <div className="flex">
+                      <div className="w-28 text-gray-400">محصول:</div>
+                      <div className="flex-1 text-white flex items-center">
+                        <Globe className="h-3.5 w-3.5 mr-1 text-gray-500" />
+                        {mockContent.country}
+                      </div>
+                    </div>
+                    
+                    <div className="flex">
+                      <div className="w-28 text-gray-400">زبان:</div>
+                      <div className="flex-1 text-white flex items-center">
+                        <Languages className="h-3.5 w-3.5 mr-1 text-gray-500" />
+                        {mockContent.languages}
+                      </div>
+                    </div>
+                    
+                    <div className="flex">
+                      <div className="w-28 text-gray-400">زیرنویس:</div>
+                      <div className="flex-1 text-white">{mockContent.subtitles.join('، ')}</div>
                     </div>
                   </div>
                   
-                  <div className="glass-effect rounded-lg p-6">
-                    <h3 className="text-xl font-bold mb-4">تصاویر فیلم</h3>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                      <div className="aspect-video rounded-lg overflow-hidden">
-                        <img 
-                          src="https://m.media-amazon.com/images/M/MV5BMjA4NDI0MTIxNF5BMl5BanBnXkFtZTYwNTM0MzY2._V1_.jpg" 
-                          alt="تصویر فیلم" 
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
-                      <div className="aspect-video rounded-lg overflow-hidden">
-                        <img 
-                          src="https://m.media-amazon.com/images/M/MV5BMTY4MzQ3NzQzOV5BMl5BanBnXkFtZTcwNjYwMzc1MQ@@._V1_.jpg" 
-                          alt="تصویر فیلم" 
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
-                      <div className="aspect-video rounded-lg overflow-hidden">
-                        <img 
-                          src="https://m.media-amazon.com/images/M/MV5BMTA4OTczNDExNDNeQTJeQWpwZ15BbWU3MDUyMzM4MzA@._V1_.jpg" 
-                          alt="تصویر فیلم" 
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
+                  {/* Tags */}
+                  <div className="mb-8">
+                    <h3 className="text-sm font-medium text-gray-400 mb-2 flex items-center">
+                      <Hash className="h-4 w-4 mr-1" />
+                      برچسب‌ها:
+                    </h3>
+                    <div className="flex flex-wrap gap-2">
+                      {mockContent.tags.map((tag, index) => (
+                        <Badge key={index} variant="secondary" className="bg-black/50 hover:bg-black/70 cursor-pointer">
+                          {tag}
+                        </Badge>
+                      ))}
                     </div>
                   </div>
-                </TabsContent>
-                
-                <TabsContent value="comments" className="space-y-6">
-                  <div className="glass-effect rounded-lg p-6">
-                    <h3 className="text-xl font-bold mb-4">دیدگاه‌ها</h3>
+                  
+                  {/* Comments Section */}
+                  <div className="mt-12 bg-black/50 p-6 rounded-lg">
+                    <h3 className="text-lg font-bold text-white mb-6 flex items-center">
+                      <MessageSquare className="h-5 w-5 mr-2 text-primary" />
+                      دیدگاه‌های کاربران
+                    </h3>
                     
                     {/* Comment Form */}
                     <form onSubmit={handleSubmitComment} className="mb-8">
                       <div className="mb-4">
                         <Textarea
-                          placeholder="دیدگاه خود را بنویسید..."
-                          className="min-h-[100px]"
+                          placeholder="دیدگاه خود را درباره این فیلم بنویسید..."
+                          className="min-h-[100px] bg-black/40 border-gray-700 focus:border-primary"
                           value={commentText}
                           onChange={(e) => setCommentText(e.target.value)}
                         />
                       </div>
-                      <Button type="submit">ارسال دیدگاه</Button>
+                      <div className="flex justify-end">
+                        <Button type="submit">ارسال دیدگاه</Button>
+                      </div>
                     </form>
                     
                     {/* Comments List */}
                     <div className="space-y-6">
                       {mockComments.map((comment) => (
-                        <div key={comment.id} className="border-b border-border pb-6 last:border-0 last:pb-0">
+                        <div key={comment.id} className="border-b border-gray-800 pb-6 last:border-0 last:pb-0">
                           <div className="flex items-start gap-3">
                             <Avatar>
                               <AvatarFallback className="bg-primary/20 text-primary">
@@ -493,20 +464,20 @@ export default function ContentPage() {
                             </Avatar>
                             <div className="flex-1">
                               <div className="flex justify-between mb-1">
-                                <h4 className="font-medium">{comment.user.name}</h4>
-                                <span className="text-xs text-muted-foreground">{comment.date}</span>
+                                <h4 className="font-medium text-white">{comment.user.name}</h4>
+                                <span className="text-xs text-gray-500">{comment.date}</span>
                               </div>
-                              <p className="text-sm text-muted-foreground mb-3">{comment.text}</p>
+                              <p className="text-sm text-gray-300 mb-3">{comment.text}</p>
                               <div className="flex items-center gap-4">
                                 <button 
-                                  className="flex items-center text-xs text-muted-foreground hover:text-primary"
+                                  className="flex items-center text-xs text-gray-400 hover:text-primary transition-colors"
                                   onClick={() => handleCommentReaction(comment.id, true)}
                                 >
                                   <ThumbsUp className="h-4 w-4 mr-1" />
                                   <span>{comment.likes}</span>
                                 </button>
                                 <button 
-                                  className="flex items-center text-xs text-muted-foreground hover:text-primary"
+                                  className="flex items-center text-xs text-gray-400 hover:text-primary transition-colors"
                                   onClick={() => handleCommentReaction(comment.id, false)}
                                 >
                                   <ThumbsDown className="h-4 w-4 mr-1" />
@@ -519,85 +490,115 @@ export default function ContentPage() {
                       ))}
                     </div>
                   </div>
-                </TabsContent>
-              </Tabs>
-            </div>
-            
-            <div>
-              {/* Sidebar */}
-              <div className="space-y-6">
-                <div className="glass-effect rounded-lg p-6">
-                  <h3 className="text-lg font-bold mb-4">لینک‌های دانلود</h3>
-                  <div className="space-y-3">
-                    {mockQualities.map((quality) => (
-                      <div key={quality.value} className="flex justify-between items-center p-3 bg-black/20 rounded-lg">
-                        <div>
-                          <span className="text-sm font-medium">{quality.label}</span>
-                          <span className="text-xs text-muted-foreground block">{quality.size}</span>
-                        </div>
-                        <Button 
-                          variant="outline" 
-                          size="sm"
-                          onClick={() => handleDownload(quality.value)}
-                        >
-                          <Download className="h-4 w-4 mr-1" />
-                          دانلود
-                        </Button>
-                      </div>
-                    ))}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+        
+        {/* Recommended Content Section */}
+        <div className="container mx-auto px-4 py-10">
+          <h2 className="text-xl font-bold text-white mb-6 flex items-center">
+            <Users className="h-5 w-5 mr-2 text-primary" />
+            فیلم‌های مشابه که ممکن است دوست داشته باشید
+          </h2>
+          
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+            <div className="group relative">
+              <img 
+                src="https://m.media-amazon.com/images/M/MV5BMjAxMzY3NjcxNF5BMl5BanBnXkFtZTcwNTI5OTM0Mw@@._V1_.jpg" 
+                alt="Inception" 
+                className="w-full aspect-[2/3] object-cover rounded-lg transition-transform group-hover:scale-105 duration-300"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end">
+                <div className="p-3 w-full">
+                  <h3 className="text-white font-medium text-sm">تلقین</h3>
+                  <div className="flex justify-between items-center mt-1">
+                    <span className="text-xs text-gray-300">2010</span>
+                    <span className="flex items-center text-yellow-500 text-xs">
+                      <Star className="h-3 w-3 fill-current mr-1" />
+                      8.8
+                    </span>
                   </div>
                 </div>
-                
-                <div className="glass-effect rounded-lg p-6">
-                  <h3 className="text-lg font-bold mb-4">فیلم‌های مشابه</h3>
-                  <div className="space-y-4">
-                    <div className="flex gap-3">
-                      <img 
-                        src="https://m.media-amazon.com/images/M/MV5BMjAxMzY3NjcxNF5BMl5BanBnXkFtZTcwNTI5OTM0Mw@@._V1_.jpg" 
-                        alt="Inception" 
-                        className="w-16 h-24 object-cover rounded"
-                      />
-                      <div>
-                        <h4 className="font-medium">تلقین</h4>
-                        <p className="text-xs text-muted-foreground">Inception (2010)</p>
-                        <div className="flex items-center mt-1">
-                          <Star className="h-3 w-3 text-yellow-500 fill-current" />
-                          <span className="text-xs mx-1">8.8</span>
-                        </div>
-                      </div>
-                    </div>
-                    
-                    <div className="flex gap-3">
-                      <img 
-                        src="https://m.media-amazon.com/images/M/MV5BMTk0MDQ3MzAzOV5BMl5BanBnXkFtZTgwNzU1NzE3MjE@._V1_.jpg" 
-                        alt="Interstellar" 
-                        className="w-16 h-24 object-cover rounded"
-                      />
-                      <div>
-                        <h4 className="font-medium">در میان ستارگان</h4>
-                        <p className="text-xs text-muted-foreground">Interstellar (2014)</p>
-                        <div className="flex items-center mt-1">
-                          <Star className="h-3 w-3 text-yellow-500 fill-current" />
-                          <span className="text-xs mx-1">8.6</span>
-                        </div>
-                      </div>
-                    </div>
-                    
-                    <div className="flex gap-3">
-                      <img 
-                        src="https://m.media-amazon.com/images/M/MV5BMTY3OTI5NDczN15BMl5BanBnXkFtZTcwNDA0NDY3Mw@@._V1_.jpg" 
-                        alt="Shutter Island" 
-                        className="w-16 h-24 object-cover rounded"
-                      />
-                      <div>
-                        <h4 className="font-medium">جزیره شاتر</h4>
-                        <p className="text-xs text-muted-foreground">Shutter Island (2010)</p>
-                        <div className="flex items-center mt-1">
-                          <Star className="h-3 w-3 text-yellow-500 fill-current" />
-                          <span className="text-xs mx-1">8.2</span>
-                        </div>
-                      </div>
-                    </div>
+              </div>
+            </div>
+            
+            <div className="group relative">
+              <img 
+                src="https://m.media-amazon.com/images/M/MV5BMTk0MDQ3MzAzOV5BMl5BanBnXkFtZTgwNzU1NzE3MjE@._V1_.jpg" 
+                alt="Interstellar" 
+                className="w-full aspect-[2/3] object-cover rounded-lg transition-transform group-hover:scale-105 duration-300"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end">
+                <div className="p-3 w-full">
+                  <h3 className="text-white font-medium text-sm">در میان ستارگان</h3>
+                  <div className="flex justify-between items-center mt-1">
+                    <span className="text-xs text-gray-300">2014</span>
+                    <span className="flex items-center text-yellow-500 text-xs">
+                      <Star className="h-3 w-3 fill-current mr-1" />
+                      8.6
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div className="group relative">
+              <img 
+                src="https://m.media-amazon.com/images/M/MV5BMTY3OTI5NDczN15BMl5BanBnXkFtZTcwNDA0NDY3Mw@@._V1_.jpg" 
+                alt="Shutter Island" 
+                className="w-full aspect-[2/3] object-cover rounded-lg transition-transform group-hover:scale-105 duration-300"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end">
+                <div className="p-3 w-full">
+                  <h3 className="text-white font-medium text-sm">جزیره شاتر</h3>
+                  <div className="flex justify-between items-center mt-1">
+                    <span className="text-xs text-gray-300">2010</span>
+                    <span className="flex items-center text-yellow-500 text-xs">
+                      <Star className="h-3 w-3 fill-current mr-1" />
+                      8.2
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div className="group relative">
+              <img 
+                src="https://m.media-amazon.com/images/M/MV5BMTMxNTMwODM0NF5BMl5BanBnXkFtZTcwODAyMTk2Mw@@._V1_.jpg" 
+                alt="The Dark Knight" 
+                className="w-full aspect-[2/3] object-cover rounded-lg transition-transform group-hover:scale-105 duration-300"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end">
+                <div className="p-3 w-full">
+                  <h3 className="text-white font-medium text-sm">شوالیه تاریکی</h3>
+                  <div className="flex justify-between items-center mt-1">
+                    <span className="text-xs text-gray-300">2008</span>
+                    <span className="flex items-center text-yellow-500 text-xs">
+                      <Star className="h-3 w-3 fill-current mr-1" />
+                      9.0
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div className="group relative">
+              <img 
+                src="https://m.media-amazon.com/images/M/MV5BMTQ2ODFlMDAtNzdhOC00ZDYzLWE3YTMtNDU4ZGFmZmJmYTczXkEyXkFqcGdeQXVyMTQxNzMzNDI@._V1_.jpg" 
+                alt="Memento" 
+                className="w-full aspect-[2/3] object-cover rounded-lg transition-transform group-hover:scale-105 duration-300"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end">
+                <div className="p-3 w-full">
+                  <h3 className="text-white font-medium text-sm">یادگاری</h3>
+                  <div className="flex justify-between items-center mt-1">
+                    <span className="text-xs text-gray-300">2000</span>
+                    <span className="flex items-center text-yellow-500 text-xs">
+                      <Star className="h-3 w-3 fill-current mr-1" />
+                      8.4
+                    </span>
                   </div>
                 </div>
               </div>
