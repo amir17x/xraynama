@@ -1,22 +1,12 @@
 import React from "react";
-import {
-  Calendar,
-  Globe,
-  Flag,
-  Users,
-  Star,
-  Clock,
-  Tag,
-  Award,
-  FileText,
-} from "lucide-react";
+import ContentBadge from "./ContentBadge";
 
 interface ContentMetadataBarProps {
   releaseDate?: string;
   country?: string;
   genre?: string;
   director?: string;
-  rating?: number;
+  rating?: number | string;
   duration?: string;
   classification?: string;
   awards?: string;
@@ -35,68 +25,53 @@ const ContentMetadataBar: React.FC<ContentMetadataBarProps> = ({
   imdb,
 }) => {
   return (
-    <div className="bg-dark-lighter py-2 px-4 rounded-md flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-gray-300 mb-4">
+    <div className="flex flex-wrap items-center gap-1 text-xs text-gray-300 mb-2">
       {releaseDate && (
-        <div className="flex items-center gap-x-1">
-          <Calendar className="h-4 w-4 text-gray-400" />
-          <span>{releaseDate}</span>
-        </div>
+        <ContentBadge type="release" value={releaseDate} />
       )}
       
       {country && (
-        <div className="flex items-center gap-x-1">
-          <Flag className="h-4 w-4 text-gray-400" />
-          <span>{country}</span>
-        </div>
+        <ContentBadge type="country" value={country} />
       )}
       
       {genre && (
-        <div className="flex items-center gap-x-1">
-          <Tag className="h-4 w-4 text-gray-400" />
-          <span>{genre}</span>
-        </div>
+        <ContentBadge type="genre" value={genre} />
       )}
       
       {director && (
-        <div className="flex items-center gap-x-1">
-          <Users className="h-4 w-4 text-gray-400" />
-          <span>{director}</span>
-        </div>
+        <ContentBadge type="director" value={director} />
       )}
       
       {rating && (
-        <div className="flex items-center gap-x-1">
-          <Star className="h-4 w-4 text-yellow-500" />
-          <span>{rating}</span>
-        </div>
+        <ContentBadge 
+          type="rating" 
+          value={typeof rating === 'number' ? rating.toString() : rating} 
+          className="bg-yellow-500/10" 
+        />
       )}
       
       {duration && (
-        <div className="flex items-center gap-x-1">
-          <Clock className="h-4 w-4 text-gray-400" />
-          <span>{duration}</span>
-        </div>
+        <ContentBadge type="duration" value={duration} />
       )}
       
       {classification && (
-        <div className="flex items-center gap-x-1">
-          <FileText className="h-4 w-4 text-gray-400" />
-          <span>{classification}</span>
-        </div>
+        <ContentBadge type="classification" value={classification} />
       )}
       
       {awards && (
-        <div className="flex items-center gap-x-1">
-          <Award className="h-4 w-4 text-yellow-500" />
-          <span>{awards}</span>
-        </div>
+        <ContentBadge 
+          type="award" 
+          value={awards} 
+          className="bg-yellow-500/10" 
+        />
       )}
       
       {imdb && (
-        <div className="flex items-center gap-x-1">
-          <Globe className="h-4 w-4 text-gray-400" />
-          <span>IMDb: {imdb}</span>
-        </div>
+        <ContentBadge 
+          type="imdb" 
+          value={`IMDb: ${imdb}`} 
+          className="bg-blue-500/10" 
+        />
       )}
     </div>
   );

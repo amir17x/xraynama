@@ -89,6 +89,7 @@ export default function HomePage() {
           content={featuredContent || []}
           isLoading={isFeaturedLoading}
           icon="award"
+          moreLink="/top-imdb"
         />
         
         <div className="container mx-auto px-4 py-8">
@@ -116,6 +117,7 @@ export default function HomePage() {
           content={animations || []}
           isLoading={isAnimationsLoading}
           icon="star"
+          moreLink="/category/animation"
         />
         
         <div className="container mx-auto px-4 py-8">

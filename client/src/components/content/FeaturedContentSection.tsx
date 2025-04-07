@@ -1,10 +1,9 @@
-import React from "react";
+import React, { useRef } from "react";
 import { ContentType } from "@/types";
-import ContentDetailCard from "./ContentDetailCard";
-import { useAuth } from "@/hooks/use-auth";
-import { apiRequest, queryClient } from "@/lib/queryClient";
-import { useToast } from "@/hooks/use-toast";
-import { Award, Star, Calendar } from "lucide-react";
+import { ContentCard } from "@/components/common/ContentCard";
+import { Award, Star, Calendar, ChevronLeft, ChevronRight } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Link } from "wouter";
 
 interface FeaturedContentSectionProps {
   title: string;
@@ -12,6 +11,7 @@ interface FeaturedContentSectionProps {
   content: ContentType[];
   isLoading?: boolean;
   icon?: "award" | "star" | "calendar" | null;
+  moreLink?: string;
 }
 
 const FeaturedContentSection: React.FC<FeaturedContentSectionProps> = ({
@@ -20,72 +20,24 @@ const FeaturedContentSection: React.FC<FeaturedContentSectionProps> = ({
   content,
   isLoading = false,
   icon = null,
+  moreLink,
 }) => {
-  const { user } = useAuth();
-  const { toast } = useToast();
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
 
-  const handleAddToFavorites = async (contentId: number) => {
-    if (!user) {
-      toast({
-        title: "خطا",
-        description: "برای افزودن به علاقه‌مندی‌ها ابتدا وارد شوید",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    try {
-      await apiRequest(`/api/favorites`, {
-        method: "POST",
-        data: { contentId }
-      } as any);
-
-      toast({
-        title: "افزودن به علاقه‌مندی‌ها",
-        description: "محتوا با موفقیت به لیست علاقه‌مندی‌های شما اضافه شد",
-      });
-
-      // Invalidate relevant queries
-      queryClient.invalidateQueries({ queryKey: ['/api/favorites'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/content', contentId] });
-    } catch (error) {
-      toast({
-        title: "خطا",
-        description: "در افزودن به علاقه‌مندی‌ها مشکلی پیش آمد",
-        variant: "destructive"
+  const handleScrollRight = () => {
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollBy({
+        left: -300,
+        behavior: 'smooth'
       });
     }
   };
-
-  const handleAddToWatchlist = async (contentId: number) => {
-    if (!user) {
-      toast({
-        title: "خطا",
-        description: "برای افزودن به لیست تماشا ابتدا وارد شوید",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    try {
-      await apiRequest(`/api/watchlist`, {
-        method: "POST",
-        data: { contentId }
-      } as any);
-
-      toast({
-        title: "افزودن به لیست تماشا",
-        description: "محتوا با موفقیت به لیست تماشای شما اضافه شد",
-      });
-
-      // Invalidate relevant queries
-      queryClient.invalidateQueries({ queryKey: ['/api/watchlist'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/content', contentId] });
-    } catch (error) {
-      toast({
-        title: "خطا",
-        description: "در افزودن به لیست تماشا مشکلی پیش آمد",
-        variant: "destructive"
+  
+  const handleScrollLeft = () => {
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollBy({
+        left: 300,
+        behavior: 'smooth'
       });
     }
   };
@@ -93,27 +45,20 @@ const FeaturedContentSection: React.FC<FeaturedContentSectionProps> = ({
   // Render skeletons for loading state
   if (isLoading) {
     return (
-      <div className="py-8">
+      <div className="py-6 bg-dark-lighter/30">
         <div className="container mx-auto px-4">
-          <div className="mb-6 animate-pulse">
-            <div className="h-8 bg-dark-card w-1/3 rounded-md"></div>
-            <div className="h-4 bg-dark-card w-1/2 rounded-md mt-2"></div>
+          <div className="mb-4 animate-pulse">
+            <div className="h-6 bg-dark-card w-1/4 rounded-md"></div>
+            <div className="h-3 bg-dark-card w-1/3 rounded-md mt-2"></div>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[1, 2, 3].map((_, index) => (
-              <div key={index} className="bg-dark rounded-lg overflow-hidden shadow-lg animate-pulse">
-                <div className="h-[300px] bg-dark-card"></div>
+          <div className="flex space-x-4 overflow-hidden">
+            {Array(5).fill(0).map((_, index) => (
+              <div key={index} className="flex-shrink-0 w-60 rounded-lg overflow-hidden bg-card border border-border shadow-lg animate-pulse">
+                <div className="aspect-[2/3] bg-muted"></div>
                 <div className="p-4">
-                  <div className="h-6 bg-dark-card w-3/4 rounded-md mb-3"></div>
-                  <div className="h-4 bg-dark-card w-full rounded-md mb-2"></div>
-                  <div className="h-4 bg-dark-card w-full rounded-md mb-2"></div>
-                  <div className="h-4 bg-dark-card w-3/4 rounded-md mb-4"></div>
-                  <div className="flex gap-2">
-                    <div className="h-10 bg-dark-card rounded-md flex-1"></div>
-                    <div className="h-10 bg-dark-card rounded-md flex-1"></div>
-                    <div className="h-10 bg-dark-card rounded-md flex-1"></div>
-                  </div>
+                  <div className="h-4 bg-muted rounded w-3/4 mb-2"></div>
+                  <div className="h-3 bg-muted rounded w-1/2"></div>
                 </div>
               </div>
             ))}
@@ -131,41 +76,64 @@ const FeaturedContentSection: React.FC<FeaturedContentSectionProps> = ({
   const renderIcon = () => {
     switch (icon) {
       case "award":
-        return <Award className="ml-2 h-6 w-6 text-yellow-500" />;
+        return <Award className="h-4 w-4 text-yellow-500" />;
       case "star":
-        return <Star className="ml-2 h-6 w-6 text-yellow-500" />;
+        return <Star className="h-4 w-4 text-yellow-500" />;
       case "calendar":
-        return <Calendar className="ml-2 h-6 w-6 text-blue-500" />;
+        return <Calendar className="h-4 w-4 text-blue-500" />;
       default:
         return null;
     }
   };
 
   return (
-    <div className="py-8 bg-dark">
+    <div className="py-6 bg-dark-lighter/30">
       <div className="container mx-auto px-4">
-        <div className="mb-6">
-          <h2 className="text-2xl font-bold text-white flex items-center">
-            {renderIcon()}
-            {title}
-          </h2>
-          {subtitle && <p className="text-gray-400 mt-1">{subtitle}</p>}
+        <div className="flex justify-between items-center mb-4">
+          <div>
+            <div className="flex items-center gap-2">
+              {renderIcon()}
+              <h2 className="text-xl font-medium text-white">{title}</h2>
+            </div>
+            {subtitle && <p className="text-sm text-muted-foreground mt-1">{subtitle}</p>}
+          </div>
+          
+          <div className="flex items-center gap-2">
+            <Button 
+              variant="outline" 
+              size="icon" 
+              className="rounded-full h-8 w-8"
+              onClick={handleScrollRight}
+            >
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+            
+            <Button 
+              variant="outline" 
+              size="icon" 
+              className="rounded-full h-8 w-8"
+              onClick={handleScrollLeft}
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+            
+            {moreLink && (
+              <Button asChild variant="ghost" size="sm">
+                <Link href={moreLink}>مشاهده همه</Link>
+              </Button>
+            )}
+          </div>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {content.slice(0, 6).map((item) => (
-            <ContentDetailCard
+        <div 
+          ref={scrollContainerRef}
+          className="flex gap-4 overflow-x-auto pb-4 scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-transparent"
+          style={{ scrollbarWidth: 'thin' }}
+        >
+          {content.map((item) => (
+            <ContentCard
               key={item.id}
-              id={item.id.toString()}
-              title={item.title}
-              description={item.description}
-              thumbnailUrl={item.poster}
-              releaseDate={item.year?.toString()}
-              duration={`${item.duration} دقیقه`}
-              imdb={item.imdbRating}
-              onAddToFavorites={() => handleAddToFavorites(item.id)}
-              onAddToWatchlist={() => handleAddToWatchlist(item.id)}
-              // در اینجا می‌توانید به اطلاعات بیشتری از ContentWithDetails دسترسی داشته باشید
+              content={item}
             />
           ))}
         </div>
