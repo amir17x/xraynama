@@ -7,6 +7,7 @@ import { promisify } from "util";
 import { storage } from "./storage";
 import { User as SelectUser } from "@shared/schema";
 import { MailerSend, EmailParams, Sender, Recipient } from "mailersend";
+import nodemailer from "nodemailer";
 
 declare global {
   namespace Express {
@@ -15,48 +16,64 @@ declare global {
 }
 
 const scryptAsync = promisify(scrypt);
+// تنظیمات MailerSend API (نگه‌داری شده برای سازگاری)
 const mailerSend = new MailerSend({
   apiKey: process.env.MAILERSEND_API_KEY || '',
+});
+
+// ایجاد ترنسپورتر SMTP برای Nodemailer
+const transporter = nodemailer.createTransport({
+  host: 'smtp.mailersend.net',
+  port: 587,
+  secure: false, // true for 465, false for other ports
+  auth: {
+    user: 'MS_JUZMih@test-z0vklo6ex87l7qrx.mlsender.net',
+    pass: 'mssp.BhM9lrN.pq3enl6026ml2vwr.VFZtxis'
+  }
 });
 
 // تابع ارسال ایمیل با کد تایید
 async function sendVerificationEmail(email: string, code: string): Promise<boolean> {
   try {
-    // استفاده از آدرس نمونه در مستندات رسمی
-    const sender = new Sender("hello@mailersend.com", "XrayNama");
-    const recipients = [new Recipient(email)];
-    
-    const emailParams = new EmailParams()
-      .setFrom(sender)
-      .setTo(recipients)
-      .setSubject("کد تایید برای بازیابی رمز عبور")
-      .setHtml(`
-        <div dir="rtl" style="font-family: Tahoma, Arial; line-height: 1.6; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f0f7ff; border-radius: 10px;">
-          <h2 style="color: #1e3a8a; border-bottom: 2px solid #3b82f6; padding-bottom: 10px;">بازیابی رمز عبور XrayNama</h2>
-          <p style="color: #334155;">کاربر گرامی،</p>
-          <p style="color: #334155;">درخواست بازیابی رمز عبور شما دریافت شد. کد تایید شما برای بازیابی رمز عبور:</p>
-          <div style="background-color: #dbeafe; padding: 15px; border-radius: 5px; text-align: center; margin: 20px 0;">
-            <h3 style="color: #1e40af; font-size: 24px; margin: 0;">${code}</h3>
-          </div>
-          <p style="color: #334155;">این کد تا 10 دقیقه معتبر است. در صورتی که شما درخواست بازیابی رمز عبور نداده‌اید، می‌توانید این ایمیل را نادیده بگیرید.</p>
-          <p style="color: #334155;">با احترام،<br>تیم XrayNama</p>
+    // HTML content for the email
+    const htmlContent = `
+      <div dir="rtl" style="font-family: Tahoma, Arial; line-height: 1.6; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f0f7ff; border-radius: 10px;">
+        <h2 style="color: #1e3a8a; border-bottom: 2px solid #3b82f6; padding-bottom: 10px;">بازیابی رمز عبور XrayNama</h2>
+        <p style="color: #334155;">کاربر گرامی،</p>
+        <p style="color: #334155;">درخواست بازیابی رمز عبور شما دریافت شد. کد تایید شما برای بازیابی رمز عبور:</p>
+        <div style="background-color: #dbeafe; padding: 15px; border-radius: 5px; text-align: center; margin: 20px 0;">
+          <h3 style="color: #1e40af; font-size: 24px; margin: 0;">${code}</h3>
         </div>
-      `)
-      .setText(`
-        بازیابی رمز عبور XrayNama
-        
-        کاربر گرامی،
-        درخواست بازیابی رمز عبور شما دریافت شد. کد تایید شما برای بازیابی رمز عبور:
-        
-        ${code}
-        
-        این کد تا 10 دقیقه معتبر است. در صورتی که شما درخواست بازیابی رمز عبور نداده‌اید، می‌توانید این ایمیل را نادیده بگیرید.
-        
-        با احترام،
-        تیم XrayNama
-      `);
-
-    await mailerSend.email.send(emailParams);
+        <p style="color: #334155;">این کد تا 10 دقیقه معتبر است. در صورتی که شما درخواست بازیابی رمز عبور نداده‌اید، می‌توانید این ایمیل را نادیده بگیرید.</p>
+        <p style="color: #334155;">با احترام،<br>تیم XrayNama</p>
+      </div>
+    `;
+    
+    // Text content as fallback
+    const textContent = `
+      بازیابی رمز عبور XrayNama
+      
+      کاربر گرامی،
+      درخواست بازیابی رمز عبور شما دریافت شد. کد تایید شما برای بازیابی رمز عبور:
+      
+      ${code}
+      
+      این کد تا 10 دقیقه معتبر است. در صورتی که شما درخواست بازیابی رمز عبور نداده‌اید، می‌توانید این ایمیل را نادیده بگیرید.
+      
+      با احترام،
+      تیم XrayNama
+    `;
+    
+    // Send email using Nodemailer
+    const info = await transporter.sendMail({
+      from: '"XrayNama" <no-reply@mailersend.net>', // Use MailerSend domain for sending
+      to: email,
+      subject: "کد تایید برای بازیابی رمز عبور",
+      text: textContent,
+      html: htmlContent
+    });
+    
+    console.log("Verification email sent successfully:", info.messageId);
     return true;
   } catch (error) {
     console.error("Error sending verification email:", error);
@@ -67,36 +84,40 @@ async function sendVerificationEmail(email: string, code: string): Promise<boole
 // تابع ارسال ایمیل تایید تغییر رمز عبور
 async function sendPasswordChangeConfirmation(email: string): Promise<boolean> {
   try {
-    // استفاده از آدرس نمونه در مستندات رسمی
-    const sender = new Sender("hello@mailersend.com", "XrayNama");
-    const recipients = [new Recipient(email)];
+    // HTML content for the email
+    const htmlContent = `
+      <div dir="rtl" style="font-family: Tahoma, Arial; line-height: 1.6; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f0f7ff; border-radius: 10px;">
+        <h2 style="color: #1e3a8a; border-bottom: 2px solid #3b82f6; padding-bottom: 10px;">تغییر رمز عبور با موفقیت انجام شد</h2>
+        <p style="color: #334155;">کاربر گرامی،</p>
+        <p style="color: #334155;">رمز عبور حساب کاربری شما در XrayNama با موفقیت تغییر یافت.</p>
+        <p style="color: #334155;">اگر شما این تغییر را انجام نداده‌اید، لطفاً سریعاً با پشتیبانی تماس بگیرید.</p>
+        <p style="color: #334155;">با احترام،<br>تیم XrayNama</p>
+      </div>
+    `;
     
-    const emailParams = new EmailParams()
-      .setFrom(sender)
-      .setTo(recipients)
-      .setSubject("تایید تغییر رمز عبور")
-      .setHtml(`
-        <div dir="rtl" style="font-family: Tahoma, Arial; line-height: 1.6; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f0f7ff; border-radius: 10px;">
-          <h2 style="color: #1e3a8a; border-bottom: 2px solid #3b82f6; padding-bottom: 10px;">تغییر رمز عبور با موفقیت انجام شد</h2>
-          <p style="color: #334155;">کاربر گرامی،</p>
-          <p style="color: #334155;">رمز عبور حساب کاربری شما در XrayNama با موفقیت تغییر یافت.</p>
-          <p style="color: #334155;">اگر شما این تغییر را انجام نداده‌اید، لطفاً سریعاً با پشتیبانی تماس بگیرید.</p>
-          <p style="color: #334155;">با احترام،<br>تیم XrayNama</p>
-        </div>
-      `)
-      .setText(`
-        تغییر رمز عبور با موفقیت انجام شد
-        
-        کاربر گرامی،
-        رمز عبور حساب کاربری شما در XrayNama با موفقیت تغییر یافت.
-        
-        اگر شما این تغییر را انجام نداده‌اید، لطفاً سریعاً با پشتیبانی تماس بگیرید.
-        
-        با احترام،
-        تیم XrayNama
-      `);
-
-    await mailerSend.email.send(emailParams);
+    // Text content as fallback
+    const textContent = `
+      تغییر رمز عبور با موفقیت انجام شد
+      
+      کاربر گرامی،
+      رمز عبور حساب کاربری شما در XrayNama با موفقیت تغییر یافت.
+      
+      اگر شما این تغییر را انجام نداده‌اید، لطفاً سریعاً با پشتیبانی تماس بگیرید.
+      
+      با احترام،
+      تیم XrayNama
+    `;
+    
+    // Send email using Nodemailer
+    const info = await transporter.sendMail({
+      from: '"XrayNama" <no-reply@mailersend.net>', // Use MailerSend domain for sending
+      to: email,
+      subject: "تایید تغییر رمز عبور",
+      text: textContent,
+      html: htmlContent
+    });
+    
+    console.log("Password change confirmation email sent successfully:", info.messageId);
     return true;
   } catch (error) {
     console.error("Error sending password change confirmation email:", error);
