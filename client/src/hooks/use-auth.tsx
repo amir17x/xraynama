@@ -18,21 +18,28 @@ type AuthContextType = {
   registerMutation: UseMutationResult<User, Error, RegisterData>;
 };
 
-// Login data type
-type LoginData = {
-  username: string;
-  password: string;
-};
-
-// Extended schema for registration with password confirmation
-const registerUserSchema = insertUserSchema.extend({
-  passwordConfirm: z.string()
-}).refine((data) => data.password === data.passwordConfirm, {
-  message: "رمز عبور و تأیید آن باید یکسان باشند",
-  path: ["passwordConfirm"],
+// Extend the insertUserSchema to add emailConfirm and validation
+const loginSchema = z.object({
+  username: z.string().min(3, "نام کاربری باید حداقل 3 کاراکتر باشد"),
+  password: z.string().min(6, "رمز عبور باید حداقل 6 کاراکتر باشد"),
 });
 
-type RegisterData = z.infer<typeof registerUserSchema>;
+const registerSchema = insertUserSchema
+  .extend({
+    passwordConfirm: z.string(),
+    emailConfirm: z.string(),
+  })
+  .refine((data) => data.password === data.passwordConfirm, {
+    message: "رمز عبور و تایید آن باید یکسان باشند",
+    path: ["passwordConfirm"],
+  })
+  .refine((data) => data.email === data.emailConfirm, {
+    message: "ایمیل و تایید آن باید یکسان باشند",
+    path: ["emailConfirm"],
+  });
+
+type LoginData = z.infer<typeof loginSchema>;
+type RegisterData = z.infer<typeof registerSchema>;
 
 export const AuthContext = createContext<AuthContextType | null>(null);
 
@@ -42,7 +49,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     data: user,
     error,
     isLoading,
-  } = useQuery<User | null, Error>({
+  } = useQuery<User | null>({
     queryKey: ["/api/user"],
     queryFn: getQueryFn({ on401: "returnNull" }),
   });
@@ -56,7 +63,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       queryClient.setQueryData(["/api/user"], user);
       toast({
         title: "ورود موفقیت‌آمیز",
-        description: `${user.username} عزیز، خوش آمدید!`,
+        description: `${user.displayName || user.username} عزیز، خوش آمدید!`,
       });
     },
     onError: (error: Error) => {
@@ -70,16 +77,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const registerMutation = useMutation({
     mutationFn: async (userData: RegisterData) => {
-      // Extract passwordConfirm before sending to API
-      const { passwordConfirm, ...registerData } = userData;
-      const res = await apiRequest("POST", "/api/register", registerData);
+      // Remove passwordConfirm and emailConfirm before sending
+      const { passwordConfirm, emailConfirm, ...userDataToSend } = userData;
+      const res = await apiRequest("POST", "/api/register", userDataToSend);
       return await res.json();
     },
     onSuccess: (user: User) => {
       queryClient.setQueryData(["/api/user"], user);
       toast({
         title: "ثبت‌نام موفقیت‌آمیز",
-        description: `${user.username} عزیز، خوش آمدید!`,
+        description: "حساب کاربری شما با موفقیت ایجاد شد.",
       });
     },
     onError: (error: Error) => {
@@ -99,7 +106,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       queryClient.setQueryData(["/api/user"], null);
       toast({
         title: "خروج موفقیت‌آمیز",
-        description: "شما با موفقیت از حساب کاربری خود خارج شدید.",
+        description: "با موفقیت از حساب کاربری خود خارج شدید.",
       });
     },
     onError: (error: Error) => {
@@ -134,3 +141,6 @@ export function useAuth() {
   }
   return context;
 }
+
+export { loginSchema, registerSchema };
+export type { LoginData, RegisterData };

@@ -1,631 +1,739 @@
-import { users, contents, videos, ratings, reviews, comments, playlists, playlistItems, watchHistory, favorites, badges, userBadges, watchParties, watchPartyParticipants } from "@shared/schema";
-import type { User, InsertUser, Content, InsertContent, Video, InsertVideo, Rating, InsertRating, Review, InsertReview, Comment, InsertComment, Playlist, InsertPlaylist, PlaylistItem, InsertPlaylistItem, WatchHistory, InsertWatchHistory, Favorite, InsertFavorite, Badge, UserBadge, WatchParty, InsertWatchParty, WatchPartyParticipant, InsertWatchPartyParticipant } from "@shared/schema";
-import createMemoryStore from "memorystore";
+import { users, User, InsertUser, contents, Content, InsertContent, episodes, Episode, InsertEpisode,
+  qualitySources, QualitySource, InsertQualitySource, ratings, Rating, InsertRating,
+  reviews, Review, InsertReview, comments, Comment, InsertComment, watchHistory,
+  WatchHistory, InsertWatchHistory, favorites, Favorite, InsertFavorite, playlists,
+  Playlist, InsertPlaylist, playlistItems, PlaylistItem, InsertPlaylistItem, 
+  watchParties, WatchParty, InsertWatchParty, watchPartyMembers, WatchPartyMember, 
+  InsertWatchPartyMember, watchPartyChatMessages, WatchPartyChatMessage, InsertWatchPartyChatMessage } from "@shared/schema";
 import session from "express-session";
+import createMemoryStore from "memorystore";
 
 const MemoryStore = createMemoryStore(session);
 
-// Interface for storage operations
 export interface IStorage {
-  // User operations
+  // User management
   getUser(id: number): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
   getUserByEmail(email: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
   updateUserPoints(id: number, points: number): Promise<User | undefined>;
   
-  // Content operations
+  // Content management
   getContent(id: number): Promise<Content | undefined>;
-  getAllContents(): Promise<Content[]>;
-  getContentsByType(type: string): Promise<Content[]>;
-  getContentsByGenre(genre: string): Promise<Content[]>;
-  getContentsByTag(tag: string): Promise<Content[]>;
-  getContentsByYear(year: number): Promise<Content[]>;
-  searchContents(query: string): Promise<Content[]>;
+  getAllContents(type?: string, limit?: number): Promise<Content[]>;
+  searchContents(query: string, filters?: Record<string, any>): Promise<Content[]>;
   createContent(content: InsertContent): Promise<Content>;
   
-  // Video operations
-  getVideo(id: number): Promise<Video | undefined>;
-  getVideosByContentId(contentId: number): Promise<Video[]>;
-  getVideoBySeasonEpisode(contentId: number, season: number, episode: number): Promise<Video | undefined>;
-  createVideo(video: InsertVideo): Promise<Video>;
+  // Episode management
+  getEpisodes(contentId: number): Promise<Episode[]>;
+  getEpisode(id: number): Promise<Episode | undefined>;
+  createEpisode(episode: InsertEpisode): Promise<Episode>;
   
-  // Rating operations
-  getRating(userId: number, contentId: number): Promise<Rating | undefined>;
-  getAverageRating(contentId: number): Promise<number>;
-  getRatingsCount(contentId: number): Promise<number>;
-  createOrUpdateRating(rating: InsertRating): Promise<Rating>;
+  // Quality sources management
+  getQualitySources(contentId?: number, episodeId?: number): Promise<QualitySource[]>;
+  createQualitySource(source: InsertQualitySource): Promise<QualitySource>;
   
-  // Review operations
-  getReviews(contentId: number): Promise<Review[]>;
-  getReviewsByUser(userId: number): Promise<Review[]>;
+  // Ratings management
+  getRatings(contentId: number): Promise<Rating[]>;
+  getUserRating(userId: number, contentId: number): Promise<Rating | undefined>;
+  createRating(rating: InsertRating): Promise<Rating>;
+  
+  // Reviews management
+  getReviews(contentId: number, approved?: boolean): Promise<Review[]>;
   createReview(review: InsertReview): Promise<Review>;
-  approveReview(id: number): Promise<Review | undefined>;
-  updateReviewLikes(id: number, likesChange: number, dislikesChange: number): Promise<Review | undefined>;
+  toggleReviewApproval(id: number): Promise<Review | undefined>;
+  likeReview(id: number): Promise<Review | undefined>;
+  dislikeReview(id: number): Promise<Review | undefined>;
   
-  // Comment operations
-  getComments(contentId: number): Promise<Comment[]>;
-  getCommentsByUser(userId: number): Promise<Comment[]>;
+  // Comments management
+  getComments(contentId: number, approved?: boolean): Promise<Comment[]>;
   createComment(comment: InsertComment): Promise<Comment>;
-  approveComment(id: number): Promise<Comment | undefined>;
-  updateCommentLikes(id: number, likesChange: number, dislikesChange: number): Promise<Comment | undefined>;
+  toggleCommentApproval(id: number): Promise<Comment | undefined>;
+  likeComment(id: number): Promise<Comment | undefined>;
+  dislikeComment(id: number): Promise<Comment | undefined>;
   
-  // Playlist operations
+  // Watch history management
+  getWatchHistory(userId: number): Promise<WatchHistory[]>;
+  updateWatchProgress(userId: number, contentId: number, episodeId: number | null, progress: number, completed: boolean): Promise<WatchHistory | undefined>;
+  
+  // Favorites management
+  getFavorites(userId: number): Promise<Favorite[]>;
+  addFavorite(userId: number, contentId: number): Promise<Favorite>;
+  removeFavorite(userId: number, contentId: number): Promise<boolean>;
+  
+  // Playlist management
   getPlaylists(userId: number): Promise<Playlist[]>;
+  getPlaylist(id: number): Promise<Playlist | undefined>;
   createPlaylist(playlist: InsertPlaylist): Promise<Playlist>;
-  addToPlaylist(playlistItem: InsertPlaylistItem): Promise<PlaylistItem>;
+  addToPlaylist(playlistId: number, contentId: number, order: number): Promise<PlaylistItem>;
   removeFromPlaylist(playlistId: number, contentId: number): Promise<boolean>;
   
-  // Watch history operations
-  getWatchHistory(userId: number): Promise<WatchHistory[]>;
-  updateWatchHistory(watchHistory: InsertWatchHistory): Promise<WatchHistory>;
-  
-  // Favorites operations
-  getFavorites(userId: number): Promise<Favorite[]>;
-  addToFavorites(favorite: InsertFavorite): Promise<Favorite>;
-  removeFromFavorites(userId: number, contentId: number): Promise<boolean>;
-  
-  // Badge operations
-  getAllBadges(): Promise<Badge[]>;
-  getUserBadges(userId: number): Promise<UserBadge[]>;
-  
-  // Watch party operations
+  // Watch party management
   createWatchParty(watchParty: InsertWatchParty): Promise<WatchParty>;
   getWatchParty(partyCode: string): Promise<WatchParty | undefined>;
-  joinWatchParty(watchPartyParticipant: InsertWatchPartyParticipant): Promise<WatchPartyParticipant>;
-  getWatchPartyParticipants(partyId: number): Promise<WatchPartyParticipant[]>;
+  joinWatchParty(partyId: number, userId: number): Promise<WatchPartyMember>;
+  getWatchPartyMembers(partyId: number): Promise<WatchPartyMember[]>;
+  addWatchPartyChatMessage(message: InsertWatchPartyChatMessage): Promise<WatchPartyChatMessage>;
+  getWatchPartyChatMessages(partyId: number): Promise<WatchPartyChatMessage[]>;
   
-  // Session store
+  // Session storage
   sessionStore: session.SessionStore;
 }
 
 export class MemStorage implements IStorage {
   private users: Map<number, User>;
   private contents: Map<number, Content>;
-  private videos: Map<number, Video>;
-  private ratings: Map<string, Rating>; // key: userId-contentId
+  private episodes: Map<number, Episode>;
+  private qualitySources: Map<number, QualitySource>;
+  private ratings: Map<number, Rating>;
   private reviews: Map<number, Review>;
   private comments: Map<number, Comment>;
+  private watchHistories: Map<number, WatchHistory>;
+  private favorites: Map<number, Favorite>;
   private playlists: Map<number, Playlist>;
   private playlistItems: Map<number, PlaylistItem>;
-  private watchHistories: Map<string, WatchHistory>; // key: userId-contentId-videoId
-  private favorites: Map<string, Favorite>; // key: userId-contentId
-  private badges: Map<number, Badge>;
-  private userBadges: Map<string, UserBadge>; // key: userId-badgeId
   private watchParties: Map<number, WatchParty>;
-  private watchPartyParticipants: Map<number, WatchPartyParticipant>;
-  
-  currentUserId: number;
-  currentContentId: number;
-  currentVideoId: number;
-  currentReviewId: number;
-  currentCommentId: number;
-  currentPlaylistId: number;
-  currentPlaylistItemId: number;
-  currentWatchHistoryId: number;
-  currentFavoriteId: number;
-  currentBadgeId: number;
-  currentUserBadgeId: number;
-  currentWatchPartyId: number;
-  currentWatchPartyParticipantId: number;
-  
+  private watchPartyMembers: Map<number, WatchPartyMember>;
+  private watchPartyChatMessages: Map<number, WatchPartyChatMessage>;
+
+  private currentIds: {
+    users: number;
+    contents: number;
+    episodes: number;
+    qualitySources: number;
+    ratings: number;
+    reviews: number;
+    comments: number;
+    watchHistories: number;
+    favorites: number;
+    playlists: number;
+    playlistItems: number;
+    watchParties: number;
+    watchPartyMembers: number;
+    watchPartyChatMessages: number;
+  };
+
   sessionStore: session.SessionStore;
 
   constructor() {
     this.users = new Map();
     this.contents = new Map();
-    this.videos = new Map();
+    this.episodes = new Map();
+    this.qualitySources = new Map();
     this.ratings = new Map();
     this.reviews = new Map();
     this.comments = new Map();
-    this.playlists = new Map();
-    this.playlistItems = new Map();
     this.watchHistories = new Map();
     this.favorites = new Map();
-    this.badges = new Map();
-    this.userBadges = new Map();
+    this.playlists = new Map();
+    this.playlistItems = new Map();
     this.watchParties = new Map();
-    this.watchPartyParticipants = new Map();
-    
-    this.currentUserId = 1;
-    this.currentContentId = 1;
-    this.currentVideoId = 1;
-    this.currentReviewId = 1;
-    this.currentCommentId = 1;
-    this.currentPlaylistId = 1;
-    this.currentPlaylistItemId = 1;
-    this.currentWatchHistoryId = 1;
-    this.currentFavoriteId = 1;
-    this.currentBadgeId = 1;
-    this.currentUserBadgeId = 1;
-    this.currentWatchPartyId = 1;
-    this.currentWatchPartyParticipantId = 1;
-    
+    this.watchPartyMembers = new Map();
+    this.watchPartyChatMessages = new Map();
+
+    this.currentIds = {
+      users: 1,
+      contents: 1,
+      episodes: 1,
+      qualitySources: 1,
+      ratings: 1,
+      reviews: 1,
+      comments: 1,
+      watchHistories: 1,
+      favorites: 1,
+      playlists: 1,
+      playlistItems: 1,
+      watchParties: 1,
+      watchPartyMembers: 1,
+      watchPartyChatMessages: 1,
+    };
+
     this.sessionStore = new MemoryStore({
       checkPeriod: 86400000, // prune expired entries every 24h
     });
-    
-    // Initialize with demo data
-    this.initializeDemoData();
   }
 
-  // User operations
+  // User methods
   async getUser(id: number): Promise<User | undefined> {
     return this.users.get(id);
   }
 
   async getUserByUsername(username: string): Promise<User | undefined> {
     return Array.from(this.users.values()).find(
-      (user) => user.username === username,
+      (user) => user.username.toLowerCase() === username.toLowerCase()
     );
   }
 
   async getUserByEmail(email: string): Promise<User | undefined> {
     return Array.from(this.users.values()).find(
-      (user) => user.email === email,
+      (user) => user.email.toLowerCase() === email.toLowerCase()
     );
   }
 
-  async createUser(insertUser: InsertUser): Promise<User> {
-    const id = this.currentUserId++;
+  async createUser(userData: InsertUser): Promise<User> {
+    const id = this.currentIds.users++;
     const now = new Date();
     const user: User = { 
-      ...insertUser, 
-      id, 
+      ...userData, 
+      id,
       points: 0,
-      createdAt: now
+      createdAt: now,
+      badges: [],
     };
     this.users.set(id, user);
     return user;
   }
 
   async updateUserPoints(id: number, points: number): Promise<User | undefined> {
-    const user = this.users.get(id);
+    const user = await this.getUser(id);
     if (!user) return undefined;
     
-    const updated = {
-      ...user,
-      points: user.points + points
+    const updatedUser = { 
+      ...user, 
+      points: user.points + points 
     };
-    this.users.set(id, updated);
-    return updated;
+    this.users.set(id, updatedUser);
+    return updatedUser;
   }
 
-  // Content operations
+  // Content methods
   async getContent(id: number): Promise<Content | undefined> {
     return this.contents.get(id);
   }
 
-  async getAllContents(): Promise<Content[]> {
-    return Array.from(this.contents.values());
+  async getAllContents(type?: string, limit?: number): Promise<Content[]> {
+    let contents = Array.from(this.contents.values());
+    
+    if (type) {
+      contents = contents.filter(content => content.type === type);
+    }
+    
+    contents.sort((a, b) => {
+      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+    });
+    
+    if (limit) {
+      contents = contents.slice(0, limit);
+    }
+    
+    return contents;
   }
 
-  async getContentsByType(type: string): Promise<Content[]> {
-    return Array.from(this.contents.values()).filter(
-      (content) => content.type === type,
-    );
+  async searchContents(query: string, filters?: Record<string, any>): Promise<Content[]> {
+    let contents = Array.from(this.contents.values());
+    
+    // Text search
+    if (query) {
+      const lowerQuery = query.toLowerCase();
+      contents = contents.filter(content => 
+        content.title.toLowerCase().includes(lowerQuery) || 
+        content.englishTitle.toLowerCase().includes(lowerQuery) ||
+        (content.synopsis && content.synopsis.toLowerCase().includes(lowerQuery)) ||
+        (content.director && content.director.toLowerCase().includes(lowerQuery)) ||
+        (content.actors && content.actors.toLowerCase().includes(lowerQuery))
+      );
+    }
+    
+    // Apply filters
+    if (filters) {
+      if (filters.type) {
+        contents = contents.filter(content => content.type === filters.type);
+      }
+      
+      if (filters.year) {
+        contents = contents.filter(content => content.year === filters.year);
+      }
+      
+      if (filters.genres && filters.genres.length) {
+        contents = contents.filter(content => 
+          content.genres.some(genre => filters.genres.includes(genre))
+        );
+      }
+      
+      if (filters.tags && filters.tags.length) {
+        contents = contents.filter(content => 
+          content.tags.some(tag => filters.tags.includes(tag))
+        );
+      }
+      
+      if (filters.minRating) {
+        contents = contents.filter(content => {
+          const rating = parseFloat(content.imdbRating || "0");
+          return rating >= filters.minRating;
+        });
+      }
+    }
+    
+    return contents;
   }
 
-  async getContentsByGenre(genre: string): Promise<Content[]> {
-    return Array.from(this.contents.values()).filter(
-      (content) => content.genres.includes(genre),
-    );
-  }
-
-  async getContentsByTag(tag: string): Promise<Content[]> {
-    return Array.from(this.contents.values()).filter(
-      (content) => content.tags.includes(tag),
-    );
-  }
-
-  async getContentsByYear(year: number): Promise<Content[]> {
-    return Array.from(this.contents.values()).filter(
-      (content) => content.year === year,
-    );
-  }
-
-  async searchContents(query: string): Promise<Content[]> {
-    const lowercaseQuery = query.toLowerCase();
-    return Array.from(this.contents.values()).filter(
-      (content) => 
-        content.titleFa.toLowerCase().includes(lowercaseQuery) ||
-        content.titleEn.toLowerCase().includes(lowercaseQuery) ||
-        content.genres.some(genre => genre.toLowerCase().includes(lowercaseQuery)) ||
-        content.tags.some(tag => tag.toLowerCase().includes(lowercaseQuery)) ||
-        content.directors.some(director => director.toLowerCase().includes(lowercaseQuery)) ||
-        content.actors.some(actor => actor.toLowerCase().includes(lowercaseQuery))
-    );
-  }
-
-  async createContent(insertContent: InsertContent): Promise<Content> {
-    const id = this.currentContentId++;
+  async createContent(contentData: InsertContent): Promise<Content> {
+    const id = this.currentIds.contents++;
     const now = new Date();
-    const content: Content = { 
-      ...insertContent, 
-      id, 
-      createdAt: now
+    const content: Content = {
+      ...contentData,
+      id,
+      createdAt: now,
+      updatedAt: now,
     };
     this.contents.set(id, content);
     return content;
   }
 
-  // Video operations
-  async getVideo(id: number): Promise<Video | undefined> {
-    return this.videos.get(id);
+  // Episode methods
+  async getEpisodes(contentId: number): Promise<Episode[]> {
+    return Array.from(this.episodes.values())
+      .filter(episode => episode.contentId === contentId)
+      .sort((a, b) => {
+        if (a.season !== b.season) {
+          return a.season - b.season;
+        }
+        return a.episode - b.episode;
+      });
   }
 
-  async getVideosByContentId(contentId: number): Promise<Video[]> {
-    return Array.from(this.videos.values()).filter(
-      (video) => video.contentId === contentId,
-    );
+  async getEpisode(id: number): Promise<Episode | undefined> {
+    return this.episodes.get(id);
   }
 
-  async getVideoBySeasonEpisode(contentId: number, season: number, episode: number): Promise<Video | undefined> {
-    return Array.from(this.videos.values()).find(
-      (video) => video.contentId === contentId && video.season === season && video.episode === episode,
-    );
-  }
-
-  async createVideo(insertVideo: InsertVideo): Promise<Video> {
-    const id = this.currentVideoId++;
-    const now = new Date();
-    const video: Video = { 
-      ...insertVideo, 
-      id, 
-      createdAt: now
+  async createEpisode(episodeData: InsertEpisode): Promise<Episode> {
+    const id = this.currentIds.episodes++;
+    const episode: Episode = {
+      ...episodeData,
+      id
     };
-    this.videos.set(id, video);
-    return video;
+    this.episodes.set(id, episode);
+    return episode;
   }
 
-  // Rating operations
-  async getRating(userId: number, contentId: number): Promise<Rating | undefined> {
-    return this.ratings.get(`${userId}-${contentId}`);
-  }
-
-  async getAverageRating(contentId: number): Promise<number> {
-    const contentRatings = Array.from(this.ratings.values()).filter(
-      (rating) => rating.contentId === contentId,
-    );
+  // Quality sources methods
+  async getQualitySources(contentId?: number, episodeId?: number): Promise<QualitySource[]> {
+    let sources = Array.from(this.qualitySources.values());
     
-    if (contentRatings.length === 0) return 0;
-    
-    const sum = contentRatings.reduce((acc, rating) => acc + rating.rating, 0);
-    return sum / contentRatings.length;
-  }
-
-  async getRatingsCount(contentId: number): Promise<number> {
-    return Array.from(this.ratings.values()).filter(
-      (rating) => rating.contentId === contentId,
-    ).length;
-  }
-
-  async createOrUpdateRating(insertRating: InsertRating): Promise<Rating> {
-    const key = `${insertRating.userId}-${insertRating.contentId}`;
-    const existingRating = this.ratings.get(key);
-    
-    const now = new Date();
-    if (existingRating) {
-      const updated = {
-        ...existingRating,
-        rating: insertRating.rating,
-        createdAt: now
-      };
-      this.ratings.set(key, updated);
-      return updated;
+    if (contentId) {
+      sources = sources.filter(source => source.contentId === contentId);
     }
     
-    const newRating: Rating = {
-      ...insertRating,
-      id: this.ratings.size + 1,
-      createdAt: now
+    if (episodeId) {
+      sources = sources.filter(source => source.episodeId === episodeId);
+    }
+    
+    return sources;
+  }
+
+  async createQualitySource(sourceData: InsertQualitySource): Promise<QualitySource> {
+    const id = this.currentIds.qualitySources++;
+    const source: QualitySource = {
+      ...sourceData,
+      id
     };
-    this.ratings.set(key, newRating);
-    return newRating;
+    this.qualitySources.set(id, source);
+    return source;
   }
 
-  // Review operations
-  async getReviews(contentId: number): Promise<Review[]> {
-    return Array.from(this.reviews.values())
-      .filter(review => review.contentId === contentId && review.approved)
-      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+  // Ratings methods
+  async getRatings(contentId: number): Promise<Rating[]> {
+    return Array.from(this.ratings.values())
+      .filter(rating => rating.contentId === contentId);
   }
 
-  async getReviewsByUser(userId: number): Promise<Review[]> {
-    return Array.from(this.reviews.values())
-      .filter(review => review.userId === userId)
-      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+  async getUserRating(userId: number, contentId: number): Promise<Rating | undefined> {
+    return Array.from(this.ratings.values())
+      .find(rating => rating.userId === userId && rating.contentId === contentId);
   }
 
-  async createReview(insertReview: InsertReview): Promise<Review> {
-    const id = this.currentReviewId++;
+  async createRating(ratingData: InsertRating): Promise<Rating> {
+    // Check if user already rated this content
+    const existingRating = await this.getUserRating(ratingData.userId, ratingData.contentId);
+    
+    if (existingRating) {
+      // Update existing rating
+      const updatedRating: Rating = {
+        ...existingRating,
+        rating: ratingData.rating,
+      };
+      this.ratings.set(existingRating.id, updatedRating);
+      return updatedRating;
+    }
+    
+    // Create new rating
+    const id = this.currentIds.ratings++;
+    const now = new Date();
+    const rating: Rating = {
+      ...ratingData,
+      id,
+      createdAt: now,
+    };
+    this.ratings.set(id, rating);
+    return rating;
+  }
+
+  // Reviews methods
+  async getReviews(contentId: number, approved?: boolean): Promise<Review[]> {
+    let reviews = Array.from(this.reviews.values())
+      .filter(review => review.contentId === contentId);
+    
+    if (approved !== undefined) {
+      reviews = reviews.filter(review => review.approved === approved);
+    }
+    
+    return reviews.sort((a, b) => 
+      new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    );
+  }
+
+  async createReview(reviewData: InsertReview): Promise<Review> {
+    const id = this.currentIds.reviews++;
     const now = new Date();
     const review: Review = {
-      ...insertReview,
+      ...reviewData,
       id,
       approved: false,
       likes: 0,
       dislikes: 0,
-      createdAt: now
+      createdAt: now,
     };
     this.reviews.set(id, review);
     return review;
   }
 
-  async approveReview(id: number): Promise<Review | undefined> {
+  async toggleReviewApproval(id: number): Promise<Review | undefined> {
     const review = this.reviews.get(id);
     if (!review) return undefined;
     
-    const updated = {
+    const updatedReview: Review = {
       ...review,
-      approved: true
+      approved: !review.approved,
     };
-    this.reviews.set(id, updated);
-    return updated;
+    this.reviews.set(id, updatedReview);
+    return updatedReview;
   }
 
-  async updateReviewLikes(id: number, likesChange: number, dislikesChange: number): Promise<Review | undefined> {
+  async likeReview(id: number): Promise<Review | undefined> {
     const review = this.reviews.get(id);
     if (!review) return undefined;
     
-    const updated = {
+    const updatedReview: Review = {
       ...review,
-      likes: Math.max(0, review.likes + likesChange),
-      dislikes: Math.max(0, review.dislikes + dislikesChange)
+      likes: review.likes + 1,
     };
-    this.reviews.set(id, updated);
-    return updated;
+    this.reviews.set(id, updatedReview);
+    return updatedReview;
   }
 
-  // Comment operations
-  async getComments(contentId: number): Promise<Comment[]> {
-    return Array.from(this.comments.values())
-      .filter(comment => comment.contentId === contentId && comment.approved)
-      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+  async dislikeReview(id: number): Promise<Review | undefined> {
+    const review = this.reviews.get(id);
+    if (!review) return undefined;
+    
+    const updatedReview: Review = {
+      ...review,
+      dislikes: review.dislikes + 1,
+    };
+    this.reviews.set(id, updatedReview);
+    return updatedReview;
   }
 
-  async getCommentsByUser(userId: number): Promise<Comment[]> {
-    return Array.from(this.comments.values())
-      .filter(comment => comment.userId === userId)
-      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+  // Comments methods
+  async getComments(contentId: number, approved?: boolean): Promise<Comment[]> {
+    let comments = Array.from(this.comments.values())
+      .filter(comment => comment.contentId === contentId);
+    
+    if (approved !== undefined) {
+      comments = comments.filter(comment => comment.approved === approved);
+    }
+    
+    return comments.sort((a, b) => 
+      new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    );
   }
 
-  async createComment(insertComment: InsertComment): Promise<Comment> {
-    const id = this.currentCommentId++;
+  async createComment(commentData: InsertComment): Promise<Comment> {
+    const id = this.currentIds.comments++;
     const now = new Date();
     const comment: Comment = {
-      ...insertComment,
+      ...commentData,
       id,
       approved: false,
       likes: 0,
       dislikes: 0,
-      createdAt: now
+      createdAt: now,
     };
     this.comments.set(id, comment);
     return comment;
   }
 
-  async approveComment(id: number): Promise<Comment | undefined> {
+  async toggleCommentApproval(id: number): Promise<Comment | undefined> {
     const comment = this.comments.get(id);
     if (!comment) return undefined;
     
-    const updated = {
+    const updatedComment: Comment = {
       ...comment,
-      approved: true
+      approved: !comment.approved,
     };
-    this.comments.set(id, updated);
-    return updated;
+    this.comments.set(id, updatedComment);
+    return updatedComment;
   }
 
-  async updateCommentLikes(id: number, likesChange: number, dislikesChange: number): Promise<Comment | undefined> {
+  async likeComment(id: number): Promise<Comment | undefined> {
     const comment = this.comments.get(id);
     if (!comment) return undefined;
     
-    const updated = {
+    const updatedComment: Comment = {
       ...comment,
-      likes: Math.max(0, comment.likes + likesChange),
-      dislikes: Math.max(0, comment.dislikes + dislikesChange)
+      likes: comment.likes + 1,
     };
-    this.comments.set(id, updated);
-    return updated;
+    this.comments.set(id, updatedComment);
+    return updatedComment;
   }
 
-  // Playlist operations
+  async dislikeComment(id: number): Promise<Comment | undefined> {
+    const comment = this.comments.get(id);
+    if (!comment) return undefined;
+    
+    const updatedComment: Comment = {
+      ...comment,
+      dislikes: comment.dislikes + 1,
+    };
+    this.comments.set(id, updatedComment);
+    return updatedComment;
+  }
+
+  // Watch history methods
+  async getWatchHistory(userId: number): Promise<WatchHistory[]> {
+    return Array.from(this.watchHistories.values())
+      .filter(history => history.userId === userId)
+      .sort((a, b) => 
+        new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
+      );
+  }
+
+  async updateWatchProgress(
+    userId: number, 
+    contentId: number, 
+    episodeId: number | null, 
+    progress: number, 
+    completed: boolean
+  ): Promise<WatchHistory | undefined> {
+    // Check if entry exists
+    const existingEntry = Array.from(this.watchHistories.values()).find(
+      history => history.userId === userId && 
+                history.contentId === contentId && 
+                history.episodeId === episodeId
+    );
+    
+    const now = new Date();
+    
+    if (existingEntry) {
+      // Update existing entry
+      const updatedEntry: WatchHistory = {
+        ...existingEntry,
+        progress,
+        completed,
+        updatedAt: now,
+      };
+      this.watchHistories.set(existingEntry.id, updatedEntry);
+      return updatedEntry;
+    }
+    
+    // Create new entry
+    const id = this.currentIds.watchHistories++;
+    const newEntry: WatchHistory = {
+      id,
+      userId,
+      contentId,
+      episodeId,
+      progress,
+      completed,
+      createdAt: now,
+      updatedAt: now,
+    };
+    this.watchHistories.set(id, newEntry);
+    return newEntry;
+  }
+
+  // Favorites methods
+  async getFavorites(userId: number): Promise<Favorite[]> {
+    return Array.from(this.favorites.values())
+      .filter(favorite => favorite.userId === userId)
+      .sort((a, b) => 
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      );
+  }
+
+  async addFavorite(userId: number, contentId: number): Promise<Favorite> {
+    // Check if already in favorites
+    const existingFavorite = Array.from(this.favorites.values()).find(
+      fav => fav.userId === userId && fav.contentId === contentId
+    );
+    
+    if (existingFavorite) {
+      return existingFavorite;
+    }
+    
+    // Add to favorites
+    const id = this.currentIds.favorites++;
+    const now = new Date();
+    const favorite: Favorite = {
+      id,
+      userId,
+      contentId,
+      createdAt: now,
+    };
+    this.favorites.set(id, favorite);
+    return favorite;
+  }
+
+  async removeFavorite(userId: number, contentId: number): Promise<boolean> {
+    const favorite = Array.from(this.favorites.values()).find(
+      fav => fav.userId === userId && fav.contentId === contentId
+    );
+    
+    if (!favorite) {
+      return false;
+    }
+    
+    return this.favorites.delete(favorite.id);
+  }
+
+  // Playlist methods
   async getPlaylists(userId: number): Promise<Playlist[]> {
     return Array.from(this.playlists.values())
-      .filter(playlist => playlist.userId === userId);
+      .filter(playlist => playlist.userId === userId)
+      .sort((a, b) => 
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      );
   }
 
-  async createPlaylist(insertPlaylist: InsertPlaylist): Promise<Playlist> {
-    const id = this.currentPlaylistId++;
+  async getPlaylist(id: number): Promise<Playlist | undefined> {
+    return this.playlists.get(id);
+  }
+
+  async createPlaylist(playlistData: InsertPlaylist): Promise<Playlist> {
+    const id = this.currentIds.playlists++;
     const now = new Date();
     const playlist: Playlist = {
-      ...insertPlaylist,
+      ...playlistData,
       id,
-      createdAt: now
+      createdAt: now,
     };
     this.playlists.set(id, playlist);
     return playlist;
   }
 
-  async addToPlaylist(insertPlaylistItem: InsertPlaylistItem): Promise<PlaylistItem> {
-    const id = this.currentPlaylistItemId++;
+  async addToPlaylist(playlistId: number, contentId: number, order: number): Promise<PlaylistItem> {
+    // Check if item already in playlist
+    const existingItem = Array.from(this.playlistItems.values()).find(
+      item => item.playlistId === playlistId && item.contentId === contentId
+    );
+    
+    if (existingItem) {
+      // Update order if needed
+      if (existingItem.order !== order) {
+        const updatedItem: PlaylistItem = {
+          ...existingItem,
+          order,
+        };
+        this.playlistItems.set(existingItem.id, updatedItem);
+        return updatedItem;
+      }
+      return existingItem;
+    }
+    
+    // Add new item
+    const id = this.currentIds.playlistItems++;
     const now = new Date();
     const playlistItem: PlaylistItem = {
-      ...insertPlaylistItem,
       id,
-      addedAt: now
+      playlistId,
+      contentId,
+      order,
+      addedAt: now,
     };
     this.playlistItems.set(id, playlistItem);
     return playlistItem;
   }
 
   async removeFromPlaylist(playlistId: number, contentId: number): Promise<boolean> {
-    const items = Array.from(this.playlistItems.entries())
-      .filter(([_, item]) => item.playlistId === playlistId && item.contentId === contentId);
+    const item = Array.from(this.playlistItems.values()).find(
+      item => item.playlistId === playlistId && item.contentId === contentId
+    );
     
-    if (items.length === 0) return false;
-    
-    for (const [key, _] of items) {
-      this.playlistItems.delete(key);
+    if (!item) {
+      return false;
     }
     
-    return true;
+    return this.playlistItems.delete(item.id);
   }
 
-  // Watch history operations
-  async getWatchHistory(userId: number): Promise<WatchHistory[]> {
-    return Array.from(this.watchHistories.values())
-      .filter(history => history.userId === userId)
-      .sort((a, b) => b.watchedAt.getTime() - a.watchedAt.getTime());
-  }
-
-  async updateWatchHistory(insertWatchHistory: InsertWatchHistory): Promise<WatchHistory> {
-    const key = `${insertWatchHistory.userId}-${insertWatchHistory.contentId}-${insertWatchHistory.videoId}`;
-    const existingHistory = this.watchHistories.get(key);
-    
-    const now = new Date();
-    if (existingHistory) {
-      const updated = {
-        ...existingHistory,
-        progress: insertWatchHistory.progress,
-        watchedAt: now
-      };
-      this.watchHistories.set(key, updated);
-      return updated;
-    }
-    
-    const id = this.currentWatchHistoryId++;
-    const newHistory: WatchHistory = {
-      ...insertWatchHistory,
-      id,
-      watchedAt: now
-    };
-    this.watchHistories.set(key, newHistory);
-    return newHistory;
-  }
-
-  // Favorites operations
-  async getFavorites(userId: number): Promise<Favorite[]> {
-    return Array.from(this.favorites.values())
-      .filter(favorite => favorite.userId === userId)
-      .sort((a, b) => b.addedAt.getTime() - a.addedAt.getTime());
-  }
-
-  async addToFavorites(insertFavorite: InsertFavorite): Promise<Favorite> {
-    const key = `${insertFavorite.userId}-${insertFavorite.contentId}`;
-    
-    // Check if already exists
-    const existing = this.favorites.get(key);
-    if (existing) return existing;
-    
-    const id = this.currentFavoriteId++;
-    const now = new Date();
-    const favorite: Favorite = {
-      ...insertFavorite,
-      id,
-      addedAt: now
-    };
-    this.favorites.set(key, favorite);
-    return favorite;
-  }
-
-  async removeFromFavorites(userId: number, contentId: number): Promise<boolean> {
-    const key = `${userId}-${contentId}`;
-    const exists = this.favorites.has(key);
-    
-    if (!exists) return false;
-    
-    this.favorites.delete(key);
-    return true;
-  }
-
-  // Badge operations
-  async getAllBadges(): Promise<Badge[]> {
-    return Array.from(this.badges.values());
-  }
-
-  async getUserBadges(userId: number): Promise<UserBadge[]> {
-    return Array.from(this.userBadges.values())
-      .filter(userBadge => userBadge.userId === userId);
-  }
-
-  // Watch party operations
-  async createWatchParty(insertWatchParty: InsertWatchParty): Promise<WatchParty> {
-    const id = this.currentWatchPartyId++;
+  // Watch party methods
+  async createWatchParty(watchPartyData: InsertWatchParty): Promise<WatchParty> {
+    const id = this.currentIds.watchParties++;
     const now = new Date();
     const watchParty: WatchParty = {
-      ...insertWatchParty,
+      ...watchPartyData,
       id,
+      isActive: true,
       createdAt: now,
-      active: true
     };
     this.watchParties.set(id, watchParty);
     return watchParty;
   }
 
   async getWatchParty(partyCode: string): Promise<WatchParty | undefined> {
-    return Array.from(this.watchParties.values())
-      .find(party => party.partyCode === partyCode && party.active);
+    return Array.from(this.watchParties.values()).find(
+      party => party.partyCode === partyCode && party.isActive
+    );
   }
 
-  async joinWatchParty(insertWatchPartyParticipant: InsertWatchPartyParticipant): Promise<WatchPartyParticipant> {
-    const id = this.currentWatchPartyParticipantId++;
+  async joinWatchParty(partyId: number, userId: number): Promise<WatchPartyMember> {
+    // Check if already a member
+    const existingMember = Array.from(this.watchPartyMembers.values()).find(
+      member => member.partyId === partyId && member.userId === userId
+    );
+    
+    if (existingMember) {
+      return existingMember;
+    }
+    
+    // Add member
+    const id = this.currentIds.watchPartyMembers++;
     const now = new Date();
-    const participant: WatchPartyParticipant = {
-      ...insertWatchPartyParticipant,
+    const member: WatchPartyMember = {
       id,
-      joinedAt: now
+      partyId,
+      userId,
+      joinedAt: now,
     };
-    this.watchPartyParticipants.set(id, participant);
-    return participant;
+    this.watchPartyMembers.set(id, member);
+    return member;
   }
 
-  async getWatchPartyParticipants(partyId: number): Promise<WatchPartyParticipant[]> {
-    return Array.from(this.watchPartyParticipants.values())
-      .filter(participant => participant.partyId === partyId)
-      .sort((a, b) => a.joinedAt.getTime() - b.joinedAt.getTime());
+  async getWatchPartyMembers(partyId: number): Promise<WatchPartyMember[]> {
+    return Array.from(this.watchPartyMembers.values())
+      .filter(member => member.partyId === partyId)
+      .sort((a, b) => 
+        new Date(a.joinedAt).getTime() - new Date(b.joinedAt).getTime()
+      );
   }
 
-  // Initialize demo data
-  private initializeDemoData() {
-    // Initialize with sample data for testing
-    // This would be removed in a production environment with real data
-    
-    // Sample badges
-    const badges: Badge[] = [
-      {
-        id: this.currentBadgeId++,
-        name: "کاربر فعال",
-        description: "بعد از ۱۰۰ امتیاز",
-        icon: "badge-active",
-        requiredPoints: 100
-      },
-      {
-        id: this.currentBadgeId++,
-        name: "منتقد حرفه‌ای",
-        description: "بعد از ۵ نقد تأییدشده",
-        icon: "badge-critic",
-        requiredPoints: 0
-      },
-      {
-        id: this.currentBadgeId++,
-        name: "فن انیمیشن",
-        description: "بعد از تماشای ۱۰ انیمیشن",
-        icon: "badge-animation",
-        requiredPoints: 0
-      }
-    ];
-    
-    badges.forEach(badge => {
-      this.badges.set(badge.id, badge);
-    });
-    
-    // Sample content types for navbar
-    const contentTypes = ["animation", "movie", "series", "documentary"];
-    
-    // Sample genres
-    const genres = ["action", "adventure", "comedy", "drama", "sci-fi", "horror", "romance", "thriller"];
+  async addWatchPartyChatMessage(messageData: InsertWatchPartyChatMessage): Promise<WatchPartyChatMessage> {
+    const id = this.currentIds.watchPartyChatMessages++;
+    const now = new Date();
+    const message: WatchPartyChatMessage = {
+      ...messageData,
+      id,
+      createdAt: now,
+    };
+    this.watchPartyChatMessages.set(id, message);
+    return message;
+  }
+
+  async getWatchPartyChatMessages(partyId: number): Promise<WatchPartyChatMessage[]> {
+    return Array.from(this.watchPartyChatMessages.values())
+      .filter(message => message.partyId === partyId)
+      .sort((a, b) => 
+        new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+      );
   }
 }
 
