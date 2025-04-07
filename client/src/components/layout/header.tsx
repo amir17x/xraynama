@@ -61,7 +61,7 @@ const Header = () => {
       <div className="container mx-auto px-4 md:px-6">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link href="/" className="flex items-center space-x-2 space-x-reverse">
+          <Link href="/" className="flex items-center space-x-2 space-x-reverse relative z-10">
             <div className="w-8 h-8 bg-primary rounded-md flex items-center justify-center text-white font-bold text-lg">
               X
             </div>
@@ -69,7 +69,7 @@ const Header = () => {
           </Link>
 
           {/* Main Navigation - Desktop */}
-          <nav className="hidden md:flex items-center space-x-1 space-x-reverse">
+          <nav className="hidden md:flex items-center space-x-1 space-x-reverse relative z-10">
             <Link href="/">
               <a className="px-3 py-2 rounded-md text-sm font-medium text-white hover:bg-dark-card transition duration-200">
                 خانه
@@ -100,7 +100,7 @@ const Header = () => {
           {/* Search Bar - Desktop */}
           <form 
             onSubmit={handleSearch}
-            className="hidden md:flex items-center flex-1 mx-4 max-w-xl relative"
+            className="hidden md:flex items-center flex-1 mx-4 max-w-xl relative z-10"
           >
             <Input
               type="text"
@@ -124,7 +124,7 @@ const Header = () => {
           </form>
 
           {/* User Actions */}
-          <div className="flex items-center space-x-3 space-x-reverse">
+          <div className="flex items-center space-x-3 space-x-reverse relative z-10">
             {/* Mobile Search Button */}
             <button
               className="md:hidden text-white p-2 glassmorphic-icon"
@@ -152,7 +152,7 @@ const Header = () => {
                       <UserCircle className="h-6 w-6" />
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="min-w-[200px] bg-dark-card border border-blue-900/50 backdrop-blur-lg z-50 rounded-lg shadow-xl">
+                  <DropdownMenuContent align="end" className="min-w-[200px] bg-dark-card border border-blue-900/50 backdrop-blur-lg z-40 rounded-lg shadow-xl">
                     <div className="p-3 flex items-center border-b border-blue-900/30">
                       <div className="w-10 h-10 bg-blue-900/40 rounded-full flex items-center justify-center mr-3">
                         {user.avatar ? (
