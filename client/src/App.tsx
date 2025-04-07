@@ -4,8 +4,6 @@ import { queryClient } from "./lib/queryClient";
 import { Toaster } from "@/components/ui/toaster";
 import { AuthProvider } from "@/hooks/use-auth";
 import { ProtectedRoute } from "@/lib/protected-route";
-import { Header } from "@/components/layout/Header";
-import { Footer } from "@/components/layout/Footer";
 
 import HomePage from "@/pages/home-page";
 import NotFound from "@/pages/not-found";
@@ -20,7 +18,6 @@ import RequestPage from "@/pages/request-page";
 import TermsPage from "@/pages/terms-page";
 import FAQPage from "@/pages/faq-page";
 import TopIMDBPage from "@/pages/top-imdb-page";
-import WatchPartyPage from "@/pages/watch-party-page";
 
 function Router() {
   return (
@@ -31,7 +28,6 @@ function Router() {
       <Route path="/category/:type" component={CategoryPage} />
       <Route path="/search" component={SearchPage} />
       <Route path="/top-imdb" component={TopIMDBPage} />
-      <Route path="/watch-party" component={WatchPartyPage} />
       <ProtectedRoute path="/profile" component={ProfilePage} />
       
       {/* Support pages */}
@@ -50,14 +46,8 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        <div className="flex flex-col min-h-screen">
-          <Header />
-          <main className="flex-grow">
-            <Router />
-          </main>
-          <Footer />
-          <Toaster />
-        </div>
+        <Router />
+        <Toaster />
       </AuthProvider>
     </QueryClientProvider>
   );

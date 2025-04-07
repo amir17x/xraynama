@@ -1,107 +1,67 @@
-import { ReactNode } from 'react';
+import { Fragment } from 'react';
 import { Link } from 'wouter';
+import { Dialog, Transition } from '@headlessui/react';
 import { X } from 'lucide-react';
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetClose } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
-import { Separator } from '@/components/ui/separator';
 
-type NavItem = {
-  label: string;
-  href: string;
-  icon: ReactNode;
-};
-
-type MobileMenuProps = {
+interface MobileMenuProps {
   isOpen: boolean;
   onClose: () => void;
-  navItems: NavItem[];
-};
+  navItems: { label: string; href: string }[];
+}
 
 export function MobileMenu({ isOpen, onClose, navItems }: MobileMenuProps) {
   return (
-    <Sheet open={isOpen} onOpenChange={onClose}>
-      <SheetContent side="right" className="w-72 p-0 overflow-y-auto max-h-screen">
-        <SheetHeader className="p-4 text-right border-b border-border">
-          <div className="flex items-center justify-between">
-            <SheetClose asChild>
-              <Button variant="ghost" size="icon" className="h-8 w-8">
-                <X className="h-5 w-5" />
+    <Transition show={isOpen} as={Fragment}>
+      <Dialog as="div" className="fixed inset-0 z-50 md:hidden" onClose={onClose}>
+        <Transition.Child
+          as={Fragment}
+          enter="ease-out duration-300"
+          enterFrom="opacity-0"
+          enterTo="opacity-100"
+          leave="ease-in duration-200"
+          leaveFrom="opacity-100"
+          leaveTo="opacity-0"
+        >
+          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm" />
+        </Transition.Child>
+
+        <Transition.Child
+          as={Fragment}
+          enter="transform transition ease-in-out duration-300"
+          enterFrom="translate-x-full"
+          enterTo="translate-x-0"
+          leave="transform transition ease-in-out duration-300"
+          leaveFrom="translate-x-0"
+          leaveTo="translate-x-full"
+        >
+          <Dialog.Panel className="fixed inset-y-0 left-0 right-0 w-full max-w-md mr-auto glass-effect shadow-xl">
+            <div className="flex items-center justify-between px-4 py-3 border-b border-border">
+              <Dialog.Title className="text-xl font-semibold text-foreground">
+                منو
+              </Dialog.Title>
+              <Button variant="ghost" size="icon" onClick={onClose}>
+                <X className="h-6 w-6" />
               </Button>
-            </SheetClose>
-            <SheetTitle className="text-xl font-bold text-primary">Xraynama</SheetTitle>
-          </div>
-        </SheetHeader>
-        
-        <div className="py-4">
-          <div className="px-4 space-y-1">
-            {navItems.map((item) => (
-              <Link 
-                key={item.href} 
-                href={item.href}
-                onClick={onClose}
-              >
-                <a className="flex items-center py-3 px-4 rounded-md hover:bg-muted text-foreground transition duration-200">
-                  {item.icon}
-                  <span>{item.label}</span>
-                </a>
-              </Link>
-            ))}
-          </div>
-          
-          <Separator className="my-4" />
-          
-          <div className="px-4 space-y-1">
-            <Link href="/top-imdb" onClick={onClose}>
-              <a className="flex items-center py-3 px-4 rounded-md hover:bg-muted text-foreground transition duration-200">
-                <span>برترین‌های IMDb</span>
-              </a>
-            </Link>
-            <Link href="/watch-party" onClick={onClose}>
-              <a className="flex items-center py-3 px-4 rounded-md hover:bg-muted text-foreground transition duration-200">
-                <span>تماشای گروهی</span>
-              </a>
-            </Link>
-          </div>
-          
-          <Separator className="my-4" />
-          
-          <div className="px-4 space-y-1">
-            <Link href="/contact" onClick={onClose}>
-              <a className="py-3 px-4 rounded-md hover:bg-muted text-foreground transition duration-200 block">
-                تماس با ما
-              </a>
-            </Link>
-            <Link href="/report" onClick={onClose}>
-              <a className="py-3 px-4 rounded-md hover:bg-muted text-foreground transition duration-200 block">
-                گزارش خطا
-              </a>
-            </Link>
-            <Link href="/request" onClick={onClose}>
-              <a className="py-3 px-4 rounded-md hover:bg-muted text-foreground transition duration-200 block">
-                درخواست محتوا
-              </a>
-            </Link>
-            <Link href="/faq" onClick={onClose}>
-              <a className="py-3 px-4 rounded-md hover:bg-muted text-foreground transition duration-200 block">
-                سوالات متداول
-              </a>
-            </Link>
-            <Link href="/terms" onClick={onClose}>
-              <a className="py-3 px-4 rounded-md hover:bg-muted text-foreground transition duration-200 block">
-                قوانین و مقررات
-              </a>
-            </Link>
-          </div>
-        </div>
-        
-        <div className="p-4 border-t border-border mt-auto">
-          <Link href="/auth">
-            <a className="w-full bg-primary text-primary-foreground hover:bg-primary/90 py-2 px-4 rounded-md text-center block">
-              ورود / ثبت نام
-            </a>
-          </Link>
-        </div>
-      </SheetContent>
-    </Sheet>
+            </div>
+            
+            <div className="px-4 py-6">
+              <nav className="space-y-4">
+                {navItems.map((item) => (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className="block px-3 py-2 rounded-md text-lg font-medium text-foreground hover:bg-muted transition duration-200"
+                    onClick={onClose}
+                  >
+                    {item.label}
+                  </Link>
+                ))}
+              </nav>
+            </div>
+          </Dialog.Panel>
+        </Transition.Child>
+      </Dialog>
+    </Transition>
   );
 }

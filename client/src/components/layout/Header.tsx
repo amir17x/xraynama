@@ -1,10 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link, useLocation } from 'wouter';
+import { SearchBar } from '@/components/common/SearchBar';
 import { useAuth } from '@/hooks/use-auth';
-import { 
-  Loader2, Menu, ChevronDown, User, Heart, ListVideo, Settings, LogOut, 
-  Search, Film, Tv, Video, FileVideo, TrendingUp, Users
-} from 'lucide-react';
+import { Loader2, Menu, ChevronDown, User, Heart, ListVideo, Settings, LogOut } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import {
@@ -14,8 +12,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Input } from '@/components/ui/input';
-import { SearchBar } from '@/components/common/SearchBar';
 import { MobileMenu } from './MobileMenu';
 
 export function Header() {
@@ -39,13 +35,11 @@ export function Header() {
   };
 
   const navItems = [
-    { label: 'صفحه اصلی', href: '/', icon: <Film className="ml-2 h-5 w-5" /> },
-    { label: 'فیلم‌ها', href: '/category/movie', icon: <Film className="ml-2 h-5 w-5" /> },
-    { label: 'سریال‌ها', href: '/category/series', icon: <Tv className="ml-2 h-5 w-5" /> },
-    { label: 'انیمیشن', href: '/category/animation', icon: <Video className="ml-2 h-5 w-5" /> },
-    { label: 'مستند', href: '/category/documentary', icon: <FileVideo className="ml-2 h-5 w-5" /> },
-    { label: 'برترین‌ها', href: '/top-imdb', icon: <TrendingUp className="ml-2 h-5 w-5" /> },
-    { label: 'تماشای گروهی', href: '/watch-party', icon: <Users className="ml-2 h-5 w-5" /> },
+    { label: 'صفحه اصلی', href: '/' },
+    { label: 'فیلم‌ها', href: '/category/movie' },
+    { label: 'سریال‌ها', href: '/category/series' },
+    { label: 'انیمیشن', href: '/category/animation' },
+    { label: 'مستند', href: '/category/documentary' },
   ];
 
   return (
