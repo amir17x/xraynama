@@ -22,6 +22,16 @@ import {
   Home,
   PlayCircle,
   TrendingUp,
+  Calendar,
+  Globe,
+  Flag,
+  Users,
+  Star,
+  Filter,
+  Info,
+  Tag,
+  Award,
+  FileText,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 

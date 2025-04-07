@@ -10,6 +10,7 @@ import { ContentType } from '@/types';
 import { Button } from '@/components/ui/button';
 import { ChevronUp, Play, Heart, Download } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import FeaturedContentSection from '@/components/content/FeaturedContentSection';
 
 export default function HomePage() {
   // Get featured content (top-rated)
@@ -72,44 +73,60 @@ export default function HomePage() {
     <>
       <Header />
       
-      <main className="container mx-auto px-4 py-8">
-        {/* Featured content slider */}
-        <FeaturedSlider 
-          content={featuredContent || []} 
-          isLoading={isFeaturedLoading} 
+      <main>
+        <div className="container mx-auto px-4 py-8">
+          {/* Featured content slider */}
+          <FeaturedSlider 
+            content={featuredContent || []} 
+            isLoading={isFeaturedLoading} 
+          />
+        </div>
+        
+        {/* Top Rated Content with new icon-rich component */}
+        <FeaturedContentSection
+          title="محتوای برتر"
+          subtitle="برترین‌های وبسایت با امتیاز بالا"
+          content={featuredContent || []}
+          isLoading={isFeaturedLoading}
+          icon="award"
         />
         
-        {/* Latest Movies */}
-        <ContentRow 
-          title="آخرین فیلم‌ها" 
-          moreLink="/category/movie" 
-          content={latestMovies || []} 
-          isLoading={isMoviesLoading} 
+        <div className="container mx-auto px-4 py-8">
+          {/* Latest Movies */}
+          <ContentRow 
+            title="آخرین فیلم‌ها" 
+            moreLink="/category/movie" 
+            content={latestMovies || []} 
+            isLoading={isMoviesLoading} 
+          />
+          
+          {/* Popular Series */}
+          <ContentRow 
+            title="سریال‌های پرطرفدار" 
+            moreLink="/category/series" 
+            content={popularSeries || []} 
+            isLoading={isSeriesLoading} 
+          />
+        </div>
+        
+        {/* Animation with new icon-rich component */}
+        <FeaturedContentSection
+          title="انیمیشن‌های برتر"
+          subtitle="بهترین انیمیشن‌های موجود در سایت"
+          content={animations || []}
+          isLoading={isAnimationsLoading}
+          icon="star"
         />
         
-        {/* Popular Series */}
-        <ContentRow 
-          title="سریال‌های پرطرفدار" 
-          moreLink="/category/series" 
-          content={popularSeries || []} 
-          isLoading={isSeriesLoading} 
-        />
-        
-        {/* Animations */}
-        <ContentRow 
-          title="انیمیشن‌های برتر" 
-          moreLink="/category/animation" 
-          content={animations || []} 
-          isLoading={isAnimationsLoading} 
-        />
-        
-        {/* Documentaries */}
-        <ContentRow 
-          title="مستندهای برگزیده" 
-          moreLink="/category/documentary" 
-          content={documentaries || []} 
-          isLoading={isDocumentariesLoading} 
-        />
+        <div className="container mx-auto px-4 py-8">
+          {/* Documentaries */}
+          <ContentRow 
+            title="مستندهای برگزیده" 
+            moreLink="/category/documentary" 
+            content={documentaries || []} 
+            isLoading={isDocumentariesLoading} 
+          />
+        </div>
       </main>
       
       <Footer />

@@ -4,13 +4,14 @@ import { log } from '../vite';
 // Get MongoDB connection URI from environment variables
 const MONGODB_URI = process.env.MONGODB_URI;
 
-if (!MONGODB_URI) {
-  throw new Error('MongoDB URI is missing. Please set the MONGODB_URI environment variable.');
-}
-
 // Connect to MongoDB
 export const connectToMongoDB = async () => {
   try {
+    if (!MONGODB_URI) {
+      log(`No MongoDB URI provided, skipping connection`, 'mongodb');
+      return null;
+    }
+    
     log(`Connecting to MongoDB...`, 'mongodb');
     
     const options = {
@@ -19,7 +20,7 @@ export const connectToMongoDB = async () => {
       socketTimeoutMS: 45000, // Close sockets after 45 seconds of inactivity
     };
     
-    await mongoose.connect(MONGODB_URI, options);
+    await mongoose.connect(MONGODB_URI as string, options);
     
     log(`Connected to MongoDB successfully!`, 'mongodb');
     
