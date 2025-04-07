@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Link, useLocation } from "wouter";
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
@@ -32,6 +32,7 @@ import {
   Tag,
   Award,
   FileText,
+  Settings,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 
@@ -41,6 +42,7 @@ const Header = () => {
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const [showMobileSearch, setShowMobileSearch] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const dropdownMenuRef = useRef<HTMLDivElement>(null);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -125,87 +127,112 @@ const Header = () => {
           <div className="flex items-center space-x-3 space-x-reverse">
             {/* Mobile Search Button */}
             <button
-              className="md:hidden text-white"
+              className="md:hidden text-white p-2 glassmorphic-icon"
               aria-label="جستجو"
               onClick={() => setShowMobileSearch(!showMobileSearch)}
             >
-              <Search className="h-6 w-6" />
+              <Search className="h-5 w-5 text-blue-500" />
             </button>
 
             {/* Favorites Link */}
             {user && (
               <Link href="/profile?tab=favorites">
-                <a className="text-white hover:text-primary-light transition-colors duration-200" aria-label="لیست علاقه‌مندی‌ها">
-                  <Heart className="h-6 w-6" />
+                <a className="p-2 glassmorphic-icon" aria-label="لیست علاقه‌مندی‌ها">
+                  <Heart className="h-5 w-5 text-blue-500" />
                 </a>
               </Link>
             )}
 
             {/* User Menu / Auth Button */}
             {user ? (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon" className="text-white hover:text-primary-light">
-                    <UserCircle className="h-6 w-6" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="min-w-[200px] bg-dark-card border-dark-border">
-                  <div className="px-2 py-1.5 text-sm font-medium text-white">
-                    {user.displayName || user.username}
-                  </div>
-                  <DropdownMenuSeparator className="bg-dark-border" />
-                  <DropdownMenuItem asChild>
-                    <Link href="/profile" className="cursor-pointer">
-                      <a className="flex items-center">
-                        <User className="ml-2 h-4 w-4" />
-                        <span>پروفایل</span>
-                      </a>
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <Link href="/profile?tab=history" className="cursor-pointer">
-                      <a className="flex items-center">
-                        <Clock className="ml-2 h-4 w-4" />
-                        <span>تاریخچه تماشا</span>
-                      </a>
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <Link href="/profile?tab=favorites" className="cursor-pointer">
-                      <a className="flex items-center">
-                        <Heart className="ml-2 h-4 w-4" />
-                        <span>علاقه‌مندی‌ها</span>
-                      </a>
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <Link href="/profile?tab=playlists" className="cursor-pointer">
-                      <a className="flex items-center">
-                        <List className="ml-2 h-4 w-4" />
-                        <span>پلی‌لیست‌ها</span>
-                      </a>
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator className="bg-dark-border" />
-                  <DropdownMenuItem onClick={handleLogout} className="cursor-pointer text-destructive">
-                    <LogOut className="ml-2 h-4 w-4" />
-                    <span>خروج</span>
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+              <div className="relative" ref={dropdownMenuRef}>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="icon" className="relative z-50 text-white hover:text-blue-400 glassmorphic-icon">
+                      <UserCircle className="h-6 w-6" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="min-w-[200px] bg-dark-card border border-blue-900/50 backdrop-blur-lg z-50 rounded-lg shadow-xl">
+                    <div className="p-3 flex items-center border-b border-blue-900/30">
+                      <div className="w-10 h-10 bg-blue-900/40 rounded-full flex items-center justify-center mr-3">
+                        {user.avatar ? (
+                          <img src={user.avatar} alt={user.name || user.username} className="w-full h-full rounded-full object-cover" />
+                        ) : (
+                          <UserCircle className="h-6 w-6 text-blue-500" />
+                        )}
+                      </div>
+                      <div>
+                        <div className="text-sm font-medium text-white">
+                          {user.name || user.username}
+                        </div>
+                        <div className="text-xs text-gray-400">@{user.username}</div>
+                      </div>
+                    </div>
+                    <div className="p-2">
+                      <DropdownMenuItem asChild className="rounded-md my-1 hover:bg-blue-900/20 focus:bg-blue-900/20">
+                        <Link href="/profile" className="cursor-pointer">
+                          <a className="flex items-center py-1 px-2">
+                            <User className="ml-2 h-4 w-4 text-blue-500" />
+                            <span>پروفایل</span>
+                          </a>
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild className="rounded-md my-1 hover:bg-blue-900/20 focus:bg-blue-900/20">
+                        <Link href="/profile?tab=favorites" className="cursor-pointer">
+                          <a className="flex items-center py-1 px-2">
+                            <Heart className="ml-2 h-4 w-4 text-blue-500" />
+                            <span>علاقه‌مندی‌ها</span>
+                          </a>
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild className="rounded-md my-1 hover:bg-blue-900/20 focus:bg-blue-900/20">
+                        <Link href="/profile?tab=playlists" className="cursor-pointer">
+                          <a className="flex items-center py-1 px-2">
+                            <List className="ml-2 h-4 w-4 text-blue-500" />
+                            <span>پلی‌لیست‌ها</span>
+                          </a>
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild className="rounded-md my-1 hover:bg-blue-900/20 focus:bg-blue-900/20">
+                        <Link href="/profile?tab=history" className="cursor-pointer">
+                          <a className="flex items-center py-1 px-2">
+                            <Clock className="ml-2 h-4 w-4 text-blue-500" />
+                            <span>تاریخچه تماشا</span>
+                          </a>
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild className="rounded-md my-1 hover:bg-blue-900/20 focus:bg-blue-900/20">
+                        <Link href="/profile?tab=settings" className="cursor-pointer">
+                          <a className="flex items-center py-1 px-2">
+                            <Settings className="ml-2 h-4 w-4 text-blue-500" />
+                            <span>تنظیمات</span>
+                          </a>
+                        </Link>
+                      </DropdownMenuItem>
+                    </div>
+                    <DropdownMenuSeparator className="bg-blue-900/30 mx-2" />
+                    <div className="p-2">
+                      <DropdownMenuItem onClick={handleLogout} className="cursor-pointer rounded-md hover:bg-red-900/20 focus:bg-red-900/20 py-1 px-2">
+                        <LogOut className="ml-2 h-4 w-4 text-red-500" />
+                        <span className="text-red-400">خروج</span>
+                      </DropdownMenuItem>
+                    </div>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
             ) : (
-              <Button asChild variant="primary" size="sm">
+              <Button asChild variant="default" size="sm" className="bg-blue-700 hover:bg-blue-600 text-white">
                 <Link href="/auth">ورود / ثبت‌نام</Link>
               </Button>
             )}
 
             {/* Mobile Menu Button */}
             <button
-              className="md:hidden text-white"
+              className="md:hidden p-2 glassmorphic-icon"
               aria-label="منو"
               onClick={() => setShowMobileMenu(!showMobileMenu)}
             >
-              <Menu className="h-6 w-6" />
+              <Menu className="h-5 w-5 text-blue-500" />
             </button>
           </div>
         </div>
