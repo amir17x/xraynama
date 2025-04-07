@@ -3,7 +3,7 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "./lib/queryClient";
 import { Toaster } from "@/components/ui/toaster";
 import { AuthProvider } from "@/hooks/use-auth";
-import { ProtectedRoute } from "@/lib/protected-route";
+import { ProtectedRoute, AdminRoute } from "@/lib/protected-route";
 
 import HomePage from "@/pages/home-page";
 import NotFound from "@/pages/not-found";
@@ -21,6 +21,12 @@ import TopIMDBPage from "@/pages/top-imdb-page";
 import ForgotPasswordPage from "@/pages/forgot-password";
 import VerifyCodePage from "@/pages/verify-code";
 import ResetPasswordPage from "@/pages/reset-password";
+
+// Admin pages
+import AdminDashboard from "@/pages/admin/dashboard";
+import AdminUsers from "@/pages/admin/users";
+import AdminContent from "@/pages/admin/content";
+import AdminComments from "@/pages/admin/comments";
 
 function Router() {
   return (
@@ -44,6 +50,12 @@ function Router() {
       <Route path="/request" component={RequestPage} />
       <Route path="/terms" component={TermsPage} />
       <Route path="/faq" component={FAQPage} />
+      
+      {/* Admin pages - protected with AdminRoute */}
+      <AdminRoute path="/admin/dashboard" component={AdminDashboard} />
+      <AdminRoute path="/admin/users" component={AdminUsers} />
+      <AdminRoute path="/admin/content" component={AdminContent} />
+      <AdminRoute path="/admin/comments" component={AdminComments} />
       
       <Route component={NotFound} />
     </Switch>
