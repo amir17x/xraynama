@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { Link, useLocation } from 'wouter';
 import { SearchBar } from '@/components/common/SearchBar';
 import { useAuth } from '@/hooks/use-auth';
-import { Loader2, Menu, ChevronDown, User, Heart, ListVideo, Settings, LogOut } from 'lucide-react';
+import { Loader2, Menu, ChevronDown, User, Heart, ListVideo, Settings, LogOut, ShieldAlert } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import {
@@ -123,8 +123,8 @@ export function Header() {
                       <>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem onClick={() => setLocation('/admin/dashboard')} className="text-primary font-semibold">
-                          <Settings className="mr-2 h-4 w-4" />
-                          <span>پنل مدیریت</span>
+                          <ShieldAlert className="mr-2 h-4 w-4" />
+                          <span>مدیر سیستم</span>
                         </DropdownMenuItem>
                       </>
                     )}
