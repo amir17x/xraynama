@@ -98,7 +98,7 @@ export interface IStorage {
   removeFromPlaylist(playlistId: number, contentId: number): Promise<void>;
 
   // Session store
-  sessionStore: session.SessionStore;
+  sessionStore: any;
 }
 
 // In-memory implementation of the storage interface
@@ -121,7 +121,7 @@ export class MemStorage implements IStorage {
   private playlistsMap: Map<number, Playlist>;
   private playlistItemsMap: Map<number, { playlistId: number, contentId: number, order: number }>;
   
-  public sessionStore: session.SessionStore;
+  public sessionStore: any; // Using any instead of session.SessionStore due to type issues
   private currentIds: {
     users: number;
     content: number;

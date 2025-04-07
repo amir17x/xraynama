@@ -1,6 +1,40 @@
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
+import { MongoDBStorage } from "./db/mongodb-storage";
+import { storage } from "./storage";
+
+// Check if we need to use MongoDB
+const useMongoDb = process.env.MONGODB_URI ? true : false;
+
+// Initialize MongoDB storage if available
+let mongoDBStorage: MongoDBStorage | null = null;
+if (useMongoDb) {
+  mongoDBStorage = new MongoDBStorage();
+  
+  // Replace storage reference with MongoDB implementation
+  // This is a hack to make it work without changing all the code
+  // that uses storage directly
+  Object.setPrototypeOf(storage, mongoDBStorage);
+  
+  // Copy methods to the storage object
+  for (const key of Object.getOwnPropertyNames(MongoDBStorage.prototype)) {
+    if (key !== 'constructor') {
+      (storage as any)[key] = (mongoDBStorage as any)[key];
+    }
+  }
+  
+  // Copy properties from the MongoDB storage instance
+  for (const key of Object.getOwnPropertyNames(mongoDBStorage)) {
+    if (key !== 'constructor') {
+      (storage as any)[key] = (mongoDBStorage as any)[key];
+    }
+  }
+  
+  log("Using MongoDB storage", "storage");
+} else {
+  log("Using in-memory storage", "storage");
+}
 
 const app = express();
 app.use(express.json());
@@ -37,6 +71,17 @@ app.use((req, res, next) => {
 });
 
 (async () => {
+  // Connect to MongoDB if available
+  if (useMongoDb && mongoDBStorage) {
+    try {
+      await mongoDBStorage.init();
+      log("Connected to MongoDB successfully", "mongodb");
+    } catch (error) {
+      log(`Failed to connect to MongoDB: ${error}`, "mongodb");
+      process.exit(1);
+    }
+  }
+  
   const server = await registerRoutes(app);
 
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
