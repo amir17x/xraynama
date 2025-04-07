@@ -1,5 +1,6 @@
 import dotenv from 'dotenv';
-import { MemStorage, hashPassword } from './storage';
+import { hashPassword, storage } from './storage';
+import { MongoDBStorage } from './db/mongodb-storage';
 
 dotenv.config();
 
@@ -8,8 +9,30 @@ async function seedAdminUser() {
   console.log('Starting admin user seeding...');
   
   try {
-    // ایجاد یک نمونه از ذخیره‌سازی
-    const storage = new MemStorage();
+    // اتصال به MongoDB اگر تنظیم شده باشد
+    const useMongoDb = process.env.MONGODB_URI ? true : false;
+    if (useMongoDb) {
+      const mongoDBStorage = new MongoDBStorage();
+      await mongoDBStorage.init();
+      console.log('Connected to MongoDB for admin seeding');
+      
+      // جایگزینی مرجع storage با پیاده‌سازی MongoDB
+      Object.setPrototypeOf(storage, mongoDBStorage);
+      
+      // کپی متدها به شیء storage
+      for (const key of Object.getOwnPropertyNames(MongoDBStorage.prototype)) {
+        if (key !== 'constructor') {
+          (storage as any)[key] = (mongoDBStorage as any)[key];
+        }
+      }
+      
+      // کپی ویژگی‌ها از نمونه MongoDB storage
+      for (const key of Object.getOwnPropertyNames(mongoDBStorage)) {
+        if (key !== 'constructor') {
+          (storage as any)[key] = (mongoDBStorage as any)[key];
+        }
+      }
+    }
     
     // بررسی اینکه آیا کاربر ادمین قبلاً وجود دارد یا نه
     const existingAdmin = await storage.getUserByUsername('admin');
@@ -18,7 +41,7 @@ async function seedAdminUser() {
       console.log('Admin user already exists. Skipping creation.');
     } else {
       // رمز عبور رو هش می‌کنیم
-      const hashedPassword = await hashPassword('admin123');
+      const hashedPassword = await hashPassword('admin1234');
       
       // کاربر ادمین رو می‌سازیم
       const adminUser = {
@@ -36,7 +59,7 @@ async function seedAdminUser() {
       if (result) {
         console.log('Admin user created successfully!');
         console.log('Username: admin');
-        console.log('Password: admin123');
+        console.log('Password: admin1234');
         console.log(result);
       } else {
         console.error('Failed to create admin user');
