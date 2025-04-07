@@ -126,6 +126,13 @@ export interface IStorage {
   createPlaylist(playlist: InsertPlaylist): Promise<Playlist>;
   addToPlaylist(playlistId: number, contentId: number, order: number): Promise<void>;
   removeFromPlaylist(playlistId: number, contentId: number): Promise<void>;
+  
+  // Password reset operations
+  createVerificationCode(email: string): Promise<string>;
+  verifyCode(email: string, code: string): Promise<boolean>;
+  createResetToken(email: string): Promise<string>;
+  verifyResetToken(email: string, token: string): Promise<boolean>;
+  resetPassword(email: string, newPassword: string): Promise<boolean>;
 
   // Session store
   sessionStore: any;
