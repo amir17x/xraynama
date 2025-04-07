@@ -1,7 +1,13 @@
 import React, { useRef } from "react";
 import { ContentType } from "@/types";
 import { ContentCard } from "@/components/common/ContentCard";
-import { Award, Star, Calendar, ChevronLeft, ChevronRight } from "lucide-react";
+import { 
+  AwardIcon, 
+  StarIcon, 
+  CalendarIcon, 
+  ChevronLeftIcon, 
+  ChevronRightIcon 
+} from "@/components/icons/RoundedIcons";
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
 
@@ -89,11 +95,11 @@ const FeaturedContentSection: React.FC<FeaturedContentSectionProps> = ({
   const renderIcon = () => {
     switch (icon) {
       case "award":
-        return <Award className="h-4 w-4 text-yellow-500" />;
+        return <AwardIcon className="h-4 w-4" />;
       case "star":
-        return <Star className="h-4 w-4 text-yellow-500" />;
+        return <StarIcon className="h-4 w-4" />;
       case "calendar":
-        return <Calendar className="h-4 w-4 text-blue-500" />;
+        return <CalendarIcon className="h-4 w-4" />;
       default:
         return null;
     }
@@ -110,7 +116,7 @@ const FeaturedContentSection: React.FC<FeaturedContentSectionProps> = ({
           
           {moreLink && (
             <div className="flex items-center gap-1">
-              <ChevronLeft className="h-4 w-4 text-muted-foreground" />
+              <ChevronLeftIcon className="h-4 w-4 text-muted-foreground" />
               <Button asChild variant="link" size="sm" className="p-0 h-auto text-sm text-muted-foreground hover:text-white">
                 <Link href={moreLink}>مشاهده همه</Link>
               </Button>
@@ -127,7 +133,7 @@ const FeaturedContentSection: React.FC<FeaturedContentSectionProps> = ({
             className="absolute left-[-20px] top-1/2 transform -translate-y-1/2 rounded-full h-10 w-10 z-10 bg-card/80 backdrop-blur-sm border-gray-700"
             onClick={handleScrollRight}
           >
-            <ChevronRight className="h-5 w-5" />
+            <ChevronRightIcon className="h-5 w-5" />
           </Button>
           
           <div 
@@ -149,7 +155,7 @@ const FeaturedContentSection: React.FC<FeaturedContentSectionProps> = ({
             className="absolute right-[-20px] top-1/2 transform -translate-y-1/2 rounded-full h-10 w-10 z-10 bg-card/80 backdrop-blur-sm border-gray-700"
             onClick={handleScrollLeft}
           >
-            <ChevronLeft className="h-5 w-5" />
+            <ChevronLeftIcon className="h-5 w-5" />
           </Button>
         </div>
       </div>
