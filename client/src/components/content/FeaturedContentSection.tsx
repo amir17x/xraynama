@@ -115,9 +115,9 @@ const FeaturedContentSection: React.FC<FeaturedContentSectionProps> = ({
           </div>
           
           {moreLink && (
-            <div className="flex items-center gap-1">
-              <ChevronLeftIcon className="h-4 w-4 text-muted-foreground" />
-              <Button asChild variant="link" size="sm" className="p-0 h-auto text-sm text-muted-foreground hover:text-white">
+            <div className="flex items-center gap-1 group">
+              <ChevronLeftIcon className="h-4 w-4 text-blue-500 group-hover:text-blue-400 transition-colors" />
+              <Button asChild variant="link" size="sm" className="p-0 h-auto text-sm text-blue-500 hover:text-blue-400 transition-colors">
                 <Link href={moreLink}>مشاهده همه</Link>
               </Button>
             </div>
@@ -130,10 +130,10 @@ const FeaturedContentSection: React.FC<FeaturedContentSectionProps> = ({
           <Button 
             variant="outline" 
             size="icon" 
-            className="absolute left-[-20px] top-1/2 transform -translate-y-1/2 rounded-full h-10 w-10 z-10 bg-card/80 backdrop-blur-sm border-gray-700"
+            className="group absolute left-[-20px] top-1/2 transform -translate-y-1/2 rounded-full h-10 w-10 z-10 bg-blue-950/40 backdrop-blur-sm border-blue-900/50 hover:bg-blue-900/60 transition-all hover:scale-110"
             onClick={handleScrollRight}
           >
-            <ChevronRightIcon className="h-5 w-5" />
+            <ChevronRightIcon className="h-5 w-5 text-blue-500 group-hover:text-blue-400" />
           </Button>
           
           <div 
@@ -152,10 +152,10 @@ const FeaturedContentSection: React.FC<FeaturedContentSectionProps> = ({
           <Button 
             variant="outline" 
             size="icon" 
-            className="absolute right-[-20px] top-1/2 transform -translate-y-1/2 rounded-full h-10 w-10 z-10 bg-card/80 backdrop-blur-sm border-gray-700"
+            className="group absolute right-[-20px] top-1/2 transform -translate-y-1/2 rounded-full h-10 w-10 z-10 bg-blue-950/40 backdrop-blur-sm border-blue-900/50 hover:bg-blue-900/60 transition-all hover:scale-110"
             onClick={handleScrollLeft}
           >
-            <ChevronLeftIcon className="h-5 w-5" />
+            <ChevronLeftIcon className="h-5 w-5 text-blue-500 group-hover:text-blue-400" />
           </Button>
         </div>
       </div>
