@@ -1,0 +1,170 @@
+What is SMTP?
+SMTP, or Simple Mail Transfer Protocol, is the standard set of rules by which emails are sent, received, and relayed over the Internet. Regular email clients (Gmail, Yahoo, Outlook etc) all use SMTP to send your message to a mail server that then uses SMTP to relay that message to the correct recipient server.
+
+Remember:
+MailerSend is a powerful platform designed specifically for sending transactional emails—automated messages triggered by user actions or events within your application or website.
+
+Please note that configuring MailerSend’s SMTP relay to send regular emails is not recommended, as they may not render or send properly.
+
+How to send emails via SMTP
+Create a new SMTP user
+To send emails using SMTP:
+
+1. Navigate to the Domains page.
+
+2. Find the domain from which you want to send emails via SMTP and click Manage.
+
+Domains page in MailerSend.
+Note:
+Your domain must be verified in order to send emails.
+
+3. Scroll down to SMTP.
+
+4. Click Generate new user.
+
+
+Note:
+You will still be able to use the API if you create SMTP users.
+
+By creating SMTP users, the following information will be automatically generated:
+
+Username
+
+Password
+
+
+Note:
+SMTP credentials are not exclusive to specific domains. All SMTP users can be used account-wide for any verified domains on the account.
+
+You will be required to enter this information into your content management system either directly or via a plugin. Either way, all systems will require you to enter your Server (SMTP host), Port, Username and Password.
+
+Change the SMTP username
+The SMTP credentials available under your domain’s dashboard are meant for authentication only with our SMTP relay. This username is systematically generated and cannot be changed; however, you can reset the password anytime.
+
+The SMTP username is not intended to be used as the sender/from address unless explicitly specified. Instead, you can choose to use any sender/from email address as long as it is under your verified domain(s). For instance, if your verified domain is example.com, you can send from any email address that ends in @example.com. This option should be available in the SMTP configuration you use to send emails.
+
+SMTP limits
+Connection transaction limit
+The SMTP relay has a limit on the maximum number of emails sent using a single connection. That limit is 5 for Hobby and Starter accounts and 50 for Professional and Enterprise.
+
+Daily requests & rate limits
+MailerSend has a daily request quota for API and SMTP relay services. Every request is counted against the quota and is reset daily at midnight UTC. This quota is dependent on your MailerSend plan:
+
+No plan: 100 requests per day
+
+Hobby plan: 1,000 requests per day
+
+Starter plan: 100,000 requests per day
+
+Professional plan: 500,000 requests per day
+
+Enterprise plan: 500,000 requests per day
+
+Additionally, the following general rate limits are also in place:
+
+SMTP relay requests: Up to 120 requests per minute.
+
+You can find more information about these limits in our developer documentation here.
+
+How to troubleshoot SMTP emails not sending
+We recommend you run through some troubleshooting steps to resolve SMTP errors, as usually this type of problem can happen for the following reasons:
+
+Wrong username or password: these fields are case-sensitive, so you need to ensure both are exactly as shown in your account and that your provider is not changing them to lowercase or uppercase.
+
+Sender email address: ensure the 'from' address you have opted to use matches the domain you've verified in your MailerSend account and is entered in lowercase.
+
+Configuration: you need to connect using TLS (STARTTLS). MailerSend's SMTP relay supports TLS versions 1.2 & 1.3. We recommend double-checking that the server name is set to smtp.mailersend.net and that you're connecting to port 587.
+
+Security settings: If you are testing MailerSend's SMTP using a local client, you'll need to ensure that your firewall does not block the connection. You might need to set your firewall software to allow SMTP sending using port 587.
+
+You've reached your account's quota: the quota is reset every day, please wait or upgrade your account.
+
+Remember:
+Starting June 3, 2024, MailerSend will no longer support TLS versions 1.0 and 1.1 for SMTP relay. We will exclusively support TLS versions 1.2 and above. This update is crucial for aligning with industry best practices for security and data integrity.
+
+Send SMTP emails in WordPress
+If you’re using WordPress, we recommend you use our own plugin, the Official SMTP Integration plugin, to start sending emails via SMTP. It's pre-set to match MailerSend's server requirements so you only have to add your username and password to start sending.
+
+We recommend reading our detailed step-by-step guide here for instructions on installing and setting up the plugin.
+
+Your SMTP credentials were compromised
+We conduct routine account checks, and sometimes, we notice some accounts send phishing content emails via SMTP. When this happens, we notify you your SMTP credentials were compromised and those are being used to send such content. There are multiple reasons why this happens: 
+
+- The credentials were obtained from the SMTP software.
+- Your local device could potentially have malware. 
+- The SMTP password was shared as plain text through other platforms.
+
+If your SMTP credentials are compromised, we recommend you take the following steps: 
+
+Clean your local devices or the devices that had/have access to that password. 
+
+If your details are being used on your website, we suggest scanning it for potential malware and clearing the malware. 
+
+Change your MailerSend account password (the one you used to access your account) and enable 2-factor authentication. 
+
+Update your SMTP password from your Dashboard -> Emails -> Domains -> Manage next to the domain in question -> Under SMTP, click on update the password. 
+
+Update the SMTP password on your website once it is clean, and monitor your emails sent closely for the next few days. 
+
+Please follow the steps above and investigate how these credentials were compromised, as well as any steps you took to prevent this from happening again. 
+
+What’s the difference between SMTP and API?
+Whether to use API or SMTP for sending depends on your specific use case and current setup:
+
+If you send in lower volumes and rarely send your emails in bulk, or require a simple setup that doesn't require coding skills, you may find that SMTP relay works better for you. Sometimes, SMTP may be the only option available, depending on your limitations. For example, perhaps your content management system only uses SMTP, and you don't have a developer available to write the code required to switch to sending via API.
+
+However, if you often send in bulk, would like to use MailerSend's template feature, have coding skills, or plan to use a no-code integration such as Zapier or Integromat, then MailerSend's email API would be the optimal solution.
+
+The key difference between SMTP and API is that SMTP uses multiple back-and-forths between the client and the server to communicate, whereas the more feature-rich API receives HTTP requests directly from your app, and email sending is triggered directly from there.
+
+To determine which route is best for you, compare the two below:
+
+
+
+SMTP Relay
+
+Web API
+
+Protocol
+
+SMTP (Simple Mail Transfer Protocol)
+
+HTTPS (HyperText Transfer Protocol)
+
+Pros
+
+Maintenance
+
+Simple setup
+
+No coding skills required
+
+Easy to test
+
+Straightforward troubleshooting
+
+Compatible with most legacy systems
+
+Easy migration between services
+
+Ideal for bulk-sending
+
+Quicker email deliverability
+
+Compatible with MailerSend templates
+
+More customization options (advanced personalization, delays, triggers)
+
+Cons
+
+MailerSend templates cannot be sent via SMTP
+
+More potential points of failure
+
+Requires some coding skills
+
+Migrating services is more complex
+
+Both SMTP and Web API share the same deliverability and rate limit characteristics.
+
+Ultimately, the choice is yours. If you’re a casual email sender with a simple content management system, SMTP relay may be what works for you; whereas bulk senders and app developers may benefit more from the use of email API.

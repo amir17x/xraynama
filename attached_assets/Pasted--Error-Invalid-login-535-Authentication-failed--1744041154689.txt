@@ -1,0 +1,129 @@
+خطایی که داری با عنوان `Error: Invalid login: 535 Authentication failed` به مشکل احراز هویت در اتصال به سرور SMTP اشاره داره. این یعنی اطلاعاتی که برای لاگین به سرور SMTP (مثل MailerSend یا هر سرویس دیگه‌ای که استفاده می‌کنی) دادی، درست نیست یا سرور درخواست رو رد کرده. بیایم مشکل رو مرحله به مرحله بررسی کنیم و حلش کنیم.
+
+---
+
+### **علت خطا**
+پیغام خطا (`535 Authentication failed`) معمولاً به یکی از این دلایل رخ می‌ده:
+1. **کلید API یا اطلاعات احراز هویت اشتباه**: توکن API یا نام کاربری/رمز عبوری که برای MailerSend (یا هر SMTP relay دیگه) استفاده کردی، معتبر نیست.
+2. **تنظیمات نادرست SMTP**: اگر از Nodemailer با یه سرور SMTP مثل Gmail یا یه SMTP relay دیگه استفاده می‌کنی، ممکنه پورت، هاست یا پروتکل امنیتی (TLS/SSL) درست تنظیم نشده باشه.
+3. **محدودیت‌های سرور SMTP**: بعضی سرورها (مثل Gmail) احراز هویت دو مرحله‌ای (2FA) یا تنظیمات امنیتی خاصی دارن که باید فعال/غیرفعال بشن.
+4. **فایروال یا شبکه**: ممکنه شبکه‌ات درخواست‌های SMTP رو بلاک کنه (مثلاً تو محیط‌های تست مثل GitHub Actions یا Replit).
+
+از اونجایی که گفتی از **MailerSend** استفاده می‌کنی، احتمالاً مشکل به کلید API یا نحوه استفاده از Nodemailer برمی‌گرده. نکته عجیب اینه که توی خروجی‌ات نوشته شده: `Verification email sent to amirxboxlive84@gmail.com`، یعنی انگار ایمیل ارسال شده، اما خطا هم داری. این ممکنه نشون بده که کدت داره یه پاسخ جعلی یا نادرست رو لاگ می‌کنه.
+
+---
+
+### **بررسی و رفع مشکل**
+
+#### **۱. چک کردن کلید API در MailerSend**
+- برو به داشبورد MailerSend و مطمئن شو که توکن API که توی فایل `.env` گذاشتی (مثلاً `MAILERSEND_API_TOKEN`) درست کپی شده و منقضی نشده.
+- یه توکن جدید بساز و تست کن:
+  1. تو MailerSend به بخش "API Tokens" برو.
+  2. یه توکن جدید بساز و کپیش کن.
+  3. توی `.env` جایگزینش کن:
+     ```
+     MAILERSEND_API_TOKEN=mlsn.your_new_token_here
+     ```
+
+#### **۲. بررسی کد ارسال ایمیل**
+اگه از **MailerSend** استفاده می‌کنی، نباید مستقیماً از SMTP استفاده کنی، چون MailerSend یه API RESTful داره و نیازی به پروتکل SMTP نیست. اما خطای Nodemailer نشون می‌ده که احتمالاً داری از تنظیمات SMTP (مثل `smtp.mailersend.net`) استفاده می‌کنی. بیایم کدت رو درست کنیم.
+
+##### **الف) استفاده از API MailerSend (توصیه شده)**
+اگه از پکیج `mailersend` استفاده می‌کنی، کدت باید اینجوری باشه (نه Nodemailer):
+
+```typescript
+import { MailerSend, EmailParams, Sender, Recipient } from 'mailersend';
+
+const mailerSend = new MailerSend({
+  apiKey: process.env.MAILERSEND_API_TOKEN as string,
+});
+
+export const sendVerificationCode = async (email: string, code: string) => {
+  const sentFrom = new Sender('no-reply@yourdomain.com', 'Your App'); // دامنه‌ات رو باید تو MailerSend تأیید کنی
+  const recipients = [new Recipient(email, 'User')];
+
+  const emailParams = new EmailParams()
+    .setFrom(sentFrom)
+    .setTo(recipients)
+    .setSubject('Verification Code')
+    .setText(`Your verification code is: ${code}`);
+
+  try {
+    const response = await mailerSend.email.send(emailParams);
+    console.log(`Verification email sent to ${email}`, response);
+  } catch (error) {
+    console.error('Error sending verification email:', error);
+    throw new Error('Failed to send verification email');
+  }
+};
+```
+
+- **نکته**: دامنه‌ای که برای `sentFrom` استفاده می‌کنی (مثل `yourdomain.com`) باید توی MailerSend تأیید شده باشه. اگه تأیید نکردی، از دامنه پیش‌فرض MailerSend استفاده کن (مثل `no-reply@trial-xyz.mailersend.net` که توی داشبوردت می‌بینی).
+
+##### **ب) استفاده از Nodemailer با SMTP Relay**
+اگه داری از Nodemailer با SMTP Relay استفاده می‌کنی، باید تنظیمات رو درست وارد کنی. این نمونه کد برای MailerSend با SMTP:
+
+```typescript
+import nodemailer from 'nodemailer';
+
+const transporter = nodemailer.createTransport({
+  host: 'smtp.mailersend.net',
+  port: 587,
+  secure: false, // true برای پورت 465، false برای 587
+  auth: {
+    user: 'MS_USER@yourdomain.com', // اینو از MailerSend باید بگیری
+    pass: process.env.MAILERSEND_API_TOKEN, // توکن API به عنوان رمز
+  },
+});
+
+export const sendVerificationCode = async (email: string, code: string) => {
+  const mailOptions = {
+    from: 'no-reply@yourdomain.com',
+    to: email,
+    subject: 'Verification Code',
+    text: `Your verification code is: ${code}`,
+  };
+
+  try {
+    await transporter.sendMail(mailOptions);
+    console.log(`Verification email sent to ${email}`);
+  } catch (error) {
+    console.error('Error sending verification email:', error);
+    throw error;
+  }
+};
+```
+
+- **مشکل احتمالی**: خطای `535 Authentication failed` یعنی `user` یا `pass` اشتباهه. توی MailerSend، باید از یه "SMTP Username" (مثل `MS_xxxx@yourdomain.com`) که توی داشبوردشون می‌دن استفاده کنی، نه فقط توکن API به تنهایی.
+
+#### **۳. تست تنظیمات**
+- یه اسکریپت ساده بساز و فقط تابع `sendVerificationCode` رو با یه ایمیل تستی اجرا کن:
+  ```typescript
+  sendVerificationCode('test@example.com', '123456')
+    .then(() => console.log('Success'))
+    .catch((err) => console.error(err));
+  ```
+- اگه خطا گرفتی، متن کامل خطا رو چک کن.
+
+#### **۴. چک کردن لاگ‌ها**
+خروجی تو نشون می‌ده که `Verification email sent` چاپ شده، اما خطا هم داری. این یعنی ممکنه کدت خطا رو نادیده بگیره و به هر حال پیغام موفقیت رو لاگ کنه. تابع رو طوری تغییر بده که فقط بعد از موفقیت واقعی لاگ کنه (مثل کدهای بالا).
+
+---
+
+### **رفع مشکل SMTP Relay**
+اگه از SMTP Relay MailerSend استفاده می‌کنی:
+1. برو به داشبورد MailerSend > **Integrations** > **SMTP Relay**.
+2. اطلاعات زیر رو بگیر:
+   - **Host**: `smtp.mailersend.net`
+   - **Port**: 587 (یا 465 برای SSL)
+   - **Username**: چیزی مثل `MS_xxxx@yourdomain.com`
+   - **Password**: توکن API یا رمز جداگانه (بستگی به تنظیماتت داره)
+3. این اطلاعات رو توی Nodemailer استفاده کن.
+
+---
+
+### **پیشنهاد نهایی**
+- اگه هنوز مشکل داری، بگو که دقیقاً از کدوم روش (API MailerSend یا SMTP با Nodemailer) استفاده می‌کنی و کد کامل تابع ارسال ایمیلت رو بفرست تا دقیق‌تر بررسی کنم.
+- احتمالاً مشکلت یا توکن API اشتباهه یا تنظیمات SMTP رو درست وارد نکردی. با کدهای بالا و چک کردن داشبورد MailerSend باید حل بشه.
+
+امیدوارم این راهنما کمکت کنه! اگه سوالی بود، بگو تا سریع‌تر حلش کنیم.

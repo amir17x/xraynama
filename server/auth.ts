@@ -24,12 +24,14 @@ const mailerSend = new MailerSend({
 // ایجاد ترنسپورتر SMTP برای Nodemailer
 const transporter = nodemailer.createTransport({
   host: 'smtp.mailersend.net',
-  port: 587,
+  port: 2525,
   secure: false, // true for 465, false for other ports
   auth: {
     user: 'MS_JUZMih@test-z0vklo6ex87l7qrx.mlsender.net',
     pass: 'mssp.BhM9lrN.pq3enl6026ml2vwr.VFZtxis'
-  }
+  },
+  debug: true, // اضافه کردن گزینه‌های رفع اشکال
+  logger: true
 });
 
 // تابع ارسال ایمیل با کد تایید
@@ -66,7 +68,7 @@ async function sendVerificationEmail(email: string, code: string): Promise<boole
     
     // Send email using Nodemailer
     const info = await transporter.sendMail({
-      from: '"XrayNama" <no-reply@mailersend.net>', // Use MailerSend domain for sending
+      from: '"XrayNama" <MS_JUZMih@test-z0vklo6ex87l7qrx.mlsender.net>', // استفاده از آدرس SMTP کاربر
       to: email,
       subject: "کد تایید برای بازیابی رمز عبور",
       text: textContent,
@@ -110,7 +112,7 @@ async function sendPasswordChangeConfirmation(email: string): Promise<boolean> {
     
     // Send email using Nodemailer
     const info = await transporter.sendMail({
-      from: '"XrayNama" <no-reply@mailersend.net>', // Use MailerSend domain for sending
+      from: '"XrayNama" <MS_JUZMih@test-z0vklo6ex87l7qrx.mlsender.net>', // استفاده از آدرس SMTP کاربر
       to: email,
       subject: "تایید تغییر رمز عبور",
       text: textContent,
@@ -264,7 +266,7 @@ export function setupAuth(app: Express) {
       // Generate and save verification code
       const code = await storage.createVerificationCode(email);
       
-      // Send email with the code using MailerSend
+      // Send email with the verification code
       try {
         await sendVerificationEmail(email, code);
         console.log(`Verification email sent to ${email}`);
@@ -272,6 +274,9 @@ export function setupAuth(app: Express) {
         console.error("Error sending verification email:", emailError);
         // حتی در صورت خطا در ارسال ایمیل، پیام موفقیت‌آمیز به کاربر نشان می‌دهیم
         // اما خطا را در لاگ ثبت می‌کنیم
+        
+        // در محیط توسعه، کد بازیابی را چاپ می‌کنیم تا بتوان بدون ایمیل هم آزمایش کرد
+        console.log("Note: Email sending failed but verification code was still generated.");
       }
       
       // در محیط توسعه، کد را نمایش می‌دهیم برای تست آسان‌تر
@@ -340,6 +345,9 @@ export function setupAuth(app: Express) {
       } catch (emailError) {
         console.error("Error sending password change confirmation email:", emailError);
         // ثبت خطا در لاگ، ولی همچنان پاسخ موفقیت آمیز به کاربر ارسال می‌کنیم
+        
+        // در محیط توسعه، اعلان می‌کنیم که ایمیل ارسال نشده اما عملیات موفق بوده است
+        console.log("Note: Password change confirmation email failed but password was still reset successfully.");
       }
       
       return res.status(200).json({ 
