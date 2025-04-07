@@ -39,7 +39,7 @@ export default function ForgotPasswordPage() {
         data,
       });
     },
-    onSuccess: (data) => {
+    onSuccess: () => {
       // Store email in session storage to use in next steps
       sessionStorage.setItem("resetEmail", form.getValues().email);
       setSubmitSuccess(true);
@@ -107,7 +107,7 @@ export default function ForgotPasswordPage() {
         <CardFooter className="flex justify-center">
           <div className="text-sm text-center">
             <span className="text-muted-foreground">به یاد آوردید؟ </span>
-            <Link href="/login" className="text-primary hover:underline">
+            <Link href="/auth" className="text-primary hover:underline">
               بازگشت به صفحه ورود
             </Link>
           </div>

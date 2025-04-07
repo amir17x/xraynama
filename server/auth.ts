@@ -144,7 +144,11 @@ export function setupAuth(app: Express) {
       // Check if user exists with this email
       const user = await storage.getUserByEmail(email);
       if (!user) {
-        return res.status(404).json({ message: "کاربری با این ایمیل وجود ندارد" });
+        // برای جلوگیری از حملات شناسایی ایمیل‌ها، همان پیام موفقیت را ارسال می‌کنیم
+        // اما کد را ارسال نمی‌کنیم
+        return res.status(200).json({ 
+          message: "کد تأیید با موفقیت ارسال شد. لطفاً ایمیل خود را بررسی کنید."
+        });
       }
       
       // Generate and save verification code

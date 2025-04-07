@@ -74,7 +74,7 @@ export default function ResetPasswordPage() {
       
       // Redirect to login page after a short delay
       setTimeout(() => {
-        setLocation("/login");
+        setLocation("/auth");
       }, 2000);
     },
     onError: (error: Error) => {
@@ -156,7 +156,7 @@ export default function ResetPasswordPage() {
         </CardContent>
         <CardFooter className="flex justify-center">
           <div className="text-sm text-center">
-            <Link href="/login" className="text-primary hover:underline">
+            <Link href="/auth" className="text-primary hover:underline">
               بازگشت به صفحه ورود
             </Link>
           </div>

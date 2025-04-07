@@ -62,11 +62,12 @@ export default function VerifyCodePage() {
         data,
       });
     },
-    onSuccess: (response) => {
+    onSuccess: async (response) => {
       setSubmitSuccess(true);
       
       // Store the reset token in session storage
-      const { token } = response.data;
+      const data = await response.json();
+      const { token } = data;
       sessionStorage.setItem("resetToken", token);
       
       // Redirect to reset password page after a short delay
