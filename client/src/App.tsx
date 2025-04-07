@@ -1,0 +1,43 @@
+import { Switch, Route } from "wouter";
+import { queryClient } from "./lib/queryClient";
+import { QueryClientProvider } from "@tanstack/react-query";
+import { Toaster } from "@/components/ui/toaster";
+import { AuthProvider } from "./hooks/use-auth";
+import { ProtectedRoute } from "./lib/protected-route";
+
+import NotFound from "@/pages/not-found";
+import HomePage from "@/pages/home-page";
+import AuthPage from "@/pages/auth-page";
+import ContentDetailsPage from "@/pages/content-details-page";
+import SearchPage from "@/pages/search-page";
+import CategoryPage from "@/pages/category-page";
+import WatchPage from "@/pages/watch-page";
+import ProfilePage from "@/pages/profile-page";
+
+function Router() {
+  return (
+    <Switch>
+      <Route path="/" component={HomePage} />
+      <Route path="/auth" component={AuthPage} />
+      <Route path="/search" component={SearchPage} />
+      <Route path="/category/:type" component={CategoryPage} />
+      <Route path="/content/:id" component={ContentDetailsPage} />
+      <ProtectedRoute path="/watch/:videoId" component={WatchPage} />
+      <ProtectedRoute path="/profile" component={ProfilePage} />
+      <Route component={NotFound} />
+    </Switch>
+  );
+}
+
+function App() {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <AuthProvider>
+        <Router />
+        <Toaster />
+      </AuthProvider>
+    </QueryClientProvider>
+  );
+}
+
+export default App;
