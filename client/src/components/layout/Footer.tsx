@@ -33,7 +33,7 @@ export function Footer() {
               <li><Link href="/category/series" className="hover:text-primary transition-colors">سریال‌های محبوب</Link></li>
               <li><Link href="/category/animation" className="hover:text-primary transition-colors">انیمیشن‌ها</Link></li>
               <li><Link href="/category/documentary" className="hover:text-primary transition-colors">مستندها</Link></li>
-              <li><Link href="/search?sort=imdb" className="hover:text-primary transition-colors">برترین‌های IMDB</Link></li>
+              <li><Link href="/top-imdb" className="hover:text-primary transition-colors">برترین‌های IMDB</Link></li>
             </ul>
           </div>
           

@@ -17,6 +17,7 @@ import ReportPage from "@/pages/report-page";
 import RequestPage from "@/pages/request-page";
 import TermsPage from "@/pages/terms-page";
 import FAQPage from "@/pages/faq-page";
+import TopIMDBPage from "@/pages/top-imdb-page";
 
 function Router() {
   return (
@@ -26,6 +27,7 @@ function Router() {
       <Route path="/content/:id" component={ContentPage} />
       <Route path="/category/:type" component={CategoryPage} />
       <Route path="/search" component={SearchPage} />
+      <Route path="/top-imdb" component={TopIMDBPage} />
       <ProtectedRoute path="/profile" component={ProfilePage} />
       
       {/* Support pages */}
