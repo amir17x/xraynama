@@ -8,6 +8,7 @@ import { storage } from "./storage";
 import { User as SelectUser } from "@shared/schema";
 import { MailerSend, EmailParams, Sender, Recipient } from "mailersend";
 import nodemailer from "nodemailer";
+import { Resend } from 'resend';
 
 declare global {
   namespace Express {
@@ -16,12 +17,15 @@ declare global {
 }
 
 const scryptAsync = promisify(scrypt);
+
 // تنظیمات MailerSend API (نگه‌داری شده برای سازگاری)
 const mailerSend = new MailerSend({
   apiKey: process.env.MAILERSEND_API_KEY || '',
 });
 
-// استفاده مستقیم از API MailerSend بدون استفاده از SMTP
+// تنظیمات Resend API که برای ارسال ایمیل استفاده می‌شود
+const resendClient = new Resend(process.env.RESEND_API_KEY);
+
 // ترنسپورتر Nodemailer برای پشتیبانی از کد قبلی (استفاده نمی‌شود)
 const transporter = nodemailer.createTransport({
   jsonTransport: true // استفاده از ترنسپورتر JSON برای تست (ایمیل‌ها ارسال نمی‌شوند)
@@ -60,41 +64,60 @@ async function sendVerificationEmail(email: string, code: string): Promise<boole
     `;
     
     try {
-      // استفاده از API MailerSend برای ارسال ایمیل
-      const sender = new Sender("no-reply@mailersend.net", "XrayNama");
-      const recipients = [new Recipient(email)];
+      // استفاده از Resend API برای ارسال ایمیل (راه‌حل اصلی)
+      const { data, error } = await resendClient.emails.send({
+        from: 'XrayNama <onboarding@resend.dev>',
+        to: [email],
+        subject: 'کد تایید برای بازیابی رمز عبور',
+        html: htmlContent,
+        text: textContent,
+      });
       
-      const emailParams = new EmailParams()
-        .setFrom(sender)
-        .setTo(recipients)
-        .setSubject("کد تایید برای بازیابی رمز عبور")
-        .setHtml(htmlContent)
-        .setText(textContent);
-      
-      const response = await mailerSend.email.send(emailParams);
-      console.log("Verification email sent successfully:", response);
-      return true;
-    } catch (mailerSendError) {
-      console.error("Error sending email with MailerSend API:", mailerSendError);
-      
-      // اگر با API MailerSend نتوانستیم ایمیل بفرستیم، از Nodemailer برای تست استفاده می‌کنیم
-      // که البته در حالت jsonTransport فقط لاگ می‌شود و ارسال نمی‌شود
-      try {
-        const info = await transporter.sendMail({
-          from: '"XrayNama" <no-reply@mailersend.net>',
-          to: email,
-          subject: "کد تایید برای بازیابی رمز عبور",
-          text: textContent,
-          html: htmlContent
-        });
-        
-        console.log("Email logged but not sent (using JSON transport):", info);
-      } catch (nodemailerError) {
-        console.error("Also failed with Nodemailer:", nodemailerError);
+      if (error) {
+        throw new Error(`Resend API error: ${error.message}`);
       }
       
-      // خطا را به عنوان false برمی‌گردانیم، اما کد را در کنسول نمایش می‌دهیم
-      return false;
+      console.log("Verification email sent successfully with Resend:", data);
+      return true;
+    } catch (resendError) {
+      console.error("Error sending email with Resend API:", resendError);
+      
+      // راه‌حل پشتیبان اول: امتحان از طریق MailerSend API
+      try {
+        const sender = new Sender("no-reply@mailersend.net", "XrayNama");
+        const recipients = [new Recipient(email)];
+        
+        const emailParams = new EmailParams()
+          .setFrom(sender)
+          .setTo(recipients)
+          .setSubject("کد تایید برای بازیابی رمز عبور")
+          .setHtml(htmlContent)
+          .setText(textContent);
+        
+        const response = await mailerSend.email.send(emailParams);
+        console.log("Verification email sent successfully with MailerSend fallback:", response);
+        return true;
+      } catch (mailerSendError) {
+        console.error("Error sending email with MailerSend API:", mailerSendError);
+        
+        // راه‌حل پشتیبان دوم: فقط لاگ با Nodemailer
+        try {
+          const info = await transporter.sendMail({
+            from: '"XrayNama" <no-reply@resend.dev>',
+            to: email,
+            subject: "کد تایید برای بازیابی رمز عبور",
+            text: textContent,
+            html: htmlContent
+          });
+          
+          console.log("Email logged but not sent (using JSON transport):", info);
+        } catch (nodemailerError) {
+          console.error("Also failed with Nodemailer:", nodemailerError);
+        }
+        
+        // خطا را به عنوان false برمی‌گردانیم، اما کد را در کنسول نمایش می‌دهیم
+        return false;
+      }
     }
   } catch (error) {
     console.error("Error in sendVerificationEmail function:", error);
@@ -130,40 +153,59 @@ async function sendPasswordChangeConfirmation(email: string): Promise<boolean> {
     `;
     
     try {
-      // استفاده از API MailerSend برای ارسال ایمیل
-      const sender = new Sender("no-reply@mailersend.net", "XrayNama");
-      const recipients = [new Recipient(email)];
+      // استفاده از Resend API برای ارسال ایمیل (راه‌حل اصلی)
+      const { data, error } = await resendClient.emails.send({
+        from: 'XrayNama <onboarding@resend.dev>',
+        to: [email],
+        subject: 'تایید تغییر رمز عبور',
+        html: htmlContent,
+        text: textContent,
+      });
       
-      const emailParams = new EmailParams()
-        .setFrom(sender)
-        .setTo(recipients)
-        .setSubject("تایید تغییر رمز عبور")
-        .setHtml(htmlContent)
-        .setText(textContent);
-      
-      const response = await mailerSend.email.send(emailParams);
-      console.log("Password change confirmation email sent successfully:", response);
-      return true;
-    } catch (mailerSendError) {
-      console.error("Error sending email with MailerSend API:", mailerSendError);
-      
-      // اگر با API MailerSend نتوانستیم ایمیل بفرستیم، از Nodemailer برای تست استفاده می‌کنیم
-      // که البته در حالت jsonTransport فقط لاگ می‌شود و ارسال نمی‌شود
-      try {
-        const info = await transporter.sendMail({
-          from: '"XrayNama" <no-reply@mailersend.net>',
-          to: email,
-          subject: "تایید تغییر رمز عبور",
-          text: textContent,
-          html: htmlContent
-        });
-        
-        console.log("Password change confirmation email logged (using JSON transport):", info);
-      } catch (nodemailerError) {
-        console.error("Also failed with Nodemailer:", nodemailerError);
+      if (error) {
+        throw new Error(`Resend API error: ${error.message}`);
       }
       
-      return false;
+      console.log("Password change confirmation email sent successfully with Resend:", data);
+      return true;
+    } catch (resendError) {
+      console.error("Error sending email with Resend API:", resendError);
+      
+      // راه‌حل پشتیبان اول: امتحان از طریق MailerSend API
+      try {
+        const sender = new Sender("no-reply@mailersend.net", "XrayNama");
+        const recipients = [new Recipient(email)];
+        
+        const emailParams = new EmailParams()
+          .setFrom(sender)
+          .setTo(recipients)
+          .setSubject("تایید تغییر رمز عبور")
+          .setHtml(htmlContent)
+          .setText(textContent);
+        
+        const response = await mailerSend.email.send(emailParams);
+        console.log("Password change confirmation email sent successfully with MailerSend fallback:", response);
+        return true;
+      } catch (mailerSendError) {
+        console.error("Error sending email with MailerSend API:", mailerSendError);
+        
+        // راه‌حل پشتیبان دوم: فقط لاگ با Nodemailer
+        try {
+          const info = await transporter.sendMail({
+            from: '"XrayNama" <no-reply@resend.dev>',
+            to: email,
+            subject: "تایید تغییر رمز عبور",
+            text: textContent,
+            html: htmlContent
+          });
+          
+          console.log("Password change confirmation email logged (using JSON transport):", info);
+        } catch (nodemailerError) {
+          console.error("Also failed with Nodemailer:", nodemailerError);
+        }
+        
+        return false;
+      }
     }
   } catch (error) {
     console.error("Error in sendPasswordChangeConfirmation function:", error);
