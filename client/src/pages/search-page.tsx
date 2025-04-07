@@ -1,538 +1,619 @@
-import { useState, useEffect } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { useLocation } from "wouter";
-import ContentSection from "@/components/sections/content-section";
-import TagsSection from "@/components/sections/tags-section";
-import { Content } from "@shared/schema";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Slider } from "@/components/ui/slider";
+import { useState, useEffect } from 'react';
+import { useLocation } from 'wouter';
+import { useQuery } from '@tanstack/react-query';
+import { ContentType, SearchFilters } from '@/types';
+import { Header } from '@/components/layout/Header';
+import { Footer } from '@/components/layout/Footer';
+import { ContentCard } from '@/components/common/ContentCard';
+import { Button } from '@/components/ui/button';
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+  Slider
+} from '@/components/ui/slider';
 import {
   Sheet,
   SheetContent,
   SheetHeader,
   SheetTitle,
   SheetTrigger,
-} from "@/components/ui/sheet";
+} from '@/components/ui/sheet';
 import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger
-} from "@/components/ui/tabs";
-import {
-  Search,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from '@/components/ui/select';
+import { Input } from '@/components/ui/input';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Label } from '@/components/ui/label';
+import { Separator } from '@/components/ui/separator';
+import { useDebounce } from '@/hooks/use-debounce';
+import { 
+  Search, 
+  Loader2, 
+  Filter, 
+  X, 
   SlidersHorizontal,
-  X,
-  Tag,
-  Calendar,
-  Star,
-  Filter
-} from "lucide-react";
+  ChevronLeft,
+  ChevronRight
+} from 'lucide-react';
+import { apiRequest } from '@/lib/queryClient';
 
-interface SearchPageProps {}
-
-const SearchPage: React.FC<SearchPageProps> = () => {
-  const [location, setLocation] = useLocation();
+export default function SearchPage() {
+  const [, params] = useLocation();
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filters, setFilters] = useState<SearchFilters>({});
+  const [appliedFilters, setAppliedFilters] = useState<SearchFilters>({});
+  const [yearRange, setYearRange] = useState<[number, number]>([1980, new Date().getFullYear()]);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [sortBy, setSortBy] = useState<string>('newest');
   
-  // Get search parameters from URL
-  const searchParams = new URLSearchParams(typeof window !== 'undefined' ? window.location.search : '');
-  const initialQuery = searchParams.get('q') || '';
-  const initialType = searchParams.get('type') || '';
-  const initialYear = searchParams.get('year') ? parseInt(searchParams.get('year') as string) : undefined;
-  const initialGenres = searchParams.get('genres') ? (searchParams.get('genres') as string).split(',') : [];
-  const initialTags = searchParams.get('tags') ? (searchParams.get('tags') as string).split(',') : [];
-  const initialMinRating = searchParams.get('minRating') ? parseFloat(searchParams.get('minRating') as string) : 0;
-  
-  // Search state
-  const [query, setQuery] = useState<string>(initialQuery);
-  const [type, setType] = useState<string>(initialType);
-  const [year, setYear] = useState<number | undefined>(initialYear);
-  const [genres, setGenres] = useState<string[]>(initialGenres);
-  const [tags, setTags] = useState<string[]>(initialTags);
-  const [minRating, setMinRating] = useState<number>(initialMinRating);
-  const [showMobileFilters, setShowMobileFilters] = useState<boolean>(false);
-  
-  // List of available genres for filtering
-  const availableGenres = [
-    { title: "اکشن", slug: "action" },
-    { title: "کمدی", slug: "comedy" },
-    { title: "درام", slug: "drama" },
-    { title: "علمی-تخیلی", slug: "scifi" },
-    { title: "ترسناک", slug: "horror" },
-    { title: "ماجراجویی", slug: "adventure" },
-    { title: "فانتزی", slug: "fantasy" },
-    { title: "جنایی", slug: "crime" },
-    { title: "خانوادگی", slug: "family" },
-    { title: "عاشقانه", slug: "romance" },
-    { title: "بیوگرافی", slug: "biography" },
-    { title: "تاریخی", slug: "historical" },
-    { title: "موزیکال", slug: "musical" },
-    { title: "جنگی", slug: "war" },
-    { title: "وسترن", slug: "western" },
-    { title: "ورزشی", slug: "sport" },
-    { title: "راز و رمز", slug: "mystery" }
-  ];
-  
-  // List of available tags for filtering
-  const availableTags = [
-    { title: "دوبله فارسی", slug: "persian_dub" },
-    { title: "زیرنویس فارسی", slug: "persian_sub" },
-    { title: "4K", slug: "4k" },
-    { title: "HDR", slug: "hdr" },
-    { title: "برنده اسکار", slug: "oscar" },
-    { title: "برترین IMDB", slug: "top_imdb" },
-    { title: "سه‌بعدی", slug: "3d" }
-  ];
-  
-  // List of available years
-  const years = Array.from({ length: 50 }, (_, i) => new Date().getFullYear() - i);
-  
-  // Construct search query parameters
-  const buildSearchQueryParams = () => {
-    const params: Record<string, string> = {};
+  // Extract query parameters
+  useEffect(() => {
+    const searchParams = new URLSearchParams(params);
+    const queryParam = searchParams.get('q');
+    const typeParam = searchParams.get('type');
+    const yearFromParam = searchParams.get('year_from');
+    const yearToParam = searchParams.get('year_to');
+    const minRatingParam = searchParams.get('min_rating');
+    const genreParam = searchParams.get('genre');
+    const tagParam = searchParams.get('tag');
+    const sortParam = searchParams.get('sort');
     
-    if (query) params.q = query;
-    if (type) params.type = type;
-    if (year) params.year = year.toString();
-    if (genres.length > 0) params.genres = genres.join(',');
-    if (tags.length > 0) params.tags = tags.join(',');
-    if (minRating > 0) params.minRating = minRating.toString();
+    const initialFilters: SearchFilters = {};
+    if (typeParam) initialFilters.type = typeParam as any;
+    if (yearFromParam) initialFilters.year_from = parseInt(yearFromParam);
+    if (yearToParam) initialFilters.year_to = parseInt(yearToParam);
+    if (minRatingParam) initialFilters.min_rating = parseFloat(minRatingParam);
+    if (genreParam) initialFilters.genre = genreParam;
+    if (tagParam) initialFilters.tag = tagParam;
     
-    return params;
-  };
+    setSearchQuery(queryParam || '');
+    setFilters(initialFilters);
+    setAppliedFilters(initialFilters);
+    
+    if (yearFromParam && yearToParam) {
+      setYearRange([parseInt(yearFromParam), parseInt(yearToParam)]);
+    }
+    
+    if (sortParam) {
+      setSortBy(sortParam);
+    }
+    
+    // Reset to page 1 when filters change
+    setPage(1);
+  }, [params]);
   
-  // Execute search
-  const handleSearch = () => {
-    const params = buildSearchQueryParams();
-    const queryString = new URLSearchParams(params).toString();
-    setLocation(`/search?${queryString}`);
-  };
+  const debouncedQuery = useDebounce(searchQuery, 500);
+  const ITEMS_PER_PAGE = 20;
   
-  // Reset all filters
-  const resetFilters = () => {
-    setQuery(initialQuery);
-    setType('');
-    setYear(undefined);
-    setGenres([]);
-    setTags([]);
-    setMinRating(0);
-  };
-  
-  // Handle genre selection
-  const handleGenreToggle = (slug: string) => {
-    setGenres(prev => {
-      if (prev.includes(slug)) {
-        return prev.filter(g => g !== slug);
-      } else {
-        return [...prev, slug];
-      }
-    });
-  };
-  
-  // Handle tag selection
-  const handleTagToggle = (slug: string) => {
-    setTags(prev => {
-      if (prev.includes(slug)) {
-        return prev.filter(t => t !== slug);
-      } else {
-        return [...prev, slug];
-      }
-    });
-  };
-  
-  // Fetch search results
-  const { data: searchResults = [], isLoading } = useQuery<Content[]>({
-    queryKey: ['/api/search', query, type, year, genres.join(','), tags.join(','), minRating],
+  // Search API call
+  const {
+    data: searchResults,
+    isLoading,
+    isError,
+    refetch
+  } = useQuery<ContentType[]>({
+    queryKey: ['/api/search', debouncedQuery, appliedFilters, page, sortBy],
     queryFn: async () => {
-      const params = buildSearchQueryParams();
-      const queryString = new URLSearchParams(params).toString();
-      const res = await fetch(`/api/search?${queryString}`);
-      if (!res.ok) throw new Error('Failed to fetch search results');
-      return await res.json();
+      const params = new URLSearchParams();
+      
+      if (debouncedQuery) {
+        params.append('q', debouncedQuery);
+      }
+      
+      if (appliedFilters.type) {
+        params.append('type', appliedFilters.type);
+      }
+      
+      if (appliedFilters.year_from) {
+        params.append('year_from', appliedFilters.year_from.toString());
+      }
+      
+      if (appliedFilters.year_to) {
+        params.append('year_to', appliedFilters.year_to.toString());
+      }
+      
+      if (appliedFilters.min_rating) {
+        params.append('min_rating', appliedFilters.min_rating.toString());
+      }
+      
+      if (appliedFilters.genre) {
+        params.append('genre', appliedFilters.genre);
+      }
+      
+      if (appliedFilters.tag) {
+        params.append('tag', appliedFilters.tag);
+      }
+      
+      // Pagination
+      params.append('limit', ITEMS_PER_PAGE.toString());
+      params.append('offset', ((page - 1) * ITEMS_PER_PAGE).toString());
+      
+      // Sorting
+      params.append('sort', sortBy);
+      
+      try {
+        const res = await apiRequest('GET', `/api/search?${params.toString()}`);
+        const data = await res.json();
+        
+        // Update total pages - assuming the API returns a count field
+        if (data.total) {
+          setTotalPages(Math.ceil(data.total / ITEMS_PER_PAGE));
+        } else {
+          // If no count is returned, estimate based on returned results
+          if (data.length < ITEMS_PER_PAGE) {
+            setTotalPages(page);
+          } else {
+            setTotalPages(page + 1);
+          }
+        }
+        
+        return data.results || data;
+      } catch (error) {
+        console.error('Search error:', error);
+        throw error;
+      }
     },
-    enabled: !!(query || type || year || genres.length > 0 || tags.length > 0 || minRating > 0)
+    enabled: !!debouncedQuery || Object.keys(appliedFilters).length > 0,
+    staleTime: 1000 * 60 * 5, // 5 minutes
   });
   
-  return (
-    <div className="container mx-auto px-4 py-8">
-      {/* Page Header */}
-      <div className="flex items-center gap-3 mb-8">
-        <Search className="h-6 w-6 text-primary" />
-        <h1 className="text-3xl font-bold">جستجوی پیشرفته</h1>
-      </div>
-      
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-        {/* Desktop Filter Sidebar */}
-        <div className="hidden lg:block">
-          <div className="bg-dark-card rounded-lg overflow-hidden border border-dark-border shadow-lg sticky top-20">
-            <div className="p-4 bg-dark-lighter border-b border-dark-border flex justify-between items-center">
-              <h2 className="font-bold flex items-center gap-2">
-                <Filter className="h-5 w-5" />
-                فیلترها
-              </h2>
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                className="h-8 px-2 text-sm"
-                onClick={resetFilters}
-              >
-                <X className="h-4 w-4 ml-1" />
-                پاک کردن
-              </Button>
-            </div>
-            
-            <div className="p-4 space-y-6">
-              {/* Content Type Filter */}
-              <div>
-                <h3 className="font-medium mb-3">نوع محتوا</h3>
-                <Select value={type} onValueChange={setType}>
-                  <SelectTrigger className="w-full bg-dark">
-                    <SelectValue placeholder="همه انواع" />
-                  </SelectTrigger>
-                  <SelectContent className="bg-dark-card border-dark-border">
-                    <SelectItem value="">همه انواع</SelectItem>
-                    <SelectItem value="movie">فیلم</SelectItem>
-                    <SelectItem value="series">سریال</SelectItem>
-                    <SelectItem value="animation">انیمیشن</SelectItem>
-                    <SelectItem value="documentary">مستند</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              
-              {/* Year Filter */}
-              <div>
-                <h3 className="font-medium mb-3">سال انتشار</h3>
-                <Select value={year?.toString() || ''} onValueChange={(val) => setYear(val ? parseInt(val) : undefined)}>
-                  <SelectTrigger className="w-full bg-dark">
-                    <SelectValue placeholder="انتخاب سال" />
-                  </SelectTrigger>
-                  <SelectContent className="bg-dark-card border-dark-border max-h-60">
-                    <SelectItem value="">همه سال‌ها</SelectItem>
-                    {years.map(y => (
-                      <SelectItem key={y} value={y.toString()}>{y}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              
-              {/* Minimum Rating Filter */}
-              <div>
-                <div className="flex justify-between items-center mb-3">
-                  <h3 className="font-medium">حداقل امتیاز IMDB</h3>
-                  <span className="text-sm bg-primary/30 px-2 py-0.5 rounded">
-                    {minRating.toFixed(1)}
-                  </span>
-                </div>
-                <Slider
-                  value={[minRating]}
-                  min={0}
-                  max={10}
-                  step={0.1}
-                  onValueChange={(val) => setMinRating(val[0])}
-                />
-              </div>
-              
-              {/* Genres Filter */}
-              <div>
-                <h3 className="font-medium mb-3">ژانرها</h3>
-                <div className="flex flex-wrap gap-2">
-                  {availableGenres.map(genre => (
-                    <Button
-                      key={genre.slug}
-                      variant={genres.includes(genre.slug) ? "default" : "outline"}
-                      size="sm"
-                      className={`text-xs ${genres.includes(genre.slug) ? 'bg-primary' : 'bg-dark'}`}
-                      onClick={() => handleGenreToggle(genre.slug)}
-                    >
-                      {genre.title}
-                    </Button>
-                  ))}
-                </div>
-              </div>
-              
-              {/* Tags Filter */}
-              <div>
-                <h3 className="font-medium mb-3">برچسب‌ها</h3>
-                <div className="flex flex-wrap gap-2">
-                  {availableTags.map(tag => (
-                    <Button
-                      key={tag.slug}
-                      variant={tags.includes(tag.slug) ? "default" : "outline"}
-                      size="sm"
-                      className={`text-xs ${tags.includes(tag.slug) ? 'bg-primary' : 'bg-dark'}`}
-                      onClick={() => handleTagToggle(tag.slug)}
-                    >
-                      {tag.title}
-                    </Button>
-                  ))}
-                </div>
-              </div>
-              
-              {/* Apply Filters Button */}
-              <Button className="w-full" onClick={handleSearch}>
-                اعمال فیلترها
-              </Button>
-            </div>
-          </div>
-        </div>
+  // Genre data
+  const { data: genres } = useQuery({
+    queryKey: ['/api/genres'],
+    staleTime: 1000 * 60 * 60, // 1 hour
+  });
+  
+  // Tags data
+  const { data: tags } = useQuery({
+    queryKey: ['/api/tags'],
+    staleTime: 1000 * 60 * 60, // 1 hour
+  });
+  
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    setAppliedFilters(filters);
+    setPage(1);
+    refetch();
+  };
+  
+  const handleClearFilters = () => {
+    setFilters({});
+    setYearRange([1980, new Date().getFullYear()]);
+    setAppliedFilters({});
+    setPage(1);
+  };
+  
+  const handleYearRangeChange = (value: number[]) => {
+    setYearRange([value[0], value[1]]);
+    setFilters(prev => ({
+      ...prev,
+      year_from: value[0],
+      year_to: value[1]
+    }));
+  };
+  
+  const handleFilterChange = (key: keyof SearchFilters, value: any) => {
+    setFilters(prev => ({
+      ...prev,
+      [key]: value
+    }));
+  };
+  
+  const handleSortChange = (value: string) => {
+    setSortBy(value);
+    setPage(1);
+    // Trigger a refetch with the new sort parameter
+    setTimeout(() => refetch(), 0);
+  };
+  
+  const handlePageChange = (newPage: number) => {
+    setPage(newPage);
+    // Scroll to top
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+  
+  // Generate pagination
+  const renderPagination = () => {
+    const pageNumbers = [];
+    const maxPagesToShow = 5;
+    
+    let startPage = Math.max(1, page - Math.floor(maxPagesToShow / 2));
+    let endPage = Math.min(totalPages, startPage + maxPagesToShow - 1);
+    
+    // Adjust if we're near the end
+    if (endPage - startPage + 1 < maxPagesToShow) {
+      startPage = Math.max(1, endPage - maxPagesToShow + 1);
+    }
+    
+    for (let i = startPage; i <= endPage; i++) {
+      pageNumbers.push(i);
+    }
+    
+    return (
+      <div className="flex items-center justify-center mt-8 space-x-2 rtl:space-x-reverse">
+        <Button
+          variant="outline"
+          size="icon"
+          onClick={() => handlePageChange(Math.max(1, page - 1))}
+          disabled={page === 1}
+        >
+          <ChevronRight className="h-4 w-4" />
+        </Button>
         
-        {/* Main Content */}
-        <div className="lg:col-span-3">
-          {/* Search Box */}
-          <div className="bg-dark-card rounded-lg p-4 mb-6 border border-dark-border">
-            <div className="flex gap-2">
-              <Input
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                placeholder="جستجو در عنوان، خلاصه، کارگردان، بازیگران..."
-                className="bg-dark flex-1"
-              />
-              
-              {/* Mobile Filter Button */}
-              <Sheet open={showMobileFilters} onOpenChange={setShowMobileFilters}>
-                <SheetTrigger asChild>
-                  <Button variant="outline" className="lg:hidden">
-                    <SlidersHorizontal className="h-5 w-5" />
-                  </Button>
-                </SheetTrigger>
-                <SheetContent side="right" className="bg-dark-card border-dark-border w-[85vw] sm:max-w-md overflow-y-auto">
-                  <SheetHeader>
-                    <SheetTitle className="flex items-center gap-2">
-                      <Filter className="h-5 w-5" />
-                      فیلترها
-                    </SheetTitle>
-                  </SheetHeader>
-                  
-                  <div className="mt-6 space-y-6">
-                    {/* Mobile Content Type Filter */}
-                    <div>
-                      <h3 className="font-medium mb-3">نوع محتوا</h3>
-                      <Select value={type} onValueChange={setType}>
-                        <SelectTrigger className="w-full bg-dark">
-                          <SelectValue placeholder="همه انواع" />
-                        </SelectTrigger>
-                        <SelectContent className="bg-dark-card border-dark-border">
-                          <SelectItem value="">همه انواع</SelectItem>
-                          <SelectItem value="movie">فیلم</SelectItem>
-                          <SelectItem value="series">سریال</SelectItem>
-                          <SelectItem value="animation">انیمیشن</SelectItem>
-                          <SelectItem value="documentary">مستند</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    
-                    {/* Mobile Year Filter */}
-                    <div>
-                      <h3 className="font-medium mb-3">سال انتشار</h3>
-                      <Select value={year?.toString() || ''} onValueChange={(val) => setYear(val ? parseInt(val) : undefined)}>
-                        <SelectTrigger className="w-full bg-dark">
-                          <SelectValue placeholder="انتخاب سال" />
-                        </SelectTrigger>
-                        <SelectContent className="bg-dark-card border-dark-border max-h-60">
-                          <SelectItem value="">همه سال‌ها</SelectItem>
-                          {years.map(y => (
-                            <SelectItem key={y} value={y.toString()}>{y}</SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    
-                    {/* Mobile Minimum Rating Filter */}
-                    <div>
-                      <div className="flex justify-between items-center mb-3">
-                        <h3 className="font-medium">حداقل امتیاز IMDB</h3>
-                        <span className="text-sm bg-primary/30 px-2 py-0.5 rounded">
-                          {minRating.toFixed(1)}
-                        </span>
+        {startPage > 1 && (
+          <>
+            <Button
+              variant={page === 1 ? "default" : "outline"}
+              size="sm"
+              onClick={() => handlePageChange(1)}
+            >
+              1
+            </Button>
+            {startPage > 2 && <span className="text-muted-foreground">...</span>}
+          </>
+        )}
+        
+        {pageNumbers.map(num => (
+          <Button
+            key={num}
+            variant={page === num ? "default" : "outline"}
+            size="sm"
+            onClick={() => handlePageChange(num)}
+          >
+            {num}
+          </Button>
+        ))}
+        
+        {endPage < totalPages && (
+          <>
+            {endPage < totalPages - 1 && <span className="text-muted-foreground">...</span>}
+            <Button
+              variant={page === totalPages ? "default" : "outline"}
+              size="sm"
+              onClick={() => handlePageChange(totalPages)}
+            >
+              {totalPages}
+            </Button>
+          </>
+        )}
+        
+        <Button
+          variant="outline"
+          size="icon"
+          onClick={() => handlePageChange(Math.min(totalPages, page + 1))}
+          disabled={page === totalPages}
+        >
+          <ChevronLeft className="h-4 w-4" />
+        </Button>
+      </div>
+    );
+  };
+  
+  // Get applied filters count
+  const getAppliedFiltersCount = () => {
+    return Object.keys(appliedFilters).length;
+  };
+  
+  return (
+    <>
+      <Header />
+      
+      <main className="container mx-auto px-4 py-8">
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-foreground mb-6">
+            {debouncedQuery 
+              ? `نتایج جستجو برای "${debouncedQuery}"` 
+              : getAppliedFiltersCount() > 0 
+                ? 'نتایج فیلتر شده' 
+                : 'جستجوی پیشرفته'}
+          </h1>
+          
+          <div className="glass-effect p-6 rounded-lg mb-8">
+            <form onSubmit={handleSearch} className="space-y-4">
+              <div className="flex flex-col md:flex-row gap-4">
+                <div className="relative flex-grow">
+                  <Search className="absolute right-3 top-2.5 h-5 w-5 text-muted-foreground" />
+                  <Input
+                    type="text"
+                    placeholder="جستجو فیلم، سریال، انیمیشن یا مستند..."
+                    className="pr-10"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                  />
+                  {searchQuery && (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      className="absolute left-2 top-2 h-6 w-6 p-0"
+                      onClick={() => setSearchQuery('')}
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  )}
+                </div>
+                
+                {/* Mobile filter sheet */}
+                <div className="md:hidden">
+                  <Sheet>
+                    <SheetTrigger asChild>
+                      <Button variant="outline" className="flex items-center">
+                        <Filter className="h-4 w-4 mr-2" />
+                        فیلترها
+                        {getAppliedFiltersCount() > 0 && (
+                          <span className="ml-2 bg-primary text-primary-foreground rounded-full text-xs w-5 h-5 flex items-center justify-center">
+                            {getAppliedFiltersCount()}
+                          </span>
+                        )}
+                      </Button>
+                    </SheetTrigger>
+                    <SheetContent side="left" className="w-[85vw] sm:w-[400px]">
+                      <SheetHeader>
+                        <SheetTitle>فیلترهای جستجو</SheetTitle>
+                      </SheetHeader>
+                      <div className="py-4 space-y-6">
+                        <div className="space-y-2">
+                          <Label>نوع محتوا</Label>
+                          <Select
+                            value={filters.type}
+                            onValueChange={(value) => handleFilterChange('type', value)}
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder="همه" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="movie">فیلم</SelectItem>
+                              <SelectItem value="series">سریال</SelectItem>
+                              <SelectItem value="animation">انیمیشن</SelectItem>
+                              <SelectItem value="documentary">مستند</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        
+                        <div className="space-y-2">
+                          <Label>سال انتشار</Label>
+                          <div className="px-2 pt-2">
+                            <Slider
+                              value={yearRange}
+                              min={1900}
+                              max={new Date().getFullYear()}
+                              step={1}
+                              onValueChange={handleYearRangeChange}
+                              minStepsBetweenThumbs={1}
+                            />
+                            <div className="flex justify-between mt-2 text-sm text-muted-foreground">
+                              <span>{yearRange[0]}</span>
+                              <span>{yearRange[1]}</span>
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <div className="space-y-2">
+                          <Label>حداقل امتیاز</Label>
+                          <Select
+                            value={filters.min_rating?.toString()}
+                            onValueChange={(value) => handleFilterChange('min_rating', parseFloat(value))}
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder="بدون محدودیت" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="5">بالای 5</SelectItem>
+                              <SelectItem value="6">بالای 6</SelectItem>
+                              <SelectItem value="7">بالای 7</SelectItem>
+                              <SelectItem value="8">بالای 8</SelectItem>
+                              <SelectItem value="9">بالای 9</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        
+                        {genres && genres.length > 0 && (
+                          <div className="space-y-2">
+                            <Label>ژانر</Label>
+                            <Select
+                              value={filters.genre}
+                              onValueChange={(value) => handleFilterChange('genre', value)}
+                            >
+                              <SelectTrigger>
+                                <SelectValue placeholder="همه ژانرها" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {genres.map((genre: any) => (
+                                  <SelectItem key={genre.id} value={genre.slug}>
+                                    {genre.name}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
+                        )}
+                        
+                        <div className="flex justify-end space-x-2 rtl:space-x-reverse pt-4">
+                          <Button 
+                            variant="outline"
+                            onClick={handleClearFilters}
+                          >
+                            پاک کردن
+                          </Button>
+                          <Button 
+                            onClick={() => {
+                              handleSearch(new Event('submit') as any);
+                              document.querySelector('[data-radix-dialog-close]')?.dispatchEvent(
+                                new MouseEvent('click', { bubbles: true })
+                              );
+                            }}
+                          >
+                            اعمال فیلترها
+                          </Button>
+                        </div>
                       </div>
-                      <Slider
-                        value={[minRating]}
-                        min={0}
-                        max={10}
-                        step={0.1}
-                        onValueChange={(val) => setMinRating(val[0])}
-                      />
-                    </div>
-                    
-                    {/* Mobile Category Tabs */}
-                    <Tabs defaultValue="genres">
-                      <TabsList className="grid grid-cols-2 w-full">
-                        <TabsTrigger value="genres">ژانرها</TabsTrigger>
-                        <TabsTrigger value="tags">برچسب‌ها</TabsTrigger>
-                      </TabsList>
-                      
-                      {/* Mobile Genres Tab */}
-                      <TabsContent value="genres" className="mt-4">
-                        <div className="flex flex-wrap gap-2">
-                          {availableGenres.map(genre => (
-                            <Button
-                              key={genre.slug}
-                              variant={genres.includes(genre.slug) ? "default" : "outline"}
-                              size="sm"
-                              className={`text-xs ${genres.includes(genre.slug) ? 'bg-primary' : 'bg-dark'}`}
-                              onClick={() => handleGenreToggle(genre.slug)}
-                            >
-                              {genre.title}
-                            </Button>
-                          ))}
-                        </div>
-                      </TabsContent>
-                      
-                      {/* Mobile Tags Tab */}
-                      <TabsContent value="tags" className="mt-4">
-                        <div className="flex flex-wrap gap-2">
-                          {availableTags.map(tag => (
-                            <Button
-                              key={tag.slug}
-                              variant={tags.includes(tag.slug) ? "default" : "outline"}
-                              size="sm"
-                              className={`text-xs ${tags.includes(tag.slug) ? 'bg-primary' : 'bg-dark'}`}
-                              onClick={() => handleTagToggle(tag.slug)}
-                            >
-                              {tag.title}
-                            </Button>
-                          ))}
-                        </div>
-                      </TabsContent>
-                    </Tabs>
-                    
-                    {/* Mobile Action Buttons */}
-                    <div className="flex gap-2 mt-6">
-                      <Button variant="outline" className="flex-1" onClick={resetFilters}>
-                        <X className="h-4 w-4 ml-1" />
-                        پاک کردن
-                      </Button>
-                      <Button className="flex-1" onClick={() => {
-                        handleSearch();
-                        setShowMobileFilters(false);
-                      }}>
-                        اعمال فیلترها
-                      </Button>
+                    </SheetContent>
+                  </Sheet>
+                </div>
+                
+                <div className="hidden md:flex md:space-x-2 rtl:space-x-reverse">
+                  <Button type="submit">جستجو</Button>
+                  {getAppliedFiltersCount() > 0 && (
+                    <Button 
+                      variant="outline" 
+                      type="button"
+                      onClick={handleClearFilters}
+                    >
+                      پاک کردن فیلترها
+                    </Button>
+                  )}
+                </div>
+              </div>
+              
+              {/* Desktop filters */}
+              <div className="hidden md:flex flex-wrap gap-4 pt-4">
+                <div className="flex flex-col space-y-1 min-w-[200px]">
+                  <Label>نوع محتوا</Label>
+                  <Select
+                    value={filters.type}
+                    onValueChange={(value) => handleFilterChange('type', value)}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="همه" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="movie">فیلم</SelectItem>
+                      <SelectItem value="series">سریال</SelectItem>
+                      <SelectItem value="animation">انیمیشن</SelectItem>
+                      <SelectItem value="documentary">مستند</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                <div className="flex flex-col space-y-1 min-w-[200px]">
+                  <Label>حداقل امتیاز</Label>
+                  <Select
+                    value={filters.min_rating?.toString()}
+                    onValueChange={(value) => handleFilterChange('min_rating', parseFloat(value))}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="بدون محدودیت" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="5">بالای 5</SelectItem>
+                      <SelectItem value="6">بالای 6</SelectItem>
+                      <SelectItem value="7">بالای 7</SelectItem>
+                      <SelectItem value="8">بالای 8</SelectItem>
+                      <SelectItem value="9">بالای 9</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                {genres && genres.length > 0 && (
+                  <div className="flex flex-col space-y-1 min-w-[200px]">
+                    <Label>ژانر</Label>
+                    <Select
+                      value={filters.genre}
+                      onValueChange={(value) => handleFilterChange('genre', value)}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="همه ژانرها" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {genres.map((genre: any) => (
+                          <SelectItem key={genre.id} value={genre.slug}>
+                            {genre.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
+                
+                <div className="flex flex-col space-y-1 min-w-[250px]">
+                  <Label>سال انتشار</Label>
+                  <div className="px-2 pt-6">
+                    <Slider
+                      value={yearRange}
+                      min={1900}
+                      max={new Date().getFullYear()}
+                      step={1}
+                      onValueChange={handleYearRangeChange}
+                      minStepsBetweenThumbs={1}
+                    />
+                    <div className="flex justify-between mt-2 text-sm text-muted-foreground">
+                      <span>{yearRange[0]}</span>
+                      <span>{yearRange[1]}</span>
                     </div>
                   </div>
-                </SheetContent>
-              </Sheet>
-              
-              <Button onClick={handleSearch}>
-                <Search className="h-5 w-5 ml-1" />
-                جستجو
-              </Button>
-            </div>
-            
-            {/* Active Filters Display */}
-            {(type || year || genres.length > 0 || tags.length > 0 || minRating > 0) && (
-              <div className="mt-4 flex flex-wrap gap-2 items-center">
-                <span className="text-text-secondary text-sm">فیلترهای فعال:</span>
-                
-                {type && (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="text-xs h-7 bg-primary/20 border-primary/30 text-primary-light"
-                    onClick={() => setType('')}
-                  >
-                    {type === 'movie' ? 'فیلم' : 
-                     type === 'series' ? 'سریال' : 
-                     type === 'animation' ? 'انیمیشن' : 
-                     type === 'documentary' ? 'مستند' : type}
-                    <X className="h-3 w-3 mr-1" />
-                  </Button>
-                )}
-                
-                {year && (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="text-xs h-7 bg-primary/20 border-primary/30 text-primary-light flex items-center"
-                    onClick={() => setYear(undefined)}
-                  >
-                    <Calendar className="h-3 w-3 ml-1" />
-                    {year}
-                    <X className="h-3 w-3 mr-1" />
-                  </Button>
-                )}
-                
-                {minRating > 0 && (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="text-xs h-7 bg-primary/20 border-primary/30 text-primary-light flex items-center"
-                    onClick={() => setMinRating(0)}
-                  >
-                    <Star className="h-3 w-3 ml-1" />
-                    IMDB &gt;= {minRating.toFixed(1)}
-                    <X className="h-3 w-3 mr-1" />
-                  </Button>
-                )}
-                
-                {genres.map(genre => {
-                  const genreTitle = availableGenres.find(g => g.slug === genre)?.title || genre;
-                  return (
-                    <Button
-                      key={genre}
-                      variant="outline"
-                      size="sm"
-                      className="text-xs h-7 bg-primary/20 border-primary/30 text-primary-light"
-                      onClick={() => handleGenreToggle(genre)}
-                    >
-                      {genreTitle}
-                      <X className="h-3 w-3 mr-1" />
-                    </Button>
-                  );
-                })}
-                
-                {tags.map(tag => {
-                  const tagTitle = availableTags.find(t => t.slug === tag)?.title || tag;
-                  return (
-                    <Button
-                      key={tag}
-                      variant="outline"
-                      size="sm"
-                      className="text-xs h-7 bg-primary/20 border-primary/30 text-primary-light flex items-center"
-                      onClick={() => handleTagToggle(tag)}
-                    >
-                      <Tag className="h-3 w-3 ml-1" />
-                      {tagTitle}
-                      <X className="h-3 w-3 mr-1" />
-                    </Button>
-                  );
-                })}
-                
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="text-xs h-7 text-text-secondary"
-                  onClick={resetFilters}
-                >
-                  پاک کردن همه
-                </Button>
+                </div>
               </div>
-            )}
+            </form>
           </div>
           
-          {/* Search Results */}
-          <ContentSection
-            title={`نتایج جستجو (${searchResults.length})`}
-            contents={searchResults}
-            isLoading={isLoading}
-            emptyMessage={
-              query || type || year || genres.length > 0 || tags.length > 0 || minRating > 0
-                ? "هیچ نتیجه‌ای با معیارهای جستجوی شما یافت نشد"
-                : "لطفاً یک عبارت جستجو یا فیلتر وارد کنید"
-            }
-          />
+          {/* Results section */}
+          <div className="flex justify-between items-center mb-6">
+            <div className="text-muted-foreground">
+              {searchResults && !isLoading ? (
+                <span>
+                  {searchResults.length > 0 
+                    ? `${searchResults.length} نتیجه یافت شد` 
+                    : 'نتیجه‌ای یافت نشد'}
+                </span>
+              ) : null}
+            </div>
+            
+            <div className="flex items-center">
+              <SlidersHorizontal className="h-4 w-4 mr-2 text-muted-foreground" />
+              <Select
+                value={sortBy}
+                onValueChange={handleSortChange}
+              >
+                <SelectTrigger className="w-[150px]">
+                  <SelectValue placeholder="مرتب‌سازی" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="newest">جدیدترین</SelectItem>
+                  <SelectItem value="oldest">قدیمی‌ترین</SelectItem>
+                  <SelectItem value="imdb">امتیاز IMDB</SelectItem>
+                  <SelectItem value="rating">امتیاز کاربران</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          
+          {isLoading ? (
+            <div className="flex justify-center py-12">
+              <Loader2 className="h-12 w-12 animate-spin text-primary" />
+            </div>
+          ) : isError ? (
+            <div className="text-center py-12 glass-effect rounded-lg p-8">
+              <div className="text-xl font-bold text-foreground mb-4">خطا در جستجو</div>
+              <p className="text-muted-foreground mb-6">متأسفانه خطایی در هنگام جستجو رخ داد. لطفاً دوباره تلاش کنید.</p>
+              <Button onClick={() => refetch()}>تلاش مجدد</Button>
+            </div>
+          ) : searchResults && searchResults.length > 0 ? (
+            <>
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+                {searchResults.map(item => (
+                  <ContentCard key={item.id} content={item} className="w-full" />
+                ))}
+              </div>
+              
+              {/* Pagination */}
+              {totalPages > 1 && renderPagination()}
+            </>
+          ) : (
+            (debouncedQuery || getAppliedFiltersCount() > 0) && (
+              <div className="text-center py-12 glass-effect rounded-lg p-8">
+                <div className="text-xl font-bold text-foreground mb-4">نتیجه‌ای یافت نشد</div>
+                <p className="text-muted-foreground mb-6">متأسفانه محتوایی مطابق با جستجوی شما یافت نشد. لطفاً معیارهای جستجو را تغییر دهید.</p>
+                <Button onClick={handleClearFilters}>پاک کردن فیلترها</Button>
+              </div>
+            )
+          )}
         </div>
-      </div>
-    </div>
+      </main>
+      
+      <Footer />
+    </>
   );
-};
-
-export default SearchPage;
+}

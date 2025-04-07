@@ -1,739 +1,769 @@
-import { users, User, InsertUser, contents, Content, InsertContent, episodes, Episode, InsertEpisode,
-  qualitySources, QualitySource, InsertQualitySource, ratings, Rating, InsertRating,
-  reviews, Review, InsertReview, comments, Comment, InsertComment, watchHistory,
-  WatchHistory, InsertWatchHistory, favorites, Favorite, InsertFavorite, playlists,
-  Playlist, InsertPlaylist, playlistItems, PlaylistItem, InsertPlaylistItem, 
-  watchParties, WatchParty, InsertWatchParty, watchPartyMembers, WatchPartyMember, 
-  InsertWatchPartyMember, watchPartyChatMessages, WatchPartyChatMessage, InsertWatchPartyChatMessage } from "@shared/schema";
+import { 
+  users, User, InsertUser, content, Content, InsertContent,
+  seasons, Season, InsertSeason, episodes, Episode, InsertEpisode,
+  videos, Video, InsertVideo, genres, Genre, InsertGenre,
+  tags, Tag, InsertTag, contentGenres, contentTags,
+  ratings, Rating, InsertRating, reviews, Review, InsertReview,
+  comments, Comment, InsertComment, watchlist, Watchlist, InsertWatchlist,
+  favorites, Favorite, InsertFavorite, watchHistory, playlists, Playlist, InsertPlaylist,
+  playlistItems
+} from "@shared/schema";
 import session from "express-session";
 import createMemoryStore from "memorystore";
 
 const MemoryStore = createMemoryStore(session);
 
+// Interface for the storage operations
 export interface IStorage {
-  // User management
+  // User operations
   getUser(id: number): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
   getUserByEmail(email: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
-  updateUserPoints(id: number, points: number): Promise<User | undefined>;
-  
-  // Content management
-  getContent(id: number): Promise<Content | undefined>;
-  getAllContents(type?: string, limit?: number): Promise<Content[]>;
-  searchContents(query: string, filters?: Record<string, any>): Promise<Content[]>;
+  updateUser(id: number, user: Partial<User>): Promise<User | undefined>;
+
+  // Content operations
+  getAllContent(limit?: number, offset?: number): Promise<Content[]>;
+  getContentById(id: number): Promise<Content | undefined>;
+  getContentByType(type: string, limit?: number, offset?: number): Promise<Content[]>;
+  searchContent(query: string, filters?: any): Promise<Content[]>;
+  getLatestContent(limit?: number): Promise<Content[]>;
+  getTopRatedContent(limit?: number): Promise<Content[]>;
   createContent(content: InsertContent): Promise<Content>;
-  
-  // Episode management
-  getEpisodes(contentId: number): Promise<Episode[]>;
-  getEpisode(id: number): Promise<Episode | undefined>;
+
+  // Seasons operations
+  getSeasonsByContentId(contentId: number): Promise<Season[]>;
+  createSeason(season: InsertSeason): Promise<Season>;
+
+  // Episodes operations
+  getEpisodesBySeasonId(seasonId: number): Promise<Episode[]>;
   createEpisode(episode: InsertEpisode): Promise<Episode>;
-  
-  // Quality sources management
-  getQualitySources(contentId?: number, episodeId?: number): Promise<QualitySource[]>;
-  createQualitySource(source: InsertQualitySource): Promise<QualitySource>;
-  
-  // Ratings management
-  getRatings(contentId: number): Promise<Rating[]>;
-  getUserRating(userId: number, contentId: number): Promise<Rating | undefined>;
+
+  // Videos operations
+  getVideosByContentId(contentId: number): Promise<Video[]>;
+  getVideosByEpisodeId(episodeId: number): Promise<Video[]>;
+  createVideo(video: InsertVideo): Promise<Video>;
+
+  // Genres operations
+  getAllGenres(): Promise<Genre[]>;
+  getGenresByContentId(contentId: number): Promise<Genre[]>;
+  createGenre(genre: InsertGenre): Promise<Genre>;
+  addGenreToContent(contentId: number, genreId: number): Promise<void>;
+
+  // Tags operations
+  getAllTags(): Promise<Tag[]>;
+  getTagsByContentId(contentId: number): Promise<Tag[]>;
+  createTag(tag: InsertTag): Promise<Tag>;
+  addTagToContent(contentId: number, tagId: number): Promise<void>;
+
+  // Ratings operations
+  getRatingsByContentId(contentId: number): Promise<Rating[]>;
+  getUserRatingForContent(userId: number, contentId: number): Promise<Rating | undefined>;
   createRating(rating: InsertRating): Promise<Rating>;
-  
-  // Reviews management
-  getReviews(contentId: number, approved?: boolean): Promise<Review[]>;
+  updateRating(id: number, score: number): Promise<Rating | undefined>;
+
+  // Reviews operations
+  getReviewsByContentId(contentId: number): Promise<Review[]>;
   createReview(review: InsertReview): Promise<Review>;
-  toggleReviewApproval(id: number): Promise<Review | undefined>;
-  likeReview(id: number): Promise<Review | undefined>;
-  dislikeReview(id: number): Promise<Review | undefined>;
-  
-  // Comments management
-  getComments(contentId: number, approved?: boolean): Promise<Comment[]>;
+  approveReview(id: number): Promise<void>;
+
+  // Comments operations
+  getCommentsByContentId(contentId: number): Promise<Comment[]>;
   createComment(comment: InsertComment): Promise<Comment>;
-  toggleCommentApproval(id: number): Promise<Comment | undefined>;
-  likeComment(id: number): Promise<Comment | undefined>;
-  dislikeComment(id: number): Promise<Comment | undefined>;
-  
-  // Watch history management
-  getWatchHistory(userId: number): Promise<WatchHistory[]>;
-  updateWatchProgress(userId: number, contentId: number, episodeId: number | null, progress: number, completed: boolean): Promise<WatchHistory | undefined>;
-  
-  // Favorites management
-  getFavorites(userId: number): Promise<Favorite[]>;
-  addFavorite(userId: number, contentId: number): Promise<Favorite>;
-  removeFavorite(userId: number, contentId: number): Promise<boolean>;
-  
-  // Playlist management
-  getPlaylists(userId: number): Promise<Playlist[]>;
-  getPlaylist(id: number): Promise<Playlist | undefined>;
+  approveComment(id: number): Promise<void>;
+
+  // Watchlist operations
+  getUserWatchlist(userId: number): Promise<Content[]>;
+  addToWatchlist(watchlistItem: InsertWatchlist): Promise<Watchlist>;
+  removeFromWatchlist(userId: number, contentId: number): Promise<void>;
+  isInWatchlist(userId: number, contentId: number): Promise<boolean>;
+
+  // Favorites operations
+  getUserFavorites(userId: number): Promise<Content[]>;
+  addToFavorites(favorite: InsertFavorite): Promise<Favorite>;
+  removeFromFavorites(userId: number, contentId: number): Promise<void>;
+  isInFavorites(userId: number, contentId: number): Promise<boolean>;
+
+  // Watch History operations
+  getUserWatchHistory(userId: number): Promise<any[]>;
+  addToWatchHistory(userId: number, contentId: number, episodeId?: number, position?: number): Promise<void>;
+  updateWatchHistory(userId: number, contentId: number, episodeId?: number, position?: number, completed?: boolean): Promise<void>;
+
+  // Playlists operations
+  getUserPlaylists(userId: number): Promise<Playlist[]>;
+  getPlaylistById(id: number): Promise<Playlist | undefined>;
+  getPlaylistItems(playlistId: number): Promise<Content[]>;
   createPlaylist(playlist: InsertPlaylist): Promise<Playlist>;
-  addToPlaylist(playlistId: number, contentId: number, order: number): Promise<PlaylistItem>;
-  removeFromPlaylist(playlistId: number, contentId: number): Promise<boolean>;
-  
-  // Watch party management
-  createWatchParty(watchParty: InsertWatchParty): Promise<WatchParty>;
-  getWatchParty(partyCode: string): Promise<WatchParty | undefined>;
-  joinWatchParty(partyId: number, userId: number): Promise<WatchPartyMember>;
-  getWatchPartyMembers(partyId: number): Promise<WatchPartyMember[]>;
-  addWatchPartyChatMessage(message: InsertWatchPartyChatMessage): Promise<WatchPartyChatMessage>;
-  getWatchPartyChatMessages(partyId: number): Promise<WatchPartyChatMessage[]>;
-  
-  // Session storage
+  addToPlaylist(playlistId: number, contentId: number, order: number): Promise<void>;
+  removeFromPlaylist(playlistId: number, contentId: number): Promise<void>;
+
+  // Session store
   sessionStore: session.SessionStore;
 }
 
+// In-memory implementation of the storage interface
 export class MemStorage implements IStorage {
-  private users: Map<number, User>;
-  private contents: Map<number, Content>;
-  private episodes: Map<number, Episode>;
-  private qualitySources: Map<number, QualitySource>;
-  private ratings: Map<number, Rating>;
-  private reviews: Map<number, Review>;
-  private comments: Map<number, Comment>;
-  private watchHistories: Map<number, WatchHistory>;
-  private favorites: Map<number, Favorite>;
-  private playlists: Map<number, Playlist>;
-  private playlistItems: Map<number, PlaylistItem>;
-  private watchParties: Map<number, WatchParty>;
-  private watchPartyMembers: Map<number, WatchPartyMember>;
-  private watchPartyChatMessages: Map<number, WatchPartyChatMessage>;
-
+  private usersMap: Map<number, User>;
+  private contentMap: Map<number, Content>;
+  private seasonsMap: Map<number, Season>;
+  private episodesMap: Map<number, Episode>;
+  private videosMap: Map<number, Video>;
+  private genresMap: Map<number, Genre>;
+  private tagsMap: Map<number, Tag>;
+  private contentGenresMap: Map<number, { contentId: number, genreId: number }>;
+  private contentTagsMap: Map<number, { contentId: number, tagId: number }>;
+  private ratingsMap: Map<number, Rating>;
+  private reviewsMap: Map<number, Review>;
+  private commentsMap: Map<number, Comment>;
+  private watchlistMap: Map<number, Watchlist>;
+  private favoritesMap: Map<number, Favorite>;
+  private watchHistoryMap: Map<number, any>;
+  private playlistsMap: Map<number, Playlist>;
+  private playlistItemsMap: Map<number, { playlistId: number, contentId: number, order: number }>;
+  
+  public sessionStore: session.SessionStore;
   private currentIds: {
     users: number;
-    contents: number;
+    content: number;
+    seasons: number;
     episodes: number;
-    qualitySources: number;
+    videos: number;
+    genres: number;
+    tags: number;
+    contentGenres: number;
+    contentTags: number;
     ratings: number;
     reviews: number;
     comments: number;
-    watchHistories: number;
+    watchlist: number;
     favorites: number;
+    watchHistory: number;
     playlists: number;
     playlistItems: number;
-    watchParties: number;
-    watchPartyMembers: number;
-    watchPartyChatMessages: number;
   };
 
-  sessionStore: session.SessionStore;
-
   constructor() {
-    this.users = new Map();
-    this.contents = new Map();
-    this.episodes = new Map();
-    this.qualitySources = new Map();
-    this.ratings = new Map();
-    this.reviews = new Map();
-    this.comments = new Map();
-    this.watchHistories = new Map();
-    this.favorites = new Map();
-    this.playlists = new Map();
-    this.playlistItems = new Map();
-    this.watchParties = new Map();
-    this.watchPartyMembers = new Map();
-    this.watchPartyChatMessages = new Map();
-
+    this.usersMap = new Map();
+    this.contentMap = new Map();
+    this.seasonsMap = new Map();
+    this.episodesMap = new Map();
+    this.videosMap = new Map();
+    this.genresMap = new Map();
+    this.tagsMap = new Map();
+    this.contentGenresMap = new Map();
+    this.contentTagsMap = new Map();
+    this.ratingsMap = new Map();
+    this.reviewsMap = new Map();
+    this.commentsMap = new Map();
+    this.watchlistMap = new Map();
+    this.favoritesMap = new Map();
+    this.watchHistoryMap = new Map();
+    this.playlistsMap = new Map();
+    this.playlistItemsMap = new Map();
+    
+    this.sessionStore = new MemoryStore({
+      checkPeriod: 86400000 // 24 hours
+    });
+    
     this.currentIds = {
       users: 1,
-      contents: 1,
+      content: 1,
+      seasons: 1,
       episodes: 1,
-      qualitySources: 1,
+      videos: 1,
+      genres: 1,
+      tags: 1,
+      contentGenres: 1,
+      contentTags: 1,
       ratings: 1,
       reviews: 1,
       comments: 1,
-      watchHistories: 1,
+      watchlist: 1,
       favorites: 1,
+      watchHistory: 1,
       playlists: 1,
-      playlistItems: 1,
-      watchParties: 1,
-      watchPartyMembers: 1,
-      watchPartyChatMessages: 1,
+      playlistItems: 1
     };
-
-    this.sessionStore = new MemoryStore({
-      checkPeriod: 86400000, // prune expired entries every 24h
-    });
   }
 
   // User methods
   async getUser(id: number): Promise<User | undefined> {
-    return this.users.get(id);
+    return this.usersMap.get(id);
   }
 
   async getUserByUsername(username: string): Promise<User | undefined> {
-    return Array.from(this.users.values()).find(
-      (user) => user.username.toLowerCase() === username.toLowerCase()
+    return Array.from(this.usersMap.values()).find(
+      (user) => user.username === username
     );
   }
 
   async getUserByEmail(email: string): Promise<User | undefined> {
-    return Array.from(this.users.values()).find(
-      (user) => user.email.toLowerCase() === email.toLowerCase()
+    return Array.from(this.usersMap.values()).find(
+      (user) => user.email === email
     );
   }
 
-  async createUser(userData: InsertUser): Promise<User> {
+  async createUser(insertUser: InsertUser): Promise<User> {
     const id = this.currentIds.users++;
     const now = new Date();
     const user: User = { 
-      ...userData, 
-      id,
-      points: 0,
-      createdAt: now,
-      badges: [],
+      ...insertUser, 
+      id, 
+      createdAt: now, 
+      updatedAt: now,
+      avatar: insertUser.avatar || null
     };
-    this.users.set(id, user);
+    this.usersMap.set(id, user);
     return user;
   }
 
-  async updateUserPoints(id: number, points: number): Promise<User | undefined> {
-    const user = await this.getUser(id);
+  async updateUser(id: number, userData: Partial<User>): Promise<User | undefined> {
+    const user = this.usersMap.get(id);
     if (!user) return undefined;
     
     const updatedUser = { 
       ...user, 
-      points: user.points + points 
+      ...userData, 
+      updatedAt: new Date() 
     };
-    this.users.set(id, updatedUser);
+    this.usersMap.set(id, updatedUser);
     return updatedUser;
   }
 
   // Content methods
-  async getContent(id: number): Promise<Content | undefined> {
-    return this.contents.get(id);
+  async getAllContent(limit: number = 10, offset: number = 0): Promise<Content[]> {
+    return Array.from(this.contentMap.values())
+      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
+      .slice(offset, offset + limit);
   }
 
-  async getAllContents(type?: string, limit?: number): Promise<Content[]> {
-    let contents = Array.from(this.contents.values());
-    
-    if (type) {
-      contents = contents.filter(content => content.type === type);
-    }
-    
-    contents.sort((a, b) => {
-      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-    });
-    
-    if (limit) {
-      contents = contents.slice(0, limit);
-    }
-    
-    return contents;
+  async getContentById(id: number): Promise<Content | undefined> {
+    return this.contentMap.get(id);
   }
 
-  async searchContents(query: string, filters?: Record<string, any>): Promise<Content[]> {
-    let contents = Array.from(this.contents.values());
+  async getContentByType(type: string, limit: number = 10, offset: number = 0): Promise<Content[]> {
+    return Array.from(this.contentMap.values())
+      .filter(content => content.type === type)
+      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
+      .slice(offset, offset + limit);
+  }
+
+  async searchContent(query: string, filters: any = {}): Promise<Content[]> {
+    let results = Array.from(this.contentMap.values());
     
-    // Text search
+    // Basic search by title
     if (query) {
       const lowerQuery = query.toLowerCase();
-      contents = contents.filter(content => 
-        content.title.toLowerCase().includes(lowerQuery) || 
-        content.englishTitle.toLowerCase().includes(lowerQuery) ||
-        (content.synopsis && content.synopsis.toLowerCase().includes(lowerQuery)) ||
-        (content.director && content.director.toLowerCase().includes(lowerQuery)) ||
-        (content.actors && content.actors.toLowerCase().includes(lowerQuery))
+      results = results.filter(item => 
+        item.title.toLowerCase().includes(lowerQuery) || 
+        item.englishTitle.toLowerCase().includes(lowerQuery)
       );
     }
     
     // Apply filters
-    if (filters) {
-      if (filters.type) {
-        contents = contents.filter(content => content.type === filters.type);
-      }
-      
-      if (filters.year) {
-        contents = contents.filter(content => content.year === filters.year);
-      }
-      
-      if (filters.genres && filters.genres.length) {
-        contents = contents.filter(content => 
-          content.genres.some(genre => filters.genres.includes(genre))
-        );
-      }
-      
-      if (filters.tags && filters.tags.length) {
-        contents = contents.filter(content => 
-          content.tags.some(tag => filters.tags.includes(tag))
-        );
-      }
-      
-      if (filters.minRating) {
-        contents = contents.filter(content => {
-          const rating = parseFloat(content.imdbRating || "0");
-          return rating >= filters.minRating;
-        });
+    if (filters.type) {
+      results = results.filter(item => item.type === filters.type);
+    }
+    
+    if (filters.year) {
+      if (filters.year.from && filters.year.to) {
+        results = results.filter(item => item.year >= filters.year.from && item.year <= filters.year.to);
+      } else if (filters.year.from) {
+        results = results.filter(item => item.year >= filters.year.from);
+      } else if (filters.year.to) {
+        results = results.filter(item => item.year <= filters.year.to);
       }
     }
     
-    return contents;
+    if (filters.minRating) {
+      // This would require joining with ratings data
+      // Simple implementation for in-memory
+      results = results.filter(item => {
+        const contentRatings = Array.from(this.ratingsMap.values())
+          .filter(rating => rating.contentId === item.id);
+        
+        if (contentRatings.length === 0) return false;
+        
+        const avgRating = contentRatings.reduce((sum, rating) => sum + rating.score, 0) / contentRatings.length;
+        return avgRating >= filters.minRating;
+      });
+    }
+    
+    return results;
   }
 
-  async createContent(contentData: InsertContent): Promise<Content> {
-    const id = this.currentIds.contents++;
+  async getLatestContent(limit: number = 10): Promise<Content[]> {
+    return Array.from(this.contentMap.values())
+      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
+      .slice(0, limit);
+  }
+
+  async getTopRatedContent(limit: number = 10): Promise<Content[]> {
+    // Get all content
+    const allContent = Array.from(this.contentMap.values());
+    
+    // Calculate average ratings
+    const contentWithRatings = allContent.map(item => {
+      const contentRatings = Array.from(this.ratingsMap.values())
+        .filter(rating => rating.contentId === item.id);
+      
+      const avgRating = contentRatings.length > 0 
+        ? contentRatings.reduce((sum, rating) => sum + rating.score, 0) / contentRatings.length 
+        : 0;
+      
+      return { ...item, avgRating };
+    });
+    
+    // Sort by average rating and return top N
+    return contentWithRatings
+      .sort((a, b) => b.avgRating - a.avgRating)
+      .slice(0, limit);
+  }
+
+  async createContent(insertContent: InsertContent): Promise<Content> {
+    const id = this.currentIds.content++;
     const now = new Date();
-    const content: Content = {
-      ...contentData,
-      id,
-      createdAt: now,
-      updatedAt: now,
+    const content: Content = { 
+      ...insertContent, 
+      id, 
+      createdAt: now, 
+      updatedAt: now 
     };
-    this.contents.set(id, content);
+    this.contentMap.set(id, content);
     return content;
   }
 
-  // Episode methods
-  async getEpisodes(contentId: number): Promise<Episode[]> {
-    return Array.from(this.episodes.values())
-      .filter(episode => episode.contentId === contentId)
-      .sort((a, b) => {
-        if (a.season !== b.season) {
-          return a.season - b.season;
-        }
-        return a.episode - b.episode;
-      });
+  // Seasons methods
+  async getSeasonsByContentId(contentId: number): Promise<Season[]> {
+    return Array.from(this.seasonsMap.values())
+      .filter(season => season.contentId === contentId)
+      .sort((a, b) => a.seasonNumber - b.seasonNumber);
   }
 
-  async getEpisode(id: number): Promise<Episode | undefined> {
-    return this.episodes.get(id);
-  }
-
-  async createEpisode(episodeData: InsertEpisode): Promise<Episode> {
-    const id = this.currentIds.episodes++;
-    const episode: Episode = {
-      ...episodeData,
-      id
+  async createSeason(insertSeason: InsertSeason): Promise<Season> {
+    const id = this.currentIds.seasons++;
+    const now = new Date();
+    const season: Season = { 
+      ...insertSeason, 
+      id, 
+      createdAt: now, 
+      updatedAt: now 
     };
-    this.episodes.set(id, episode);
+    this.seasonsMap.set(id, season);
+    return season;
+  }
+
+  // Episodes methods
+  async getEpisodesBySeasonId(seasonId: number): Promise<Episode[]> {
+    return Array.from(this.episodesMap.values())
+      .filter(episode => episode.seasonId === seasonId)
+      .sort((a, b) => a.episodeNumber - b.episodeNumber);
+  }
+
+  async createEpisode(insertEpisode: InsertEpisode): Promise<Episode> {
+    const id = this.currentIds.episodes++;
+    const now = new Date();
+    const episode: Episode = { 
+      ...insertEpisode, 
+      id, 
+      createdAt: now, 
+      updatedAt: now 
+    };
+    this.episodesMap.set(id, episode);
     return episode;
   }
 
-  // Quality sources methods
-  async getQualitySources(contentId?: number, episodeId?: number): Promise<QualitySource[]> {
-    let sources = Array.from(this.qualitySources.values());
-    
-    if (contentId) {
-      sources = sources.filter(source => source.contentId === contentId);
-    }
-    
-    if (episodeId) {
-      sources = sources.filter(source => source.episodeId === episodeId);
-    }
-    
-    return sources;
+  // Videos methods
+  async getVideosByContentId(contentId: number): Promise<Video[]> {
+    return Array.from(this.videosMap.values())
+      .filter(video => video.contentId === contentId);
   }
 
-  async createQualitySource(sourceData: InsertQualitySource): Promise<QualitySource> {
-    const id = this.currentIds.qualitySources++;
-    const source: QualitySource = {
-      ...sourceData,
-      id
+  async getVideosByEpisodeId(episodeId: number): Promise<Video[]> {
+    return Array.from(this.videosMap.values())
+      .filter(video => video.episodeId === episodeId);
+  }
+
+  async createVideo(insertVideo: InsertVideo): Promise<Video> {
+    const id = this.currentIds.videos++;
+    const now = new Date();
+    const video: Video = { 
+      ...insertVideo, 
+      id, 
+      createdAt: now, 
+      updatedAt: now 
     };
-    this.qualitySources.set(id, source);
-    return source;
+    this.videosMap.set(id, video);
+    return video;
+  }
+
+  // Genres methods
+  async getAllGenres(): Promise<Genre[]> {
+    return Array.from(this.genresMap.values());
+  }
+
+  async getGenresByContentId(contentId: number): Promise<Genre[]> {
+    // Find genre IDs associated with this content
+    const genreIds = Array.from(this.contentGenresMap.values())
+      .filter(cg => cg.contentId === contentId)
+      .map(cg => cg.genreId);
+    
+    // Get the genre objects
+    return genreIds.map(id => this.genresMap.get(id)).filter(Boolean) as Genre[];
+  }
+
+  async createGenre(insertGenre: InsertGenre): Promise<Genre> {
+    const id = this.currentIds.genres++;
+    const now = new Date();
+    const genre: Genre = { 
+      ...insertGenre, 
+      id, 
+      createdAt: now, 
+      updatedAt: now 
+    };
+    this.genresMap.set(id, genre);
+    return genre;
+  }
+
+  async addGenreToContent(contentId: number, genreId: number): Promise<void> {
+    const id = this.currentIds.contentGenres++;
+    this.contentGenresMap.set(id, { contentId, genreId });
+  }
+
+  // Tags methods
+  async getAllTags(): Promise<Tag[]> {
+    return Array.from(this.tagsMap.values());
+  }
+
+  async getTagsByContentId(contentId: number): Promise<Tag[]> {
+    // Find tag IDs associated with this content
+    const tagIds = Array.from(this.contentTagsMap.values())
+      .filter(ct => ct.contentId === contentId)
+      .map(ct => ct.tagId);
+    
+    // Get the tag objects
+    return tagIds.map(id => this.tagsMap.get(id)).filter(Boolean) as Tag[];
+  }
+
+  async createTag(insertTag: InsertTag): Promise<Tag> {
+    const id = this.currentIds.tags++;
+    const now = new Date();
+    const tag: Tag = { 
+      ...insertTag, 
+      id, 
+      createdAt: now, 
+      updatedAt: now 
+    };
+    this.tagsMap.set(id, tag);
+    return tag;
+  }
+
+  async addTagToContent(contentId: number, tagId: number): Promise<void> {
+    const id = this.currentIds.contentTags++;
+    this.contentTagsMap.set(id, { contentId, tagId });
   }
 
   // Ratings methods
-  async getRatings(contentId: number): Promise<Rating[]> {
-    return Array.from(this.ratings.values())
+  async getRatingsByContentId(contentId: number): Promise<Rating[]> {
+    return Array.from(this.ratingsMap.values())
       .filter(rating => rating.contentId === contentId);
   }
 
-  async getUserRating(userId: number, contentId: number): Promise<Rating | undefined> {
-    return Array.from(this.ratings.values())
+  async getUserRatingForContent(userId: number, contentId: number): Promise<Rating | undefined> {
+    return Array.from(this.ratingsMap.values())
       .find(rating => rating.userId === userId && rating.contentId === contentId);
   }
 
-  async createRating(ratingData: InsertRating): Promise<Rating> {
-    // Check if user already rated this content
-    const existingRating = await this.getUserRating(ratingData.userId, ratingData.contentId);
-    
-    if (existingRating) {
-      // Update existing rating
-      const updatedRating: Rating = {
-        ...existingRating,
-        rating: ratingData.rating,
-      };
-      this.ratings.set(existingRating.id, updatedRating);
-      return updatedRating;
-    }
-    
-    // Create new rating
+  async createRating(insertRating: InsertRating): Promise<Rating> {
     const id = this.currentIds.ratings++;
     const now = new Date();
-    const rating: Rating = {
-      ...ratingData,
-      id,
-      createdAt: now,
+    const rating: Rating = { 
+      ...insertRating, 
+      id, 
+      createdAt: now, 
+      updatedAt: now 
     };
-    this.ratings.set(id, rating);
+    this.ratingsMap.set(id, rating);
     return rating;
   }
 
-  // Reviews methods
-  async getReviews(contentId: number, approved?: boolean): Promise<Review[]> {
-    let reviews = Array.from(this.reviews.values())
-      .filter(review => review.contentId === contentId);
+  async updateRating(id: number, score: number): Promise<Rating | undefined> {
+    const rating = this.ratingsMap.get(id);
+    if (!rating) return undefined;
     
-    if (approved !== undefined) {
-      reviews = reviews.filter(review => review.approved === approved);
-    }
-    
-    return reviews.sort((a, b) => 
-      new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-    );
+    const updatedRating = { 
+      ...rating, 
+      score, 
+      updatedAt: new Date() 
+    };
+    this.ratingsMap.set(id, updatedRating);
+    return updatedRating;
   }
 
-  async createReview(reviewData: InsertReview): Promise<Review> {
+  // Reviews methods
+  async getReviewsByContentId(contentId: number): Promise<Review[]> {
+    return Array.from(this.reviewsMap.values())
+      .filter(review => review.contentId === contentId && review.isApproved)
+      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+  }
+
+  async createReview(insertReview: InsertReview): Promise<Review> {
     const id = this.currentIds.reviews++;
     const now = new Date();
-    const review: Review = {
-      ...reviewData,
-      id,
-      approved: false,
-      likes: 0,
-      dislikes: 0,
-      createdAt: now,
+    const review: Review = { 
+      ...insertReview, 
+      id, 
+      createdAt: now, 
+      updatedAt: now 
     };
-    this.reviews.set(id, review);
+    this.reviewsMap.set(id, review);
     return review;
   }
 
-  async toggleReviewApproval(id: number): Promise<Review | undefined> {
-    const review = this.reviews.get(id);
-    if (!review) return undefined;
-    
-    const updatedReview: Review = {
-      ...review,
-      approved: !review.approved,
-    };
-    this.reviews.set(id, updatedReview);
-    return updatedReview;
-  }
-
-  async likeReview(id: number): Promise<Review | undefined> {
-    const review = this.reviews.get(id);
-    if (!review) return undefined;
-    
-    const updatedReview: Review = {
-      ...review,
-      likes: review.likes + 1,
-    };
-    this.reviews.set(id, updatedReview);
-    return updatedReview;
-  }
-
-  async dislikeReview(id: number): Promise<Review | undefined> {
-    const review = this.reviews.get(id);
-    if (!review) return undefined;
-    
-    const updatedReview: Review = {
-      ...review,
-      dislikes: review.dislikes + 1,
-    };
-    this.reviews.set(id, updatedReview);
-    return updatedReview;
+  async approveReview(id: number): Promise<void> {
+    const review = this.reviewsMap.get(id);
+    if (review) {
+      this.reviewsMap.set(id, { ...review, isApproved: true, updatedAt: new Date() });
+    }
   }
 
   // Comments methods
-  async getComments(contentId: number, approved?: boolean): Promise<Comment[]> {
-    let comments = Array.from(this.comments.values())
-      .filter(comment => comment.contentId === contentId);
-    
-    if (approved !== undefined) {
-      comments = comments.filter(comment => comment.approved === approved);
-    }
-    
-    return comments.sort((a, b) => 
-      new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-    );
+  async getCommentsByContentId(contentId: number): Promise<Comment[]> {
+    return Array.from(this.commentsMap.values())
+      .filter(comment => comment.contentId === contentId && comment.isApproved)
+      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
   }
 
-  async createComment(commentData: InsertComment): Promise<Comment> {
+  async createComment(insertComment: InsertComment): Promise<Comment> {
     const id = this.currentIds.comments++;
     const now = new Date();
-    const comment: Comment = {
-      ...commentData,
-      id,
-      approved: false,
-      likes: 0,
-      dislikes: 0,
-      createdAt: now,
+    const comment: Comment = { 
+      ...insertComment, 
+      id, 
+      createdAt: now, 
+      updatedAt: now 
     };
-    this.comments.set(id, comment);
+    this.commentsMap.set(id, comment);
     return comment;
   }
 
-  async toggleCommentApproval(id: number): Promise<Comment | undefined> {
-    const comment = this.comments.get(id);
-    if (!comment) return undefined;
+  async approveComment(id: number): Promise<void> {
+    const comment = this.commentsMap.get(id);
+    if (comment) {
+      this.commentsMap.set(id, { ...comment, isApproved: true, updatedAt: new Date() });
+    }
+  }
+
+  // Watchlist methods
+  async getUserWatchlist(userId: number): Promise<Content[]> {
+    // Find content IDs in the user's watchlist
+    const contentIds = Array.from(this.watchlistMap.values())
+      .filter(item => item.userId === userId)
+      .map(item => item.contentId);
     
-    const updatedComment: Comment = {
-      ...comment,
-      approved: !comment.approved,
-    };
-    this.comments.set(id, updatedComment);
-    return updatedComment;
+    // Get the content objects
+    return contentIds
+      .map(id => this.contentMap.get(id))
+      .filter(Boolean) as Content[];
   }
 
-  async likeComment(id: number): Promise<Comment | undefined> {
-    const comment = this.comments.get(id);
-    if (!comment) return undefined;
-    
-    const updatedComment: Comment = {
-      ...comment,
-      likes: comment.likes + 1,
-    };
-    this.comments.set(id, updatedComment);
-    return updatedComment;
-  }
-
-  async dislikeComment(id: number): Promise<Comment | undefined> {
-    const comment = this.comments.get(id);
-    if (!comment) return undefined;
-    
-    const updatedComment: Comment = {
-      ...comment,
-      dislikes: comment.dislikes + 1,
-    };
-    this.comments.set(id, updatedComment);
-    return updatedComment;
-  }
-
-  // Watch history methods
-  async getWatchHistory(userId: number): Promise<WatchHistory[]> {
-    return Array.from(this.watchHistories.values())
-      .filter(history => history.userId === userId)
-      .sort((a, b) => 
-        new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
-      );
-  }
-
-  async updateWatchProgress(
-    userId: number, 
-    contentId: number, 
-    episodeId: number | null, 
-    progress: number, 
-    completed: boolean
-  ): Promise<WatchHistory | undefined> {
-    // Check if entry exists
-    const existingEntry = Array.from(this.watchHistories.values()).find(
-      history => history.userId === userId && 
-                history.contentId === contentId && 
-                history.episodeId === episodeId
+  async addToWatchlist(insertWatchlist: InsertWatchlist): Promise<Watchlist> {
+    // Check if already exists
+    const exists = Array.from(this.watchlistMap.values()).find(
+      item => item.userId === insertWatchlist.userId && item.contentId === insertWatchlist.contentId
     );
     
+    if (exists) return exists;
+    
+    const id = this.currentIds.watchlist++;
     const now = new Date();
-    
-    if (existingEntry) {
-      // Update existing entry
-      const updatedEntry: WatchHistory = {
-        ...existingEntry,
-        progress,
-        completed,
-        updatedAt: now,
-      };
-      this.watchHistories.set(existingEntry.id, updatedEntry);
-      return updatedEntry;
-    }
-    
-    // Create new entry
-    const id = this.currentIds.watchHistories++;
-    const newEntry: WatchHistory = {
-      id,
-      userId,
-      contentId,
-      episodeId,
-      progress,
-      completed,
-      createdAt: now,
-      updatedAt: now,
+    const watchlistItem: Watchlist = { 
+      ...insertWatchlist, 
+      id, 
+      createdAt: now
     };
-    this.watchHistories.set(id, newEntry);
-    return newEntry;
+    this.watchlistMap.set(id, watchlistItem);
+    return watchlistItem;
+  }
+
+  async removeFromWatchlist(userId: number, contentId: number): Promise<void> {
+    const item = Array.from(this.watchlistMap.entries()).find(
+      ([_, item]) => item.userId === userId && item.contentId === contentId
+    );
+    
+    if (item) {
+      this.watchlistMap.delete(item[0]);
+    }
+  }
+
+  async isInWatchlist(userId: number, contentId: number): Promise<boolean> {
+    return Array.from(this.watchlistMap.values()).some(
+      item => item.userId === userId && item.contentId === contentId
+    );
   }
 
   // Favorites methods
-  async getFavorites(userId: number): Promise<Favorite[]> {
-    return Array.from(this.favorites.values())
-      .filter(favorite => favorite.userId === userId)
-      .sort((a, b) => 
-        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-      );
+  async getUserFavorites(userId: number): Promise<Content[]> {
+    // Find content IDs in the user's favorites
+    const contentIds = Array.from(this.favoritesMap.values())
+      .filter(item => item.userId === userId)
+      .map(item => item.contentId);
+    
+    // Get the content objects
+    return contentIds
+      .map(id => this.contentMap.get(id))
+      .filter(Boolean) as Content[];
   }
 
-  async addFavorite(userId: number, contentId: number): Promise<Favorite> {
-    // Check if already in favorites
-    const existingFavorite = Array.from(this.favorites.values()).find(
-      fav => fav.userId === userId && fav.contentId === contentId
+  async addToFavorites(insertFavorite: InsertFavorite): Promise<Favorite> {
+    // Check if already exists
+    const exists = Array.from(this.favoritesMap.values()).find(
+      item => item.userId === insertFavorite.userId && item.contentId === insertFavorite.contentId
     );
     
-    if (existingFavorite) {
-      return existingFavorite;
-    }
+    if (exists) return exists;
     
-    // Add to favorites
     const id = this.currentIds.favorites++;
     const now = new Date();
-    const favorite: Favorite = {
-      id,
-      userId,
-      contentId,
-      createdAt: now,
+    const favoriteItem: Favorite = { 
+      ...insertFavorite, 
+      id, 
+      createdAt: now
     };
-    this.favorites.set(id, favorite);
-    return favorite;
+    this.favoritesMap.set(id, favoriteItem);
+    return favoriteItem;
   }
 
-  async removeFavorite(userId: number, contentId: number): Promise<boolean> {
-    const favorite = Array.from(this.favorites.values()).find(
-      fav => fav.userId === userId && fav.contentId === contentId
+  async removeFromFavorites(userId: number, contentId: number): Promise<void> {
+    const item = Array.from(this.favoritesMap.entries()).find(
+      ([_, item]) => item.userId === userId && item.contentId === contentId
     );
     
-    if (!favorite) {
-      return false;
+    if (item) {
+      this.favoritesMap.delete(item[0]);
     }
-    
-    return this.favorites.delete(favorite.id);
   }
 
-  // Playlist methods
-  async getPlaylists(userId: number): Promise<Playlist[]> {
-    return Array.from(this.playlists.values())
-      .filter(playlist => playlist.userId === userId)
-      .sort((a, b) => 
-        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-      );
+  async isInFavorites(userId: number, contentId: number): Promise<boolean> {
+    return Array.from(this.favoritesMap.values()).some(
+      item => item.userId === userId && item.contentId === contentId
+    );
   }
 
-  async getPlaylist(id: number): Promise<Playlist | undefined> {
-    return this.playlists.get(id);
+  // Watch History methods
+  async getUserWatchHistory(userId: number): Promise<any[]> {
+    return Array.from(this.watchHistoryMap.values())
+      .filter(item => item.userId === userId)
+      .sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime());
   }
 
-  async createPlaylist(playlistData: InsertPlaylist): Promise<Playlist> {
-    const id = this.currentIds.playlists++;
-    const now = new Date();
-    const playlist: Playlist = {
-      ...playlistData,
-      id,
-      createdAt: now,
-    };
-    this.playlists.set(id, playlist);
-    return playlist;
-  }
-
-  async addToPlaylist(playlistId: number, contentId: number, order: number): Promise<PlaylistItem> {
-    // Check if item already in playlist
-    const existingItem = Array.from(this.playlistItems.values()).find(
-      item => item.playlistId === playlistId && item.contentId === contentId
+  async addToWatchHistory(userId: number, contentId: number, episodeId?: number, position: number = 0): Promise<void> {
+    // Check if already exists
+    const existingItem = Array.from(this.watchHistoryMap.values()).find(
+      item => item.userId === userId && item.contentId === contentId && 
+      (episodeId ? item.episodeId === episodeId : !item.episodeId)
     );
     
     if (existingItem) {
-      // Update order if needed
-      if (existingItem.order !== order) {
-        const updatedItem: PlaylistItem = {
-          ...existingItem,
-          order,
-        };
-        this.playlistItems.set(existingItem.id, updatedItem);
-        return updatedItem;
-      }
-      return existingItem;
+      // Update existing item
+      await this.updateWatchHistory(userId, contentId, episodeId, position);
+      return;
     }
     
     // Add new item
-    const id = this.currentIds.playlistItems++;
+    const id = this.currentIds.watchHistory++;
     const now = new Date();
-    const playlistItem: PlaylistItem = {
+    
+    this.watchHistoryMap.set(id, {
       id,
+      userId,
+      contentId,
+      episodeId: episodeId || null,
+      position,
+      completed: false,
+      createdAt: now,
+      updatedAt: now
+    });
+  }
+
+  async updateWatchHistory(
+    userId: number, 
+    contentId: number, 
+    episodeId?: number, 
+    position?: number, 
+    completed?: boolean
+  ): Promise<void> {
+    const existingItemEntry = Array.from(this.watchHistoryMap.entries()).find(
+      ([_, item]) => item.userId === userId && item.contentId === contentId && 
+      (episodeId ? item.episodeId === episodeId : !item.episodeId)
+    );
+    
+    if (existingItemEntry) {
+      const [id, item] = existingItemEntry;
+      const updatedItem = { 
+        ...item,
+        position: position !== undefined ? position : item.position,
+        completed: completed !== undefined ? completed : item.completed,
+        updatedAt: new Date()
+      };
+      
+      this.watchHistoryMap.set(id, updatedItem);
+    }
+  }
+
+  // Playlists methods
+  async getUserPlaylists(userId: number): Promise<Playlist[]> {
+    return Array.from(this.playlistsMap.values())
+      .filter(playlist => playlist.userId === userId);
+  }
+
+  async getPlaylistById(id: number): Promise<Playlist | undefined> {
+    return this.playlistsMap.get(id);
+  }
+
+  async getPlaylistItems(playlistId: number): Promise<Content[]> {
+    // Find content IDs in the playlist
+    const playlistItems = Array.from(this.playlistItemsMap.values())
+      .filter(item => item.playlistId === playlistId)
+      .sort((a, b) => a.order - b.order);
+    
+    // Get the content objects
+    return playlistItems
+      .map(item => this.contentMap.get(item.contentId))
+      .filter(Boolean) as Content[];
+  }
+
+  async createPlaylist(insertPlaylist: InsertPlaylist): Promise<Playlist> {
+    const id = this.currentIds.playlists++;
+    const now = new Date();
+    const playlist: Playlist = { 
+      ...insertPlaylist, 
+      id, 
+      createdAt: now, 
+      updatedAt: now 
+    };
+    this.playlistsMap.set(id, playlist);
+    return playlist;
+  }
+
+  async addToPlaylist(playlistId: number, contentId: number, order: number): Promise<void> {
+    const id = this.currentIds.playlistItems++;
+    
+    this.playlistItemsMap.set(id, {
       playlistId,
       contentId,
-      order,
-      addedAt: now,
-    };
-    this.playlistItems.set(id, playlistItem);
-    return playlistItem;
+      order
+    });
   }
 
-  async removeFromPlaylist(playlistId: number, contentId: number): Promise<boolean> {
-    const item = Array.from(this.playlistItems.values()).find(
-      item => item.playlistId === playlistId && item.contentId === contentId
+  async removeFromPlaylist(playlistId: number, contentId: number): Promise<void> {
+    const item = Array.from(this.playlistItemsMap.entries()).find(
+      ([_, item]) => item.playlistId === playlistId && item.contentId === contentId
     );
     
-    if (!item) {
-      return false;
+    if (item) {
+      this.playlistItemsMap.delete(item[0]);
     }
-    
-    return this.playlistItems.delete(item.id);
-  }
-
-  // Watch party methods
-  async createWatchParty(watchPartyData: InsertWatchParty): Promise<WatchParty> {
-    const id = this.currentIds.watchParties++;
-    const now = new Date();
-    const watchParty: WatchParty = {
-      ...watchPartyData,
-      id,
-      isActive: true,
-      createdAt: now,
-    };
-    this.watchParties.set(id, watchParty);
-    return watchParty;
-  }
-
-  async getWatchParty(partyCode: string): Promise<WatchParty | undefined> {
-    return Array.from(this.watchParties.values()).find(
-      party => party.partyCode === partyCode && party.isActive
-    );
-  }
-
-  async joinWatchParty(partyId: number, userId: number): Promise<WatchPartyMember> {
-    // Check if already a member
-    const existingMember = Array.from(this.watchPartyMembers.values()).find(
-      member => member.partyId === partyId && member.userId === userId
-    );
-    
-    if (existingMember) {
-      return existingMember;
-    }
-    
-    // Add member
-    const id = this.currentIds.watchPartyMembers++;
-    const now = new Date();
-    const member: WatchPartyMember = {
-      id,
-      partyId,
-      userId,
-      joinedAt: now,
-    };
-    this.watchPartyMembers.set(id, member);
-    return member;
-  }
-
-  async getWatchPartyMembers(partyId: number): Promise<WatchPartyMember[]> {
-    return Array.from(this.watchPartyMembers.values())
-      .filter(member => member.partyId === partyId)
-      .sort((a, b) => 
-        new Date(a.joinedAt).getTime() - new Date(b.joinedAt).getTime()
-      );
-  }
-
-  async addWatchPartyChatMessage(messageData: InsertWatchPartyChatMessage): Promise<WatchPartyChatMessage> {
-    const id = this.currentIds.watchPartyChatMessages++;
-    const now = new Date();
-    const message: WatchPartyChatMessage = {
-      ...messageData,
-      id,
-      createdAt: now,
-    };
-    this.watchPartyChatMessages.set(id, message);
-    return message;
-  }
-
-  async getWatchPartyChatMessages(partyId: number): Promise<WatchPartyChatMessage[]> {
-    return Array.from(this.watchPartyChatMessages.values())
-      .filter(message => message.partyId === partyId)
-      .sort((a, b) => 
-        new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
-      );
   }
 }
 

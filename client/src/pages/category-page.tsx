@@ -1,162 +1,160 @@
-import { useState, useEffect } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { useParams } from "wouter";
-import ContentSection from "@/components/sections/content-section";
-import TagsSection from "@/components/sections/tags-section";
-import { Content } from "@shared/schema";
-import {
+import { useEffect } from 'react';
+import { useRoute, useLocation } from 'wouter';
+import { useQuery } from '@tanstack/react-query';
+import { ContentType } from '@/types';
+import { Header } from '@/components/layout/Header';
+import { Footer } from '@/components/layout/Footer';
+import { ContentCard } from '@/components/common/ContentCard';
+import { Button } from '@/components/ui/button';
+import { Loader2, Filter } from 'lucide-react';
+import { 
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Film, SortAsc, Filter } from "lucide-react";
+  SelectValue
+} from '@/components/ui/select';
+import { useDebounce } from '@/hooks/use-debounce';
+import { useState } from 'react';
 
-interface CategoryPageProps {}
+export default function CategoryPage() {
+  const [match, params] = useRoute<{ type: string }>('/category/:type');
+  const [, navigate] = useLocation();
+  const [sortBy, setSortBy] = useState('newest');
+  const [page, setPage] = useState(1);
+  const debouncedSort = useDebounce(sortBy, 500);
+  
+  // Redirect if no match
+  if (!match) {
+    navigate('/not-found');
+    return null;
+  }
 
-const CategoryPage: React.FC<CategoryPageProps> = () => {
-  const { type } = useParams();
-  const [sortBy, setSortBy] = useState<string>("newest");
-  const [selectedGenres, setSelectedGenres] = useState<string[]>([]);
+  const LIMIT = 20;
+  const contentType = params.type;
   
-  // Map category types to Persian titles
-  const categoryTitles: Record<string, string> = {
-    all: "همه محتواها",
-    movie: "فیلم‌ها",
-    series: "سریال‌ها",
-    animation: "انیمیشن‌ها",
-    documentary: "مستندها"
-  };
-  
-  // Map category types to icons
-  const categoryIcons: Record<string, React.ReactNode> = {
-    all: <Film className="h-6 w-6 ml-2" />,
-    movie: <Film className="h-6 w-6 ml-2" />,
-    series: <Film className="h-6 w-6 ml-2" />,
-    animation: <Film className="h-6 w-6 ml-2" />,
-    documentary: <Film className="h-6 w-6 ml-2" />
-  };
-  
-  // Format API request type parameter
-  const apiType = type === "all" ? undefined : type;
-  
-  // Fetch contents for the specified category
-  const { 
-    data: contents = [],
-    isLoading,
-    error
-  } = useQuery<Content[]>({
-    queryKey: ["/api/contents", apiType],
-    queryFn: async () => {
-      const url = apiType 
-        ? `/api/contents?type=${apiType}` 
-        : "/api/contents";
-      const res = await fetch(url);
-      if (!res.ok) throw new Error("Failed to fetch contents");
-      return await res.json();
+  // Validate content type
+  useEffect(() => {
+    const validTypes = ['movie', 'series', 'animation', 'documentary'];
+    if (!validTypes.includes(contentType)) {
+      navigate('/not-found');
     }
-  });
-  
-  // Handle genre tag click
-  const handleGenreTagClick = (genre: string) => {
-    setSelectedGenres(prev => {
-      if (prev.includes(genre)) {
-        return prev.filter(g => g !== genre);
-      } else {
-        return [...prev, genre];
-      }
-    });
+  }, [contentType, navigate]);
+
+  // Get localized content type name
+  const getContentTypeName = () => {
+    switch(contentType) {
+      case 'movie': return 'فیلم‌ها';
+      case 'series': return 'سریال‌ها';
+      case 'animation': return 'انیمیشن‌ها';
+      case 'documentary': return 'مستندها';
+      default: return '';
+    }
   };
-  
-  // Filter and sort contents
-  const filteredContents = contents
-    // Filter by selected genres if any
-    .filter(content => {
-      if (selectedGenres.length === 0) return true;
-      return content.genres?.some(genre => selectedGenres.includes(genre));
-    })
-    // Sort based on selected sort option
-    .sort((a, b) => {
-      switch (sortBy) {
-        case "newest":
-          return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-        case "oldest":
-          return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
-        case "rating-high":
-          const ratingA = a.imdbRating ? parseFloat(a.imdbRating) : 0;
-          const ratingB = b.imdbRating ? parseFloat(b.imdbRating) : 0;
-          return ratingB - ratingA;
-        case "rating-low":
-          const ratingC = a.imdbRating ? parseFloat(a.imdbRating) : 0;
-          const ratingD = b.imdbRating ? parseFloat(b.imdbRating) : 0;
-          return ratingC - ratingD;
-        case "title":
-          return a.title.localeCompare(b.title);
-        default:
-          return 0;
-      }
-    });
-  
-  return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="flex items-center mb-8">
-        {categoryIcons[type] || <Film className="h-6 w-6 ml-2" />}
-        <h1 className="text-3xl font-bold">{categoryTitles[type] || "محتواها"}</h1>
-      </div>
+
+  // Fetch content by type with pagination
+  const { data, isLoading, isFetching, isError } = useQuery<ContentType[]>({
+    queryKey: [`/api/content/type/${contentType}`, page, debouncedSort],
+    queryFn: async () => {
+      const params = new URLSearchParams();
+      params.append('limit', LIMIT.toString());
+      params.append('offset', ((page - 1) * LIMIT).toString());
       
-      {/* Filter and Sort Section */}
-      <div className="bg-dark-card rounded-lg p-6 mb-8">
-        <div className="flex flex-col md:flex-row justify-between gap-4">
-          <div className="flex items-center gap-2">
-            <Filter className="h-5 w-5" />
-            <h2 className="text-lg font-medium">فیلترها</h2>
-          </div>
+      if (debouncedSort === 'newest') {
+        params.append('sort', 'newest');
+      } else if (debouncedSort === 'oldest') {
+        params.append('sort', 'oldest');
+      } else if (debouncedSort === 'top_rated') {
+        params.append('sort', 'rating');
+      }
+      
+      const res = await fetch(`/api/content/type/${contentType}?${params.toString()}`);
+      if (!res.ok) {
+        throw new Error('خطا در دریافت اطلاعات');
+      }
+      return res.json();
+    },
+    staleTime: 1000 * 60 * 5, // 5 minutes
+  });
+
+  // Check if there's more content to load
+  const hasMore = data && data.length === LIMIT;
+
+  // Load more content
+  const loadMore = () => {
+    setPage(prev => prev + 1);
+  };
+
+  return (
+    <>
+      <Header />
+      
+      <main className="container mx-auto px-4 py-8">
+        <div className="mb-8 flex flex-col md:flex-row md:items-center md:justify-between">
+          <h1 className="text-3xl font-bold text-foreground mb-4 md:mb-0">{getContentTypeName()}</h1>
           
-          <div className="flex items-center gap-4">
-            <span className="text-text-secondary">مرتب‌سازی:</span>
+          <div className="flex items-center">
+            <Filter className="h-5 w-5 mr-2 text-muted-foreground" />
             <Select
               value={sortBy}
               onValueChange={setSortBy}
             >
-              <SelectTrigger className="w-40 bg-dark flex items-center">
-                <SortAsc className="h-4 w-4 ml-2" />
+              <SelectTrigger className="w-[180px]">
                 <SelectValue placeholder="مرتب‌سازی" />
               </SelectTrigger>
-              <SelectContent className="bg-dark-card border-dark-border">
+              <SelectContent>
                 <SelectItem value="newest">جدیدترین</SelectItem>
                 <SelectItem value="oldest">قدیمی‌ترین</SelectItem>
-                <SelectItem value="rating-high">بیشترین امتیاز</SelectItem>
-                <SelectItem value="rating-low">کمترین امتیاز</SelectItem>
-                <SelectItem value="title">بر اساس نام</SelectItem>
+                <SelectItem value="top_rated">بیشترین امتیاز</SelectItem>
               </SelectContent>
             </Select>
           </div>
         </div>
         
-        {/* Genres Filter Section */}
-        <div className="mt-4">
-          <TagsSection
-            title="ژانرها"
-            onTagClick={handleGenreTagClick}
-            selectedTags={selectedGenres}
-          />
-        </div>
-      </div>
+        {isLoading ? (
+          <div className="flex justify-center py-12">
+            <Loader2 className="h-12 w-12 animate-spin text-primary" />
+          </div>
+        ) : isError ? (
+          <div className="text-center py-12">
+            <h2 className="text-xl text-foreground mb-4">خطا در بارگذاری محتوا</h2>
+            <Button onClick={() => navigate('/')}>بازگشت به صفحه اصلی</Button>
+          </div>
+        ) : data && data.length > 0 ? (
+          <>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+              {data.map(item => (
+                <ContentCard key={item.id} content={item} className="w-full" />
+              ))}
+            </div>
+            
+            {hasMore && (
+              <div className="flex justify-center mt-8">
+                <Button 
+                  onClick={loadMore} 
+                  disabled={isFetching}
+                  className="px-8"
+                >
+                  {isFetching ? (
+                    <>
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      در حال بارگذاری...
+                    </>
+                  ) : 'بارگذاری بیشتر'}
+                </Button>
+              </div>
+            )}
+          </>
+        ) : (
+          <div className="text-center py-12">
+            <h2 className="text-xl text-foreground mb-4">محتوایی یافت نشد</h2>
+            <p className="text-muted-foreground mb-6">متأسفانه در حال حاضر محتوایی برای نمایش وجود ندارد.</p>
+            <Button onClick={() => navigate('/')}>بازگشت به صفحه اصلی</Button>
+          </div>
+        )}
+      </main>
       
-      {/* Content Results */}
-      <ContentSection
-        title={`${categoryTitles[type] || "محتواها"} (${filteredContents.length})`}
-        contents={filteredContents}
-        isLoading={isLoading}
-        emptyMessage={
-          selectedGenres.length > 0
-            ? "هیچ محتوایی با فیلترهای انتخاب شده یافت نشد"
-            : "هیچ محتوایی در این دسته‌بندی یافت نشد"
-        }
-      />
-    </div>
+      <Footer />
+    </>
   );
-};
-
-export default CategoryPage;
+}

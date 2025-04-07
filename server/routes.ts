@@ -1,515 +1,512 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
-import { setupAuth } from "./auth";
 import { storage } from "./storage";
-import { WebSocketServer, WebSocket as WS } from "ws";
-const OPEN = 1; // WebSocket ready state constant
-import { nanoid } from "nanoid";
+import { setupAuth } from "./auth";
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Setup authentication routes
+  // Set up authentication routes
   setupAuth(app);
-  
-  const httpServer = createServer(app);
-  
-  // WebSocket server for watch parties
-  const wss = new WebSocketServer({ server: httpServer });
-  
-  // Stores active watch party WebSocket connections
-  const watchPartyClients = new Map<string, Map<string, WS>>();
-  
-  wss.on("connection", (ws: WS) => {
-    let partyCode: string | null = null;
-    let clientId: string | null = null;
-    
-    ws.on("message", (message) => {
-      try {
-        const data = JSON.parse(message.toString());
-        
-        if (data.type === "join-party") {
-          partyCode = data.partyCode;
-          clientId = data.clientId || nanoid(8);
-          
-          // Initialize party room if not exists
-          if (!watchPartyClients.has(partyCode)) {
-            watchPartyClients.set(partyCode, new Map());
-          }
-          
-          // Add client to party room
-          watchPartyClients.get(partyCode)?.set(clientId, ws);
-          
-          // Send join confirmation
-          ws.send(JSON.stringify({
-            type: "joined",
-            clientId,
-            clients: Array.from(watchPartyClients.get(partyCode)?.keys() || [])
-          }));
-          
-          // Notify others
-          broadcastToParty(partyCode, {
-            type: "user-joined",
-            clientId,
-            clients: Array.from(watchPartyClients.get(partyCode)?.keys() || [])
-          }, clientId);
-        }
-        
-        if (data.type === "chat" && partyCode) {
-          // Broadcast chat message
-          broadcastToParty(partyCode, {
-            type: "chat",
-            clientId,
-            message: data.message,
-            timestamp: new Date()
-          });
-        }
-        
-        if (data.type === "player-state" && partyCode) {
-          // Broadcast player state
-          broadcastToParty(partyCode, {
-            type: "player-state",
-            clientId,
-            ...data
-          });
-        }
-      } catch (error) {
-        console.error("WebSocket message error:", error);
-      }
-    });
-    
-    ws.on("close", () => {
-      if (partyCode && clientId) {
-        // Remove client from party
-        watchPartyClients.get(partyCode)?.delete(clientId);
-        
-        // Clean up empty party rooms
-        if (watchPartyClients.get(partyCode)?.size === 0) {
-          watchPartyClients.delete(partyCode);
-        } else {
-          // Notify others about departure
-          broadcastToParty(partyCode, {
-            type: "user-left",
-            clientId,
-            clients: Array.from(watchPartyClients.get(partyCode)?.keys() || [])
-          });
-        }
-      }
-    });
-    
-    // Helper function to broadcast to party
-    function broadcastToParty(partyCode: string, data: any, excludeClientId?: string) {
-      const party = watchPartyClients.get(partyCode);
-      if (!party) return;
-      
-      const message = JSON.stringify(data);
-      party.forEach((client, id) => {
-        if (id !== excludeClientId && client.readyState === OPEN) {
-          client.send(message);
-        }
-      });
-    }
-  });
-  
-  // Content API routes
-  app.get("/api/contents", async (req, res) => {
+
+  // Content routes
+  app.get("/api/content", async (req, res, next) => {
     try {
-      const { type, limit } = req.query;
-      const contents = await storage.getAllContents(
-        type as string | undefined,
-        limit ? parseInt(limit as string) : undefined
-      );
-      res.json(contents);
+      const limit = req.query.limit ? parseInt(req.query.limit as string) : 10;
+      const offset = req.query.offset ? parseInt(req.query.offset as string) : 0;
+      const content = await storage.getAllContent(limit, offset);
+      res.json(content);
     } catch (error) {
-      res.status(500).json({ message: "خطا در دریافت محتواها" });
+      next(error);
     }
   });
-  
-  app.get("/api/contents/:id", async (req, res) => {
+
+  app.get("/api/content/latest", async (req, res, next) => {
     try {
-      const content = await storage.getContent(parseInt(req.params.id));
+      const limit = req.query.limit ? parseInt(req.query.limit as string) : 10;
+      const content = await storage.getLatestContent(limit);
+      res.json(content);
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  app.get("/api/content/top-rated", async (req, res, next) => {
+    try {
+      const limit = req.query.limit ? parseInt(req.query.limit as string) : 10;
+      const content = await storage.getTopRatedContent(limit);
+      res.json(content);
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  app.get("/api/content/:id", async (req, res, next) => {
+    try {
+      const contentId = parseInt(req.params.id);
+      const content = await storage.getContentById(contentId);
+      
       if (!content) {
         return res.status(404).json({ message: "محتوا یافت نشد" });
       }
-      res.json(content);
-    } catch (error) {
-      res.status(500).json({ message: "خطا در دریافت محتوا" });
-    }
-  });
-  
-  app.get("/api/contents/:id/episodes", async (req, res) => {
-    try {
-      const episodes = await storage.getEpisodes(parseInt(req.params.id));
-      res.json(episodes);
-    } catch (error) {
-      res.status(500).json({ message: "خطا در دریافت قسمت‌ها" });
-    }
-  });
-  
-  app.get("/api/contents/:id/sources", async (req, res) => {
-    try {
-      const sources = await storage.getQualitySources(parseInt(req.params.id));
-      res.json(sources);
-    } catch (error) {
-      res.status(500).json({ message: "خطا در دریافت منابع" });
-    }
-  });
-  
-  app.get("/api/episodes/:id/sources", async (req, res) => {
-    try {
-      const sources = await storage.getQualitySources(undefined, parseInt(req.params.id));
-      res.json(sources);
-    } catch (error) {
-      res.status(500).json({ message: "خطا در دریافت منابع" });
-    }
-  });
-  
-  app.get("/api/search", async (req, res) => {
-    try {
-      const { q, type, year, genres, tags, minRating } = req.query;
       
-      const filters: Record<string, any> = {};
-      if (type) filters.type = type;
-      if (year) filters.year = parseInt(year as string);
-      if (genres) filters.genres = (genres as string).split(",");
-      if (tags) filters.tags = (tags as string).split(",");
-      if (minRating) filters.minRating = parseFloat(minRating as string);
+      // Get additional content data
+      const [genres, tags, videos] = await Promise.all([
+        storage.getGenresByContentId(contentId),
+        storage.getTagsByContentId(contentId),
+        storage.getVideosByContentId(contentId)
+      ]);
       
-      const results = await storage.searchContents(q as string || "", filters);
-      res.json(results);
-    } catch (error) {
-      res.status(500).json({ message: "خطا در جستجو" });
-    }
-  });
-  
-  // Rating API routes
-  app.get("/api/contents/:id/ratings", async (req, res) => {
-    try {
-      const ratings = await storage.getRatings(parseInt(req.params.id));
+      // If it's a series, get seasons and episodes
+      let seasons = [];
+      if (content.type === 'series') {
+        seasons = await storage.getSeasonsByContentId(contentId);
+        
+        // For each season, get episodes
+        for (const season of seasons) {
+          const episodes = await storage.getEpisodesBySeasonId(season.id);
+          (season as any).episodes = episodes;
+          
+          // For each episode, get videos
+          for (const episode of episodes) {
+            const episodeVideos = await storage.getVideosByEpisodeId(episode.id);
+            (episode as any).videos = episodeVideos;
+          }
+        }
+      }
       
-      // Calculate average rating
-      let average = 0;
-      if (ratings.length > 0) {
-        average = ratings.reduce((sum, rating) => sum + rating.rating, 0) / ratings.length;
+      // Get ratings info
+      const ratings = await storage.getRatingsByContentId(contentId);
+      const avgRating = ratings.length > 0 
+        ? ratings.reduce((sum, rating) => sum + rating.score, 0) / ratings.length 
+        : 0;
+      
+      // Get user specific data if authenticated
+      let userRating = null;
+      let isInWatchlist = false;
+      let isInFavorites = false;
+      
+      if (req.isAuthenticated()) {
+        const userId = req.user!.id;
+        [userRating, isInWatchlist, isInFavorites] = await Promise.all([
+          storage.getUserRatingForContent(userId, contentId),
+          storage.isInWatchlist(userId, contentId),
+          storage.isInFavorites(userId, contentId)
+        ]);
       }
       
       res.json({
-        ratings,
-        average,
-        count: ratings.length
+        ...content,
+        genres,
+        tags,
+        videos,
+        seasons: content.type === 'series' ? seasons : undefined,
+        ratings: {
+          count: ratings.length,
+          averageScore: avgRating,
+          userRating
+        },
+        isInWatchlist,
+        isInFavorites
       });
     } catch (error) {
-      res.status(500).json({ message: "خطا در دریافت امتیازها" });
+      next(error);
     }
   });
-  
-  app.post("/api/contents/:id/ratings", async (req, res) => {
-    if (!req.isAuthenticated()) {
-      return res.status(401).json({ message: "لطفاً ابتدا وارد شوید" });
+
+  app.get("/api/content/type/:type", async (req, res, next) => {
+    try {
+      const type = req.params.type;
+      const limit = req.query.limit ? parseInt(req.query.limit as string) : 10;
+      const offset = req.query.offset ? parseInt(req.query.offset as string) : 0;
+      
+      if (!['movie', 'series', 'animation', 'documentary'].includes(type)) {
+        return res.status(400).json({ message: "نوع محتوا نامعتبر است" });
+      }
+      
+      const content = await storage.getContentByType(type, limit, offset);
+      res.json(content);
+    } catch (error) {
+      next(error);
     }
-    
+  });
+
+  // Search route
+  app.get("/api/search", async (req, res, next) => {
+    try {
+      const query = req.query.q as string || '';
+      let filters: any = {};
+      
+      // Parse filters from query params
+      if (req.query.type) filters.type = req.query.type;
+      if (req.query.year_from || req.query.year_to) {
+        filters.year = {};
+        if (req.query.year_from) filters.year.from = parseInt(req.query.year_from as string);
+        if (req.query.year_to) filters.year.to = parseInt(req.query.year_to as string);
+      }
+      if (req.query.min_rating) filters.minRating = parseFloat(req.query.min_rating as string);
+      
+      const results = await storage.searchContent(query, filters);
+      res.json(results);
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  // Genres and tags routes
+  app.get("/api/genres", async (req, res, next) => {
+    try {
+      const genres = await storage.getAllGenres();
+      res.json(genres);
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  app.get("/api/tags", async (req, res, next) => {
+    try {
+      const tags = await storage.getAllTags();
+      res.json(tags);
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  // Comments and reviews routes
+  app.get("/api/content/:id/comments", async (req, res, next) => {
     try {
       const contentId = parseInt(req.params.id);
-      const { rating } = req.body;
-      
-      if (!rating || rating < 1 || rating > 10) {
-        return res.status(400).json({ message: "امتیاز باید بین 1 تا 10 باشد" });
-      }
-      
-      const newRating = await storage.createRating({
-        userId: req.user.id,
-        contentId,
-        rating
-      });
-      
-      // Award points for rating
-      await storage.updateUserPoints(req.user.id, 5);
-      
-      res.status(201).json(newRating);
-    } catch (error) {
-      res.status(500).json({ message: "خطا در ثبت امتیاز" });
-    }
-  });
-  
-  // Reviews API routes
-  app.get("/api/contents/:id/reviews", async (req, res) => {
-    try {
-      // Only return approved reviews for non-admin users
-      const approved = !req.isAuthenticated() || req.user.role !== "admin" ? true : undefined;
-      const reviews = await storage.getReviews(parseInt(req.params.id), approved);
-      res.json(reviews);
-    } catch (error) {
-      res.status(500).json({ message: "خطا در دریافت نقدها" });
-    }
-  });
-  
-  app.post("/api/contents/:id/reviews", async (req, res) => {
-    if (!req.isAuthenticated()) {
-      return res.status(401).json({ message: "لطفاً ابتدا وارد شوید" });
-    }
-    
-    try {
-      const contentId = parseInt(req.params.id);
-      const { text } = req.body;
-      
-      if (!text || text.length < 10) {
-        return res.status(400).json({ message: "متن نقد باید حداقل 10 کاراکتر باشد" });
-      }
-      
-      if (text.length > 500) {
-        return res.status(400).json({ message: "متن نقد نباید بیش از 500 کاراکتر باشد" });
-      }
-      
-      const review = await storage.createReview({
-        userId: req.user.id,
-        contentId,
-        text
-      });
-      
-      // Award points for writing a review
-      await storage.updateUserPoints(req.user.id, 20);
-      
-      res.status(201).json(review);
-    } catch (error) {
-      res.status(500).json({ message: "خطا در ثبت نقد" });
-    }
-  });
-  
-  app.post("/api/reviews/:id/like", async (req, res) => {
-    if (!req.isAuthenticated()) {
-      return res.status(401).json({ message: "لطفاً ابتدا وارد شوید" });
-    }
-    
-    try {
-      const review = await storage.likeReview(parseInt(req.params.id));
-      if (!review) {
-        return res.status(404).json({ message: "نقد یافت نشد" });
-      }
-      res.json(review);
-    } catch (error) {
-      res.status(500).json({ message: "خطا در ثبت لایک" });
-    }
-  });
-  
-  app.post("/api/reviews/:id/dislike", async (req, res) => {
-    if (!req.isAuthenticated()) {
-      return res.status(401).json({ message: "لطفاً ابتدا وارد شوید" });
-    }
-    
-    try {
-      const review = await storage.dislikeReview(parseInt(req.params.id));
-      if (!review) {
-        return res.status(404).json({ message: "نقد یافت نشد" });
-      }
-      res.json(review);
-    } catch (error) {
-      res.status(500).json({ message: "خطا در ثبت دیس‌لایک" });
-    }
-  });
-  
-  // Comments API routes
-  app.get("/api/contents/:id/comments", async (req, res) => {
-    try {
-      // Only return approved comments for non-admin users
-      const approved = !req.isAuthenticated() || req.user.role !== "admin" ? true : undefined;
-      const comments = await storage.getComments(parseInt(req.params.id), approved);
+      const comments = await storage.getCommentsByContentId(contentId);
       res.json(comments);
     } catch (error) {
-      res.status(500).json({ message: "خطا در دریافت کامنت‌ها" });
+      next(error);
     }
   });
-  
-  app.post("/api/contents/:id/comments", async (req, res) => {
-    if (!req.isAuthenticated()) {
-      return res.status(401).json({ message: "لطفاً ابتدا وارد شوید" });
-    }
-    
+
+  app.post("/api/content/:id/comments", async (req, res, next) => {
     try {
+      if (!req.isAuthenticated()) {
+        return res.status(401).json({ message: "برای ثبت نظر باید وارد شوید" });
+      }
+      
       const contentId = parseInt(req.params.id);
       const { text } = req.body;
       
-      if (!text || text.length < 3) {
-        return res.status(400).json({ message: "متن کامنت باید حداقل 3 کاراکتر باشد" });
-      }
-      
-      if (text.length > 300) {
-        return res.status(400).json({ message: "متن کامنت نباید بیش از 300 کاراکتر باشد" });
+      if (!text || text.trim().length === 0) {
+        return res.status(400).json({ message: "متن نظر نمی‌تواند خالی باشد" });
       }
       
       const comment = await storage.createComment({
-        userId: req.user.id,
+        userId: req.user!.id,
         contentId,
-        text
+        text,
+        isApproved: false
       });
       
-      // Award points for commenting
-      await storage.updateUserPoints(req.user.id, 5);
+      res.status(201).json({
+        ...comment,
+        message: "نظر شما با موفقیت ثبت شد و پس از تایید نمایش داده خواهد شد"
+      });
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  app.get("/api/content/:id/reviews", async (req, res, next) => {
+    try {
+      const contentId = parseInt(req.params.id);
+      const reviews = await storage.getReviewsByContentId(contentId);
+      res.json(reviews);
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  app.post("/api/content/:id/reviews", async (req, res, next) => {
+    try {
+      if (!req.isAuthenticated()) {
+        return res.status(401).json({ message: "برای ثبت نقد باید وارد شوید" });
+      }
       
-      res.status(201).json(comment);
-    } catch (error) {
-      res.status(500).json({ message: "خطا در ثبت کامنت" });
-    }
-  });
-  
-  app.post("/api/comments/:id/like", async (req, res) => {
-    if (!req.isAuthenticated()) {
-      return res.status(401).json({ message: "لطفاً ابتدا وارد شوید" });
-    }
-    
-    try {
-      const comment = await storage.likeComment(parseInt(req.params.id));
-      if (!comment) {
-        return res.status(404).json({ message: "کامنت یافت نشد" });
+      const contentId = parseInt(req.params.id);
+      const { text } = req.body;
+      
+      if (!text || text.trim().length === 0) {
+        return res.status(400).json({ message: "متن نقد نمی‌تواند خالی باشد" });
       }
-      res.json(comment);
+      
+      const review = await storage.createReview({
+        userId: req.user!.id,
+        contentId,
+        text,
+        isApproved: false
+      });
+      
+      res.status(201).json({
+        ...review,
+        message: "نقد شما با موفقیت ثبت شد و پس از تایید نمایش داده خواهد شد"
+      });
     } catch (error) {
-      res.status(500).json({ message: "خطا در ثبت لایک" });
+      next(error);
     }
   });
-  
-  app.post("/api/comments/:id/dislike", async (req, res) => {
-    if (!req.isAuthenticated()) {
-      return res.status(401).json({ message: "لطفاً ابتدا وارد شوید" });
-    }
-    
+
+  // Ratings route
+  app.post("/api/content/:id/rate", async (req, res, next) => {
     try {
-      const comment = await storage.dislikeComment(parseInt(req.params.id));
-      if (!comment) {
-        return res.status(404).json({ message: "کامنت یافت نشد" });
+      if (!req.isAuthenticated()) {
+        return res.status(401).json({ message: "برای امتیاز دادن باید وارد شوید" });
       }
-      res.json(comment);
+      
+      const contentId = parseInt(req.params.id);
+      const { score } = req.body;
+      
+      if (typeof score !== 'number' || score < 1 || score > 10) {
+        return res.status(400).json({ message: "امتیاز باید عددی بین 1 تا 10 باشد" });
+      }
+      
+      // Check if user has already rated this content
+      const existingRating = await storage.getUserRatingForContent(req.user!.id, contentId);
+      
+      let rating;
+      if (existingRating) {
+        // Update existing rating
+        rating = await storage.updateRating(existingRating.id, score);
+      } else {
+        // Create new rating
+        rating = await storage.createRating({
+          userId: req.user!.id,
+          contentId,
+          score
+        });
+      }
+      
+      // Get updated average rating
+      const allRatings = await storage.getRatingsByContentId(contentId);
+      const avgRating = allRatings.reduce((sum, r) => sum + r.score, 0) / allRatings.length;
+      
+      res.json({
+        rating,
+        averageScore: avgRating,
+        count: allRatings.length
+      });
     } catch (error) {
-      res.status(500).json({ message: "خطا در ثبت دیس‌لایک" });
+      next(error);
     }
   });
-  
-  // Watch history API routes
-  app.get("/api/watch-history", async (req, res) => {
-    if (!req.isAuthenticated()) {
-      return res.status(401).json({ message: "لطفاً ابتدا وارد شوید" });
-    }
-    
+
+  // Watchlist routes
+  app.get("/api/user/watchlist", async (req, res, next) => {
     try {
-      const history = await storage.getWatchHistory(req.user.id);
+      if (!req.isAuthenticated()) {
+        return res.status(401).json({ message: "برای مشاهده لیست تماشا باید وارد شوید" });
+      }
+      
+      const watchlist = await storage.getUserWatchlist(req.user!.id);
+      res.json(watchlist);
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  app.post("/api/content/:id/watchlist", async (req, res, next) => {
+    try {
+      if (!req.isAuthenticated()) {
+        return res.status(401).json({ message: "برای افزودن به لیست تماشا باید وارد شوید" });
+      }
+      
+      const contentId = parseInt(req.params.id);
+      
+      // Check if content exists
+      const content = await storage.getContentById(contentId);
+      if (!content) {
+        return res.status(404).json({ message: "محتوا یافت نشد" });
+      }
+      
+      // Add to watchlist
+      await storage.addToWatchlist({
+        userId: req.user!.id,
+        contentId
+      });
+      
+      res.json({ message: "با موفقیت به لیست تماشا اضافه شد" });
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  app.delete("/api/content/:id/watchlist", async (req, res, next) => {
+    try {
+      if (!req.isAuthenticated()) {
+        return res.status(401).json({ message: "برای حذف از لیست تماشا باید وارد شوید" });
+      }
+      
+      const contentId = parseInt(req.params.id);
+      
+      // Remove from watchlist
+      await storage.removeFromWatchlist(req.user!.id, contentId);
+      
+      res.json({ message: "با موفقیت از لیست تماشا حذف شد" });
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  // Favorites routes
+  app.get("/api/user/favorites", async (req, res, next) => {
+    try {
+      if (!req.isAuthenticated()) {
+        return res.status(401).json({ message: "برای مشاهده علاقه‌مندی‌ها باید وارد شوید" });
+      }
+      
+      const favorites = await storage.getUserFavorites(req.user!.id);
+      res.json(favorites);
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  app.post("/api/content/:id/favorites", async (req, res, next) => {
+    try {
+      if (!req.isAuthenticated()) {
+        return res.status(401).json({ message: "برای افزودن به علاقه‌مندی‌ها باید وارد شوید" });
+      }
+      
+      const contentId = parseInt(req.params.id);
+      
+      // Check if content exists
+      const content = await storage.getContentById(contentId);
+      if (!content) {
+        return res.status(404).json({ message: "محتوا یافت نشد" });
+      }
+      
+      // Add to favorites
+      await storage.addToFavorites({
+        userId: req.user!.id,
+        contentId
+      });
+      
+      res.json({ message: "با موفقیت به علاقه‌مندی‌ها اضافه شد" });
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  app.delete("/api/content/:id/favorites", async (req, res, next) => {
+    try {
+      if (!req.isAuthenticated()) {
+        return res.status(401).json({ message: "برای حذف از علاقه‌مندی‌ها باید وارد شوید" });
+      }
+      
+      const contentId = parseInt(req.params.id);
+      
+      // Remove from favorites
+      await storage.removeFromFavorites(req.user!.id, contentId);
+      
+      res.json({ message: "با موفقیت از علاقه‌مندی‌ها حذف شد" });
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  // Watch history routes
+  app.get("/api/user/history", async (req, res, next) => {
+    try {
+      if (!req.isAuthenticated()) {
+        return res.status(401).json({ message: "برای مشاهده تاریخچه تماشا باید وارد شوید" });
+      }
+      
+      const history = await storage.getUserWatchHistory(req.user!.id);
       res.json(history);
     } catch (error) {
-      res.status(500).json({ message: "خطا در دریافت تاریخچه تماشا" });
+      next(error);
     }
   });
-  
-  app.post("/api/watch-progress", async (req, res) => {
-    if (!req.isAuthenticated()) {
-      return res.status(401).json({ message: "لطفاً ابتدا وارد شوید" });
-    }
-    
+
+  app.post("/api/content/:id/history", async (req, res, next) => {
     try {
-      const { contentId, episodeId, progress, completed } = req.body;
-      
-      if (!contentId || progress === undefined) {
-        return res.status(400).json({ message: "اطلاعات ناقص است" });
+      if (!req.isAuthenticated()) {
+        return res.status(401).json({ message: "برای ثبت تاریخچه تماشا باید وارد شوید" });
       }
       
-      const watchProgress = await storage.updateWatchProgress(
-        req.user.id,
-        contentId,
-        episodeId || null,
-        progress,
-        completed || false
-      );
+      const contentId = parseInt(req.params.id);
+      const { episodeId, position, completed } = req.body;
       
-      // If completed, award points for watching content
+      // Add or update watch history
       if (completed) {
-        await storage.updateUserPoints(req.user.id, 10);
+        await storage.updateWatchHistory(
+          req.user!.id,
+          contentId,
+          episodeId ? parseInt(episodeId) : undefined,
+          position,
+          completed
+        );
+      } else {
+        await storage.addToWatchHistory(
+          req.user!.id,
+          contentId,
+          episodeId ? parseInt(episodeId) : undefined,
+          position
+        );
       }
       
-      res.json(watchProgress);
+      res.json({ message: "تاریخچه تماشا با موفقیت ثبت شد" });
     } catch (error) {
-      res.status(500).json({ message: "خطا در ثبت پیشرفت" });
+      next(error);
     }
   });
-  
-  // Favorites API routes
-  app.get("/api/favorites", async (req, res) => {
-    if (!req.isAuthenticated()) {
-      return res.status(401).json({ message: "لطفاً ابتدا وارد شوید" });
-    }
-    
+
+  // Playlists routes
+  app.get("/api/user/playlists", async (req, res, next) => {
     try {
-      const favorites = await storage.getFavorites(req.user.id);
-      
-      // Get content details for each favorite
-      const favoriteContents = await Promise.all(
-        favorites.map(async (fav) => {
-          const content = await storage.getContent(fav.contentId);
-          return { ...fav, content };
-        })
-      );
-      
-      res.json(favoriteContents);
-    } catch (error) {
-      res.status(500).json({ message: "خطا در دریافت علاقه‌مندی‌ها" });
-    }
-  });
-  
-  app.post("/api/favorites/:id", async (req, res) => {
-    if (!req.isAuthenticated()) {
-      return res.status(401).json({ message: "لطفاً ابتدا وارد شوید" });
-    }
-    
-    try {
-      const contentId = parseInt(req.params.id);
-      const favorite = await storage.addFavorite(req.user.id, contentId);
-      res.status(201).json(favorite);
-    } catch (error) {
-      res.status(500).json({ message: "خطا در افزودن به علاقه‌مندی‌ها" });
-    }
-  });
-  
-  app.delete("/api/favorites/:id", async (req, res) => {
-    if (!req.isAuthenticated()) {
-      return res.status(401).json({ message: "لطفاً ابتدا وارد شوید" });
-    }
-    
-    try {
-      const contentId = parseInt(req.params.id);
-      const success = await storage.removeFavorite(req.user.id, contentId);
-      
-      if (!success) {
-        return res.status(404).json({ message: "علاقه‌مندی یافت نشد" });
+      if (!req.isAuthenticated()) {
+        return res.status(401).json({ message: "برای مشاهده پلی‌لیست‌ها باید وارد شوید" });
       }
       
-      res.status(200).json({ success: true });
-    } catch (error) {
-      res.status(500).json({ message: "خطا در حذف از علاقه‌مندی‌ها" });
-    }
-  });
-  
-  // Playlist API routes
-  app.get("/api/playlists", async (req, res) => {
-    if (!req.isAuthenticated()) {
-      return res.status(401).json({ message: "لطفاً ابتدا وارد شوید" });
-    }
-    
-    try {
-      const playlists = await storage.getPlaylists(req.user.id);
+      const playlists = await storage.getUserPlaylists(req.user!.id);
       res.json(playlists);
     } catch (error) {
-      res.status(500).json({ message: "خطا در دریافت پلی‌لیست‌ها" });
+      next(error);
     }
   });
-  
-  app.post("/api/playlists", async (req, res) => {
-    if (!req.isAuthenticated()) {
-      return res.status(401).json({ message: "لطفاً ابتدا وارد شوید" });
-    }
-    
+
+  app.get("/api/playlists/:id", async (req, res, next) => {
     try {
+      const playlistId = parseInt(req.params.id);
+      const playlist = await storage.getPlaylistById(playlistId);
+      
+      if (!playlist) {
+        return res.status(404).json({ message: "پلی‌لیست یافت نشد" });
+      }
+      
+      // Check if user can access this playlist
+      if (!playlist.isPublic && (!req.isAuthenticated() || req.user!.id !== playlist.userId)) {
+        return res.status(403).json({ message: "شما به این پلی‌لیست دسترسی ندارید" });
+      }
+      
+      const items = await storage.getPlaylistItems(playlistId);
+      
+      res.json({
+        ...playlist,
+        items
+      });
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  app.post("/api/playlists", async (req, res, next) => {
+    try {
+      if (!req.isAuthenticated()) {
+        return res.status(401).json({ message: "برای ایجاد پلی‌لیست باید وارد شوید" });
+      }
+      
       const { name, description, isPublic } = req.body;
       
-      if (!name) {
-        return res.status(400).json({ message: "نام پلی‌لیست الزامی است" });
+      if (!name || name.trim().length === 0) {
+        return res.status(400).json({ message: "نام پلی‌لیست نمی‌تواند خالی باشد" });
       }
       
       const playlist = await storage.createPlaylist({
-        userId: req.user.id,
+        userId: req.user!.id,
         name,
         description: description || "",
         isPublic: isPublic || false
@@ -517,208 +514,80 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       res.status(201).json(playlist);
     } catch (error) {
-      res.status(500).json({ message: "خطا در ایجاد پلی‌لیست" });
+      next(error);
     }
   });
-  
-  app.post("/api/playlists/:id/items", async (req, res) => {
-    if (!req.isAuthenticated()) {
-      return res.status(401).json({ message: "لطفاً ابتدا وارد شوید" });
-    }
-    
+
+  app.post("/api/playlists/:id/items", async (req, res, next) => {
     try {
+      if (!req.isAuthenticated()) {
+        return res.status(401).json({ message: "برای افزودن به پلی‌لیست باید وارد شوید" });
+      }
+      
       const playlistId = parseInt(req.params.id);
-      const { contentId, order } = req.body;
-      
-      // Check if playlist exists and belongs to user
-      const playlist = await storage.getPlaylist(playlistId);
-      if (!playlist) {
-        return res.status(404).json({ message: "پلی‌لیست یافت نشد" });
-      }
-      
-      if (playlist.userId !== req.user.id) {
-        return res.status(403).json({ message: "دسترسی غیرمجاز" });
-      }
-      
-      const playlistItem = await storage.addToPlaylist(
-        playlistId,
-        contentId,
-        order || 0
-      );
-      
-      res.status(201).json(playlistItem);
-    } catch (error) {
-      res.status(500).json({ message: "خطا در افزودن به پلی‌لیست" });
-    }
-  });
-  
-  app.delete("/api/playlists/:playlistId/items/:contentId", async (req, res) => {
-    if (!req.isAuthenticated()) {
-      return res.status(401).json({ message: "لطفاً ابتدا وارد شوید" });
-    }
-    
-    try {
-      const playlistId = parseInt(req.params.playlistId);
-      const contentId = parseInt(req.params.contentId);
-      
-      // Check if playlist exists and belongs to user
-      const playlist = await storage.getPlaylist(playlistId);
-      if (!playlist) {
-        return res.status(404).json({ message: "پلی‌لیست یافت نشد" });
-      }
-      
-      if (playlist.userId !== req.user.id) {
-        return res.status(403).json({ message: "دسترسی غیرمجاز" });
-      }
-      
-      const success = await storage.removeFromPlaylist(playlistId, contentId);
-      
-      if (!success) {
-        return res.status(404).json({ message: "آیتم در پلی‌لیست یافت نشد" });
-      }
-      
-      res.status(200).json({ success: true });
-    } catch (error) {
-      res.status(500).json({ message: "خطا در حذف از پلی‌لیست" });
-    }
-  });
-  
-  // Watch Party API routes
-  app.post("/api/watch-parties", async (req, res) => {
-    if (!req.isAuthenticated()) {
-      return res.status(401).json({ message: "لطفاً ابتدا وارد شوید" });
-    }
-    
-    try {
-      const { contentId, episodeId } = req.body;
+      const { contentId } = req.body;
       
       if (!contentId) {
         return res.status(400).json({ message: "شناسه محتوا الزامی است" });
       }
       
-      // Generate a random 6-character code
-      const partyCode = nanoid(6);
+      // Check if playlist exists and belongs to user
+      const playlist = await storage.getPlaylistById(playlistId);
+      if (!playlist) {
+        return res.status(404).json({ message: "پلی‌لیست یافت نشد" });
+      }
       
-      // Set expiration to 24 hours from now
-      const expiresAt = new Date();
-      expiresAt.setHours(expiresAt.getHours() + 24);
+      if (playlist.userId !== req.user!.id) {
+        return res.status(403).json({ message: "شما اجازه تغییر این پلی‌لیست را ندارید" });
+      }
       
-      const watchParty = await storage.createWatchParty({
-        creatorId: req.user.id,
-        contentId,
-        episodeId: episodeId || null,
-        partyCode,
-        expiresAt
-      });
+      // Check if content exists
+      const content = await storage.getContentById(parseInt(contentId));
+      if (!content) {
+        return res.status(404).json({ message: "محتوا یافت نشد" });
+      }
       
-      // Automatically join the party as creator
-      await storage.joinWatchParty(watchParty.id, req.user.id);
+      // Get current items to determine order
+      const items = await storage.getPlaylistItems(playlistId);
+      const order = items.length + 1;
       
-      // Award points for creating a watch party
-      await storage.updateUserPoints(req.user.id, 10);
+      // Add to playlist
+      await storage.addToPlaylist(playlistId, parseInt(contentId), order);
       
-      res.status(201).json(watchParty);
+      res.json({ message: "محتوا با موفقیت به پلی‌لیست اضافه شد" });
     } catch (error) {
-      res.status(500).json({ message: "خطا در ایجاد تماشای گروهی" });
+      next(error);
     }
   });
-  
-  app.get("/api/watch-parties/:code", async (req, res) => {
+
+  app.delete("/api/playlists/:id/items/:contentId", async (req, res, next) => {
     try {
-      const watchParty = await storage.getWatchParty(req.params.code);
-      
-      if (!watchParty) {
-        return res.status(404).json({ message: "تماشای گروهی یافت نشد یا منقضی شده است" });
+      if (!req.isAuthenticated()) {
+        return res.status(401).json({ message: "برای حذف از پلی‌لیست باید وارد شوید" });
       }
       
-      // Get content details
-      const content = await storage.getContent(watchParty.contentId);
+      const playlistId = parseInt(req.params.id);
+      const contentId = parseInt(req.params.contentId);
       
-      // Get episode details if applicable
-      let episode = null;
-      if (watchParty.episodeId) {
-        episode = await storage.getEpisode(watchParty.episodeId);
+      // Check if playlist exists and belongs to user
+      const playlist = await storage.getPlaylistById(playlistId);
+      if (!playlist) {
+        return res.status(404).json({ message: "پلی‌لیست یافت نشد" });
       }
       
-      // Get quality sources
-      const sources = await storage.getQualitySources(
-        watchParty.contentId,
-        watchParty.episodeId || undefined
-      );
+      if (playlist.userId !== req.user!.id) {
+        return res.status(403).json({ message: "شما اجازه تغییر این پلی‌لیست را ندارید" });
+      }
       
-      // Get members
-      const members = await storage.getWatchPartyMembers(watchParty.id);
+      // Remove from playlist
+      await storage.removeFromPlaylist(playlistId, contentId);
       
-      // Get chat messages
-      const messages = await storage.getWatchPartyChatMessages(watchParty.id);
-      
-      res.json({
-        ...watchParty,
-        content,
-        episode,
-        sources,
-        members,
-        messages
-      });
+      res.json({ message: "محتوا با موفقیت از پلی‌لیست حذف شد" });
     } catch (error) {
-      res.status(500).json({ message: "خطا در دریافت اطلاعات تماشای گروهی" });
+      next(error);
     }
   });
-  
-  app.post("/api/watch-parties/:code/join", async (req, res) => {
-    if (!req.isAuthenticated()) {
-      return res.status(401).json({ message: "لطفاً ابتدا وارد شوید" });
-    }
-    
-    try {
-      const watchParty = await storage.getWatchParty(req.params.code);
-      
-      if (!watchParty) {
-        return res.status(404).json({ message: "تماشای گروهی یافت نشد یا منقضی شده است" });
-      }
-      
-      // Join party
-      const member = await storage.joinWatchParty(watchParty.id, req.user.id);
-      
-      // Award points for joining a watch party
-      await storage.updateUserPoints(req.user.id, 5);
-      
-      res.status(200).json(member);
-    } catch (error) {
-      res.status(500).json({ message: "خطا در پیوستن به تماشای گروهی" });
-    }
-  });
-  
-  app.post("/api/watch-parties/:code/chat", async (req, res) => {
-    if (!req.isAuthenticated()) {
-      return res.status(401).json({ message: "لطفاً ابتدا وارد شوید" });
-    }
-    
-    try {
-      const { message } = req.body;
-      
-      if (!message) {
-        return res.status(400).json({ message: "پیام الزامی است" });
-      }
-      
-      const watchParty = await storage.getWatchParty(req.params.code);
-      
-      if (!watchParty) {
-        return res.status(404).json({ message: "تماشای گروهی یافت نشد یا منقضی شده است" });
-      }
-      
-      // Add chat message
-      const chatMessage = await storage.addWatchPartyChatMessage({
-        partyId: watchParty.id,
-        userId: req.user.id,
-        message
-      });
-      
-      res.status(201).json(chatMessage);
-    } catch (error) {
-      res.status(500).json({ message: "خطا در ارسال پیام" });
-    }
-  });
-  
+
+  const httpServer = createServer(app);
   return httpServer;
 }

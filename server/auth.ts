@@ -15,13 +15,13 @@ declare global {
 
 const scryptAsync = promisify(scrypt);
 
-export async function hashPassword(password: string) {
+async function hashPassword(password: string) {
   const salt = randomBytes(16).toString("hex");
   const buf = (await scryptAsync(password, salt, 64)) as Buffer;
   return `${buf.toString("hex")}.${salt}`;
 }
 
-export async function comparePasswords(supplied: string, stored: string) {
+async function comparePasswords(supplied: string, stored: string) {
   const [hashed, salt] = stored.split(".");
   const hashedBuf = Buffer.from(hashed, "hex");
   const suppliedBuf = (await scryptAsync(supplied, salt, 64)) as Buffer;
@@ -29,16 +29,16 @@ export async function comparePasswords(supplied: string, stored: string) {
 }
 
 export function setupAuth(app: Express) {
-  const sessionSecret = process.env.SESSION_SECRET || "xraynama-session-secret";
-  
   const sessionSettings: session.SessionOptions = {
-    secret: sessionSecret,
+    secret: process.env.SESSION_SECRET || "xraynama_secret_key",
     resave: false,
     saveUninitialized: false,
     store: storage.sessionStore,
-    cookie: { 
-      secure: process.env.NODE_ENV === "production",
-      maxAge: 30 * 24 * 60 * 60 * 1000 // 30 days
+    cookie: {
+      maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
+      httpOnly: true,
+      secure: app.get("env") === "production",
+      sameSite: "lax"
     }
   };
 
@@ -53,9 +53,8 @@ export function setupAuth(app: Express) {
         const user = await storage.getUserByUsername(username);
         if (!user || !(await comparePasswords(password, user.password))) {
           return done(null, false);
-        } else {
-          return done(null, user);
         }
+        return done(null, user);
       } catch (error) {
         return done(error);
       }
@@ -74,7 +73,7 @@ export function setupAuth(app: Express) {
 
   app.post("/api/register", async (req, res, next) => {
     try {
-      const { username, email, password, displayName } = req.body;
+      const { username, email, password, name } = req.body;
       
       // Check if username already exists
       const existingUser = await storage.getUserByUsername(username);
@@ -88,23 +87,18 @@ export function setupAuth(app: Express) {
         return res.status(400).json({ message: "ایمیل قبلاً استفاده شده است" });
       }
       
-      // Create user
-      const hashedPassword = await hashPassword(password);
+      // Create new user with hashed password
       const user = await storage.createUser({
         username,
         email,
-        password: hashedPassword,
-        displayName: displayName || username,
-        avatar: null,
-        badges: null
+        name: name || username,
+        password: await hashPassword(password),
       });
 
-      // Log in the user automatically
+      // Log the user in
       req.login(user, (err) => {
         if (err) return next(err);
-        // Return user without password
-        const { password, ...userWithoutPassword } = user;
-        res.status(201).json(userWithoutPassword);
+        res.status(201).json(user);
       });
     } catch (error) {
       next(error);
@@ -114,15 +108,14 @@ export function setupAuth(app: Express) {
   app.post("/api/login", (req, res, next) => {
     passport.authenticate("local", (err, user, info) => {
       if (err) return next(err);
+      
       if (!user) {
         return res.status(401).json({ message: "نام کاربری یا رمز عبور اشتباه است" });
       }
       
       req.login(user, (err) => {
         if (err) return next(err);
-        // Return user without password
-        const { password, ...userWithoutPassword } = user;
-        res.status(200).json(userWithoutPassword);
+        return res.status(200).json(user);
       });
     })(req, res, next);
   });
@@ -136,8 +129,6 @@ export function setupAuth(app: Express) {
 
   app.get("/api/user", (req, res) => {
     if (!req.isAuthenticated()) return res.sendStatus(401);
-    // Return user without password
-    const { password, ...userWithoutPassword } = req.user;
-    res.json(userWithoutPassword);
+    res.json(req.user);
   });
 }

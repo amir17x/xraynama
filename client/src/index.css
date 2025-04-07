@@ -3,73 +3,71 @@
 @tailwind utilities;
 
 @layer base {
+  :root {
+    --background: 222 47% 7%;
+    --foreground: 0 0% 100%;
+    
+    --card: 222 14% 12%;
+    --card-foreground: 0 0% 100%;
+    
+    --popover: 222 14% 12%;
+    --popover-foreground: 0 0% 100%;
+    
+    --primary: 210 100% 42%;
+    --primary-foreground: 0 0% 100%;
+    
+    --secondary: 222 13% 18%;
+    --secondary-foreground: 0 0% 100%;
+    
+    --muted: 222 13% 18%;
+    --muted-foreground: 0 0% 80%;
+    
+    --accent: 196 100% 69%;
+    --accent-foreground: 222 47% 7%;
+    
+    --destructive: 0 63% 50%;
+    --destructive-foreground: 0 0% 100%;
+    
+    --border: 222 14% 25%;
+    --input: 222 14% 25%;
+    --ring: 210 100% 42%;
+    
+    --radius: 0.5rem;
+  }
+  
   * {
-    @apply border-border;
+    @apply border-border box-border;
   }
-
+  
+  html, body {
+    font-family: 'Vazirmatn', sans-serif;
+    overflow-x: hidden;
+  }
+  
   body {
-    @apply font-sans antialiased bg-background text-foreground;
-  }
-
-  /* RTL Support */
-  html {
-    direction: rtl;
+    @apply bg-background text-foreground;
   }
 }
 
 @layer components {
   .glass-effect {
-    @apply bg-dark-lighter/70 backdrop-blur-md;
+    @apply bg-card/70 backdrop-blur-md border border-white/5;
   }
   
-  .glass-card {
-    @apply bg-dark-card/70 backdrop-blur-sm transition-all duration-300;
+  .fluent-card {
+    @apply transition-all duration-300;
   }
   
-  .glass-card:hover {
-    @apply translate-y-[-2px] shadow-lg;
+  .fluent-card:hover {
+    @apply transform -translate-y-1 shadow-lg;
   }
   
-  .btn-primary {
-    @apply bg-primary transition-all duration-200;
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
   }
   
-  .btn-primary:hover {
-    @apply bg-primary-hover -translate-y-[1px];
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
   }
-  
-  .content-card {
-    @apply transition-transform duration-300;
-  }
-  
-  .content-card:hover {
-    @apply scale-[1.02] shadow-xl;
-  }
-  
-  .card-overlay {
-    background: linear-gradient(to top, rgba(18, 18, 18, 0.9) 0%, rgba(18, 18, 18, 0.5) 60%, rgba(18, 18, 18, 0) 100%);
-    @apply opacity-70 transition-opacity duration-300;
-  }
-  
-  .content-card:hover .card-overlay {
-    @apply opacity-100;
-  }
-  
-  .filter-active {
-    @apply bg-primary/30 border-primary;
-  }
-  
-  .mica-effect {
-    @apply bg-dark-lighter/50 backdrop-blur-xl border border-dark-border/30;
-  }
-}
-
-/* Custom Animation */
-@keyframes fadeIn {
-  0% { opacity: 0; }
-  100% { opacity: 1; }
-}
-
-.animate-fade-in {
-  animation: fadeIn 0.3s ease-in-out;
 }
