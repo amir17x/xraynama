@@ -1,0 +1,277 @@
+من برات یه مستند جامع آماده می‌کنم که چطور می‌تونی بخش بازیابی رمز عبور رو با استفاده از **Node.js**، **TypeScript**، **MailerSend** و **MongoDB** پیاده‌سازی کنی. این مستند شامل توضیحات مراحل، ساختار کدها و نکات مهم برای توسعه خواهد بود. هدف اینه که یه راهنمای قدم به قدم داشته باشی تا این سیستم رو به بهترین شکل پیاده‌سازی کنی.
+
+---
+
+### مستند پیاده‌سازی سیستم بازیابی رمز عبور با Node.js، TypeScript، MailerSend و MongoDB
+
+#### **مروری بر پروژه**
+ما یه API برای بازیابی رمز عبور می‌سازیم که شامل سه مرحله اصلیه:
+1. **درخواست بازیابی رمز عبور**: کاربر ایمیلش رو می‌فرسته و یه کد تأیید براش ایمیل می‌شه.
+2. **تأیید کد**: کاربر کد تأیید رو می‌فرسته و اگه معتبر باشه، یه توکن موقت دریافت می‌کنه.
+3. **تنظیم رمز عبور جدید**: کاربر با استفاده از توکن، رمز عبور جدیدش رو تنظیم می‌کنه.
+
+#### **پیش‌نیازها**
+- **Node.js**: نسخه 18 یا بالاتر
+- **TypeScript**: برای تایپ‌دار کردن کدها
+- **MailerSend**: برای ارسال ایمیل (حساب کاربری و API Token نیاز داری)
+- **MongoDB**: برای ذخیره‌سازی اطلاعات کاربر و کدهای تأیید
+- **پکیج‌های مورد نیاز**:
+  - `npm install express mongoose @types/express @types/node typescript ts-node`
+  - `npm install mailersend bcrypt jsonwebtoken @types/bcrypt @types/jsonwebtoken`
+
+#### **ساختار پروژه**
+```
+password-recovery-api/
+├── src/
+│   ├── controllers/
+│   │   └── authController.ts
+│   ├── models/
+│   │   ├── User.ts
+│   │   └── VerificationCode.ts
+│   ├── routes/
+│   │   └── authRoutes.ts
+│   ├── services/
+│   │   └── emailService.ts
+│   ├── config/
+│   │   └── db.ts
+│   └── index.ts
+├── .env
+├── tsconfig.json
+└── package.json
+```
+
+---
+
+### **مرحله ۱: راه‌اندازی پروژه**
+
+1. **فایل `tsconfig.json`**:
+```json
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "commonjs",
+    "strict": true,
+    "esModuleInterop": true,
+    "outDir": "./dist",
+    "rootDir": "./src"
+  },
+  "include": ["src/**/*"]
+}
+```
+
+2. **فایل `.env`**:
+```
+MONGO_URI=mongodb://localhost:27017/password_recovery
+MAILERSEND_API_TOKEN=your_mailersend_api_token
+JWT_SECRET=your_jwt_secret
+PORT=3000
+```
+
+3. **اتصال به MongoDB (`src/config/db.ts`)**:
+```typescript
+import mongoose from 'mongoose';
+
+const connectDB = async () => {
+  try {
+    await mongoose.connect(process.env.MONGO_URI as string);
+    console.log('MongoDB connected');
+  } catch (error) {
+    console.error('MongoDB connection error:', error);
+    process.exit(1);
+  }
+};
+
+export default connectDB;
+```
+
+4. **فایل اصلی (`src/index.ts`)**:
+```typescript
+import express from 'express';
+import connectDB from './config/db';
+import authRoutes from './routes/authRoutes';
+
+const app = express();
+app.use(express.json());
+
+connectDB();
+
+app.use('/api/auth', authRoutes);
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+```
+
+---
+
+### **مرحله ۲: مدل‌ها**
+
+1. **مدل کاربر (`src/models/User.ts`)**:
+```typescript
+import mongoose, { Schema } from 'mongoose';
+import bcrypt from 'bcrypt';
+
+const userSchema = new Schema({
+  email: { type: String, required: true, unique: true },
+  password: { type: String, required: true },
+});
+
+userSchema.pre('save', async function (next) {
+  if (!this.isModified('password')) return next();
+  const salt = await bcrypt.genSalt(10);
+  this.password = await bcrypt.hash(this.password, salt);
+  next();
+});
+
+export default mongoose.model('User', userSchema);
+```
+
+2. **مدل کد تأیید (`src/models/VerificationCode.ts`)**:
+```typescript
+import mongoose, { Schema } from 'mongoose';
+
+const verificationCodeSchema = new Schema({
+  email: { type: String, required: true },
+  code: { type: String, required: true },
+  expiresAt: { type: Date, default: () => new Date(Date.now() + 15 * 60 * 1000) }, // 15 دقیقه انقضا
+});
+
+export default mongoose.model('VerificationCode', verificationCodeSchema);
+```
+
+---
+
+### **مرحله ۳: سرویس ارسال ایمیل**
+
+**فایل `src/services/emailService.ts`**:
+```typescript
+import { MailerSend, EmailParams, Sender, Recipient } from 'mailersend';
+
+const mailerSend = new MailerSend({
+  apiKey: process.env.MAILERSEND_API_TOKEN as string,
+});
+
+export const sendVerificationCode = async (email: string, code: string) => {
+  const sentFrom = new Sender('no-reply@yourdomain.com', 'Your App');
+  const recipients = [new Recipient(email, 'User')];
+
+  const emailParams = new EmailParams()
+    .setFrom(sentFrom)
+    .setTo(recipients)
+    .setSubject('Verification Code for Password Recovery')
+    .setText(`Your verification code is: ${code}`);
+
+  try {
+    await mailerSend.email.send(emailParams);
+    console.log(`Verification code sent to ${email}`);
+  } catch (error) {
+    console.error('Error sending email:', error);
+    throw new Error('Failed to send email');
+  }
+};
+```
+
+---
+
+### **مرحله ۴: کنترلرها**
+
+**فایل `src/controllers/authController.ts`**:
+```typescript
+import { Request, Response } from 'express';
+import User from '../models/User';
+import VerificationCode from '../models/VerificationCode';
+import { sendVerificationCode } from '../services/emailService';
+import jwt from 'jsonwebtoken';
+import bcrypt from 'bcrypt';
+
+export const requestPasswordReset = async (req: Request, res: Response) => {
+  const { email } = req.body;
+
+  const user = await User.findOne({ email });
+  if (!user) return res.status(404).json({ message: 'User not found' });
+
+  const code = Math.floor(100000 + Math.random() * 900000).toString(); // کد ۶ رقمی
+  await VerificationCode.create({ email, code });
+
+  await sendVerificationCode(email, code);
+  res.status(200).json({ message: 'Verification code sent' });
+};
+
+export const verifyCode = async (req: Request, res: Response) => {
+  const { email, code } = req.body;
+
+  const verification = await VerificationCode.findOne({ email, code });
+  if (!verification || verification.expiresAt < new Date()) {
+    return res.status(400).json({ message: 'Invalid or expired code' });
+  }
+
+  const token = jwt.sign({ email }, process.env.JWT_SECRET as string, { expiresIn: '1h' });
+  await VerificationCode.deleteOne({ email, code }); // کد رو بعد از تأیید حذف کن
+  res.status(200).json({ token });
+};
+
+export const resetPassword = async (req: Request, res: Response) => {
+  const { token, newPassword } = req.body;
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as { email: string };
+    const user = await User.findOne({ email: decoded.email });
+    if (!user) return res.status(404).json({ message: 'User not found' });
+
+    user.password = newPassword;
+    await user.save();
+
+    res.status(200).json({ message: 'Password reset successful' });
+  } catch (error) {
+    res.status(400).json({ message: 'Invalid or expired token' });
+  }
+};
+```
+
+---
+
+### **مرحله ۵: مسیرها**
+
+**فایل `src/routes/authRoutes.ts`**:
+```typescript
+import { Router } from 'express';
+import { requestPasswordReset, verifyCode, resetPassword } from '../controllers/authController';
+
+const router = Router();
+
+router.post('/request-reset', requestPasswordReset);
+router.post('/verify-code', verifyCode);
+router.post('/reset-password', resetPassword);
+
+export default router;
+```
+
+---
+
+### **مرحله ۶: تست API**
+
+1. **درخواست کد تأیید**:
+   - **درخواست**: `POST /api/auth/request-reset`
+   - **بدنه**: `{ "email": "user@example.com" }`
+   - **پاسخ**: `{ "message": "Verification code sent" }`
+
+2. **تأیید کد**:
+   - **درخواست**: `POST /api/auth/verify-code`
+   - **بدنه**: `{ "email": "user@example.com", "code": "123456" }`
+   - **پاسخ**: `{ "token": "jwt_token_here" }`
+
+3. **تنظیم رمز جدید**:
+   - **درخواست**: `POST /api/auth/reset-password`
+   - **بدنه**: `{ "token": "jwt_token_here", "newPassword": "newpass123" }`
+   - **پاسخ**: `{ "message": "Password reset successful" }`
+
+---
+
+### **نکات مهم**
+- **امنیت**: از HTTPS در محیط تولید استفاده کن تا اطلاعات رمزگذاری بشن.
+- **مدیریت خطا**: خطاهای بیشتری مثل محدودیت تعداد درخواست‌ها (Rate Limiting) اضافه کن.
+- **بهینه‌سازی ایمیل**: می‌تونی قالب HTML برای ایمیل با MailerSend بسازی تا کاربرپسندتر باشه.
+- **انقضای توکن**: زمان انقضای توکن رو بسته به نیاز پروژه تنظیم کن.
+
+---
+
+این مستند باید بهت کمک کنه تا یه سیستم بازیابی رمز عبور امن و کارآمد بسازی. اگه سوالی داری یا بخشی نیاز به توضیح بیشتر داره، بگو تا برات کامل‌تر کنم!

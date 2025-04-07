@@ -63,6 +63,45 @@ async function sendVerificationEmail(email: string, code: string): Promise<boole
   }
 }
 
+// تابع ارسال ایمیل تایید تغییر رمز عبور
+async function sendPasswordChangeConfirmation(email: string): Promise<boolean> {
+  try {
+    const sender = new Sender("no-reply@xraynama.ir", "XrayNama");
+    const recipients = [new Recipient(email)];
+    
+    const emailParams = new EmailParams()
+      .setFrom(sender)
+      .setTo(recipients)
+      .setSubject("تایید تغییر رمز عبور")
+      .setHtml(`
+        <div dir="rtl" style="font-family: Tahoma, Arial; line-height: 1.6; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f0f7ff; border-radius: 10px;">
+          <h2 style="color: #1e3a8a; border-bottom: 2px solid #3b82f6; padding-bottom: 10px;">تغییر رمز عبور با موفقیت انجام شد</h2>
+          <p style="color: #334155;">کاربر گرامی،</p>
+          <p style="color: #334155;">رمز عبور حساب کاربری شما در XrayNama با موفقیت تغییر یافت.</p>
+          <p style="color: #334155;">اگر شما این تغییر را انجام نداده‌اید، لطفاً سریعاً با پشتیبانی تماس بگیرید.</p>
+          <p style="color: #334155;">با احترام،<br>تیم XrayNama</p>
+        </div>
+      `)
+      .setText(`
+        تغییر رمز عبور با موفقیت انجام شد
+        
+        کاربر گرامی،
+        رمز عبور حساب کاربری شما در XrayNama با موفقیت تغییر یافت.
+        
+        اگر شما این تغییر را انجام نداده‌اید، لطفاً سریعاً با پشتیبانی تماس بگیرید.
+        
+        با احترام،
+        تیم XrayNama
+      `);
+
+    await mailerSend.email.send(emailParams);
+    return true;
+  } catch (error) {
+    console.error("Error sending password change confirmation email:", error);
+    return false;
+  }
+}
+
 async function hashPassword(password: string) {
   const salt = randomBytes(16).toString("hex");
   const buf = (await scryptAsync(password, salt, 64)) as Buffer;
@@ -202,9 +241,20 @@ export function setupAuth(app: Express) {
       // Generate and save verification code
       const code = await storage.createVerificationCode(email);
       
-      // In a real application, we would send an email with the code here
-      // For demo purposes, we'll just return a success message and log the code
-      console.log(`Verification code for ${email}: ${code}`);
+      // Send email with the code using MailerSend
+      try {
+        await sendVerificationEmail(email, code);
+        console.log(`Verification email sent to ${email}`);
+      } catch (emailError) {
+        console.error("Error sending verification email:", emailError);
+        // حتی در صورت خطا در ارسال ایمیل، پیام موفقیت‌آمیز به کاربر نشان می‌دهیم
+        // اما خطا را در لاگ ثبت می‌کنیم
+      }
+      
+      // در محیط توسعه، کد را نمایش می‌دهیم برای تست آسان‌تر
+      if (process.env.NODE_ENV !== 'production') {
+        console.log(`Verification code for ${email}: ${code}`);
+      }
       
       return res.status(200).json({ 
         message: "کد تأیید با موفقیت ارسال شد. لطفاً ایمیل خود را بررسی کنید."
@@ -258,6 +308,15 @@ export function setupAuth(app: Express) {
       const success = await storage.resetPassword(email, password);
       if (!success) {
         return res.status(500).json({ message: "خطا در تغییر رمز عبور" });
+      }
+      
+      // Send confirmation email
+      try {
+        await sendPasswordChangeConfirmation(email);
+        console.log(`Password change confirmation email sent to ${email}`);
+      } catch (emailError) {
+        console.error("Error sending password change confirmation email:", emailError);
+        // ثبت خطا در لاگ، ولی همچنان پاسخ موفقیت آمیز به کاربر ارسال می‌کنیم
       }
       
       return res.status(200).json({ 
