@@ -13,6 +13,12 @@ import { Textarea } from "@/components/ui/textarea";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
 import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import {
   Heart,
   Download,
   Play,
@@ -30,7 +36,10 @@ import {
   Hash,
   Users,
   Globe,
-  Shield
+  Shield,
+  Server,
+  ChevronDown,
+  AlertTriangle
 } from "lucide-react";
 import { 
   Select, 
@@ -118,10 +127,46 @@ export default function ContentPage() {
     }
   ];
   
-  const mockQualities = [
-    { label: "1080p", value: "1080p", size: "2.1 GB", url: "#download-1080" },
-    { label: "720p", value: "720p", size: "1.4 GB", url: "#download-720" },
-    { label: "480p", value: "480p", size: "750 MB", url: "#download-480" },
+  // Download options structure
+  const mockDownloadCategories = [
+    {
+      id: "dubbed",
+      title: "دوبله فارسی دو زبانه",
+      encoder: "GapFilm",
+      options: [
+        { label: "1080p", value: "1080p", size: "2.5 GB", url: "#download-dub-1080" },
+        { label: "720p", value: "720p", size: "1.8 GB", url: "#download-dub-720" },
+        { label: "480p", value: "480p", size: "950 MB", url: "#download-dub-480" },
+      ]
+    },
+    {
+      id: "subbed",
+      title: "زبان اصلی با زیرنویس فارسی",
+      encoder: "Film2Media",
+      options: [
+        { label: "1080p", value: "1080p", size: "2.1 GB", url: "#download-sub-1080" },
+        { label: "720p", value: "720p", size: "1.4 GB", url: "#download-sub-720" },
+        { label: "480p", value: "480p", size: "750 MB", url: "#download-sub-480" },
+      ]
+    },
+    {
+      id: "original",
+      title: "زبان اصلی بدون زیرنویس",
+      encoder: "Film2Media",
+      options: [
+        { label: "1080p", value: "1080p", size: "2.0 GB", url: "#download-orig-1080" },
+        { label: "720p", value: "720p", size: "1.3 GB", url: "#download-orig-720" },
+      ]
+    },
+    {
+      id: "subtitle",
+      title: "فایل زیرنویس",
+      encoder: "Xraynama",
+      options: [
+        { label: "فارسی", value: "fa", size: "45 KB", url: "#download-sub-fa" },
+        { label: "انگلیسی", value: "en", size: "38 KB", url: "#download-sub-en" },
+      ]
+    },
   ];
   
   // Toggle Favorite
@@ -311,25 +356,13 @@ export default function ContentPage() {
                       پخش تریلر
                     </Button>
                     
-                    <Select
-                      value={selectedQuality}
-                      onValueChange={(value) => handleDownload(value)}
+                    <Button 
+                      className="w-full"
+                      onClick={() => window.location.href = "#download-box"}
                     >
-                      <SelectTrigger className="w-full bg-black/40">
-                        <Download className="h-4 w-4 mr-2" />
-                        <SelectValue placeholder="دانلود" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {mockQualities.map((quality) => (
-                          <SelectItem key={quality.value} value={quality.value}>
-                            <div className="flex justify-between w-full">
-                              <span>{quality.label}</span>
-                              <span className="text-muted-foreground text-xs">{quality.size}</span>
-                            </div>
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                      <Download className="h-4 w-4 mr-2" />
+                      مشاهده لینک‌های دانلود
+                    </Button>
                     
                     <div className="flex gap-2">
                       <Button
@@ -493,6 +526,122 @@ export default function ContentPage() {
                 </div>
               </div>
             )}
+          </div>
+        </div>
+        
+        {/* Download Box Section */}
+        <div id="download-box" className="container mx-auto px-4 py-10 border-t border-gray-800">
+          <h2 className="text-xl font-bold text-white mb-6 flex items-center">
+            <Download className="h-5 w-5 mr-2 text-primary" />
+            باکس دانلود
+          </h2>
+          
+          <div className="p-4 bg-black/40 rounded-lg">
+            <div className="flex items-center justify-between bg-black/60 rounded-t-lg p-3 mb-4">
+              <div className="flex items-center">
+                <img 
+                  src={mockContent.poster}
+                  alt={mockContent.title}
+                  className="w-16 h-24 rounded shadow-md mr-4 object-cover"
+                />
+                <div>
+                  <h3 className="font-bold text-white text-lg mb-1">{mockContent.title}</h3>
+                  <p className="text-gray-400 text-sm">{mockContent.englishTitle} ({mockContent.year})</p>
+                </div>
+              </div>
+              
+              <div className="hidden md:flex items-center gap-4">
+                <div className="flex items-center px-3 py-1 rounded bg-black/60">
+                  <Star className="h-4 w-4 text-yellow-500 fill-current mr-1" />
+                  <span className="text-yellow-500 font-medium">{mockContent.imdbRating}</span>
+                </div>
+                
+                <div className="flex items-center px-3 py-1 rounded bg-black/60">
+                  <Clock className="h-4 w-4 text-gray-400 mr-1" />
+                  <span className="text-gray-300">{mockContent.duration} دقیقه</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between bg-blue-950/60 p-3 rounded-md mb-4">
+              <div className="flex items-center">
+                <AlertTriangle className="h-5 w-5 text-yellow-500 mr-2" />
+                <span className="text-sm text-gray-300">پخش آنلاین فقط با مرورگر Chrome امکان پذیر است.</span>
+              </div>
+              
+              <Badge variant="outline" className="bg-blue-900/50 text-gray-300 border-gray-600 py-1">
+                پشتیبانی: 24 ساعته
+              </Badge>
+            </div>
+            
+            <Accordion type="single" collapsible className="space-y-4">
+              {mockDownloadCategories.map((category) => (
+                <AccordionItem 
+                  key={category.id} 
+                  value={category.id}
+                  className="border-0"
+                >
+                  <AccordionTrigger className="bg-black/30 hover:bg-black/50 rounded-lg py-3 px-4 text-white">
+                    <div className="flex items-center">
+                      <span className="mr-2">{category.title}</span>
+                      {category.id === "dubbed" && (
+                        <Badge className="bg-yellow-600 hover:bg-yellow-700 text-white mr-2">دوبله</Badge>
+                      )}
+                      {category.id === "subbed" && (
+                        <Badge className="bg-blue-600 hover:bg-blue-700 text-white mr-2">زیرنویس</Badge>
+                      )}
+                      {category.id === "subtitle" && (
+                        <Badge className="bg-gray-600 hover:bg-gray-700 text-white mr-2">زیرنویس</Badge>
+                      )}
+                    </div>
+                  </AccordionTrigger>
+                  <AccordionContent className="mt-2 pt-0 px-0">
+                    <div className="bg-black/20 rounded-lg overflow-hidden">
+                      {category.options.map((option, index) => (
+                        <div 
+                          key={index}
+                          className={`flex items-center justify-between p-3 ${
+                            index !== category.options.length - 1 ? "border-b border-gray-800" : ""
+                          }`}
+                        >
+                          <div className="flex items-center">
+                            <Server className="h-4 w-4 text-gray-500 mr-2" />
+                            <div>
+                              <div className="flex items-center">
+                                <span className="text-white">{option.label}</span>
+                                <span className="text-gray-500 text-xs mr-2">({option.size})</span>
+                              </div>
+                              <div className="text-xs text-gray-400">انکودر: {category.encoder}</div>
+                            </div>
+                          </div>
+                          
+                          <div className="flex items-center gap-2">
+                            {category.id !== "subtitle" && (
+                              <Button 
+                                variant="outline" 
+                                size="sm" 
+                                className="bg-black/30 hover:bg-black/50 border-gray-700"
+                              >
+                                <Play className="h-3.5 w-3.5 mr-1" />
+                                پخش آنلاین
+                              </Button>
+                            )}
+                            
+                            <Button 
+                              size="sm"
+                              onClick={() => handleDownload(option.label)}
+                            >
+                              <Download className="h-3.5 w-3.5 mr-1" />
+                              دانلود مستقیم
+                            </Button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+              ))}
+            </Accordion>
           </div>
         </div>
         
