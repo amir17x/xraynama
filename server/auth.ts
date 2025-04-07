@@ -21,17 +21,10 @@ const mailerSend = new MailerSend({
   apiKey: process.env.MAILERSEND_API_KEY || '',
 });
 
-// ایجاد ترنسپورتر SMTP برای Nodemailer
+// استفاده مستقیم از API MailerSend بدون استفاده از SMTP
+// ترنسپورتر Nodemailer برای پشتیبانی از کد قبلی (استفاده نمی‌شود)
 const transporter = nodemailer.createTransport({
-  host: 'smtp.mailersend.net',
-  port: 2525,
-  secure: false, // true for 465, false for other ports
-  auth: {
-    user: 'MS_JUZMih@test-z0vklo6ex87l7qrx.mlsender.net',
-    pass: 'mssp.BhM9lrN.pq3enl6026ml2vwr.VFZtxis'
-  },
-  debug: true, // اضافه کردن گزینه‌های رفع اشکال
-  logger: true
+  jsonTransport: true // استفاده از ترنسپورتر JSON برای تست (ایمیل‌ها ارسال نمی‌شوند)
 });
 
 // تابع ارسال ایمیل با کد تایید
@@ -66,19 +59,45 @@ async function sendVerificationEmail(email: string, code: string): Promise<boole
       تیم XrayNama
     `;
     
-    // Send email using Nodemailer
-    const info = await transporter.sendMail({
-      from: '"XrayNama" <MS_JUZMih@test-z0vklo6ex87l7qrx.mlsender.net>', // استفاده از آدرس SMTP کاربر
-      to: email,
-      subject: "کد تایید برای بازیابی رمز عبور",
-      text: textContent,
-      html: htmlContent
-    });
-    
-    console.log("Verification email sent successfully:", info.messageId);
-    return true;
+    try {
+      // استفاده از API MailerSend برای ارسال ایمیل
+      const sender = new Sender("no-reply@mailersend.net", "XrayNama");
+      const recipients = [new Recipient(email)];
+      
+      const emailParams = new EmailParams()
+        .setFrom(sender)
+        .setTo(recipients)
+        .setSubject("کد تایید برای بازیابی رمز عبور")
+        .setHtml(htmlContent)
+        .setText(textContent);
+      
+      const response = await mailerSend.email.send(emailParams);
+      console.log("Verification email sent successfully:", response);
+      return true;
+    } catch (mailerSendError) {
+      console.error("Error sending email with MailerSend API:", mailerSendError);
+      
+      // اگر با API MailerSend نتوانستیم ایمیل بفرستیم، از Nodemailer برای تست استفاده می‌کنیم
+      // که البته در حالت jsonTransport فقط لاگ می‌شود و ارسال نمی‌شود
+      try {
+        const info = await transporter.sendMail({
+          from: '"XrayNama" <no-reply@mailersend.net>',
+          to: email,
+          subject: "کد تایید برای بازیابی رمز عبور",
+          text: textContent,
+          html: htmlContent
+        });
+        
+        console.log("Email logged but not sent (using JSON transport):", info);
+      } catch (nodemailerError) {
+        console.error("Also failed with Nodemailer:", nodemailerError);
+      }
+      
+      // خطا را به عنوان false برمی‌گردانیم، اما کد را در کنسول نمایش می‌دهیم
+      return false;
+    }
   } catch (error) {
-    console.error("Error sending verification email:", error);
+    console.error("Error in sendVerificationEmail function:", error);
     return false;
   }
 }
@@ -110,19 +129,44 @@ async function sendPasswordChangeConfirmation(email: string): Promise<boolean> {
       تیم XrayNama
     `;
     
-    // Send email using Nodemailer
-    const info = await transporter.sendMail({
-      from: '"XrayNama" <MS_JUZMih@test-z0vklo6ex87l7qrx.mlsender.net>', // استفاده از آدرس SMTP کاربر
-      to: email,
-      subject: "تایید تغییر رمز عبور",
-      text: textContent,
-      html: htmlContent
-    });
-    
-    console.log("Password change confirmation email sent successfully:", info.messageId);
-    return true;
+    try {
+      // استفاده از API MailerSend برای ارسال ایمیل
+      const sender = new Sender("no-reply@mailersend.net", "XrayNama");
+      const recipients = [new Recipient(email)];
+      
+      const emailParams = new EmailParams()
+        .setFrom(sender)
+        .setTo(recipients)
+        .setSubject("تایید تغییر رمز عبور")
+        .setHtml(htmlContent)
+        .setText(textContent);
+      
+      const response = await mailerSend.email.send(emailParams);
+      console.log("Password change confirmation email sent successfully:", response);
+      return true;
+    } catch (mailerSendError) {
+      console.error("Error sending email with MailerSend API:", mailerSendError);
+      
+      // اگر با API MailerSend نتوانستیم ایمیل بفرستیم، از Nodemailer برای تست استفاده می‌کنیم
+      // که البته در حالت jsonTransport فقط لاگ می‌شود و ارسال نمی‌شود
+      try {
+        const info = await transporter.sendMail({
+          from: '"XrayNama" <no-reply@mailersend.net>',
+          to: email,
+          subject: "تایید تغییر رمز عبور",
+          text: textContent,
+          html: htmlContent
+        });
+        
+        console.log("Password change confirmation email logged (using JSON transport):", info);
+      } catch (nodemailerError) {
+        console.error("Also failed with Nodemailer:", nodemailerError);
+      }
+      
+      return false;
+    }
   } catch (error) {
-    console.error("Error sending password change confirmation email:", error);
+    console.error("Error in sendPasswordChangeConfirmation function:", error);
     return false;
   }
 }
