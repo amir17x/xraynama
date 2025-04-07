@@ -108,13 +108,12 @@ export default function AdminUsers() {
   // Update user role mutation
   const updateUserMutation = useMutation({
     mutationFn: async (userData: { userId: number; role: 'user' | 'admin' }) => {
-      const response = await apiRequest('PATCH', `/api/admin/users/${userData.userId}`, {
-        role: userData.role,
+      const response = await apiRequest(`/api/admin/users/${userData.userId}`, {
+        method: 'PATCH',
+        data: {
+          role: userData.role,
+        }
       });
-      
-      if (!response.ok) {
-        throw new Error('خطا در به‌روزرسانی نقش کاربر');
-      }
       
       return response.json();
     },
@@ -137,11 +136,9 @@ export default function AdminUsers() {
   // Delete user mutation
   const deleteUserMutation = useMutation({
     mutationFn: async (userId: number) => {
-      const response = await apiRequest('DELETE', `/api/admin/users/${userId}`);
-      
-      if (!response.ok) {
-        throw new Error('خطا در حذف کاربر');
-      }
+      const response = await apiRequest(`/api/admin/users/${userId}`, {
+        method: 'DELETE'
+      });
       
       return response.json();
     },
@@ -166,11 +163,10 @@ export default function AdminUsers() {
   // Edit user mutation
   const editUserMutation = useMutation({
     mutationFn: async (userData: { userId: number; data: any }) => {
-      const response = await apiRequest('PATCH', `/api/admin/users/${userData.userId}`, userData.data);
-      
-      if (!response.ok) {
-        throw new Error('خطا در ویرایش اطلاعات کاربر');
-      }
+      const response = await apiRequest(`/api/admin/users/${userData.userId}`, {
+        method: 'PATCH',
+        data: userData.data
+      });
       
       return response.json();
     },

@@ -111,11 +111,9 @@ export default function AdminContent() {
   // Delete content mutation
   const deleteContentMutation = useMutation({
     mutationFn: async (contentId: number) => {
-      const response = await apiRequest('DELETE', `/api/admin/content/${contentId}`);
-      
-      if (!response.ok) {
-        throw new Error('خطا در حذف محتوا');
-      }
+      const response = await apiRequest(`/api/admin/content/${contentId}`, {
+        method: 'DELETE'
+      });
       
       return response.json();
     },

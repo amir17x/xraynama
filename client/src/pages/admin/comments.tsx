@@ -102,11 +102,9 @@ export default function AdminComments() {
   // Approve comment mutation
   const approveCommentMutation = useMutation({
     mutationFn: async (commentId: number) => {
-      const response = await apiRequest('PATCH', `/api/admin/comments/${commentId}/approve`);
-      
-      if (!response.ok) {
-        throw new Error('خطا در تأیید نظر');
-      }
+      const response = await apiRequest(`/api/admin/comments/${commentId}/approve`, {
+        method: 'PATCH'
+      });
       
       return response.json();
     },
@@ -130,11 +128,9 @@ export default function AdminComments() {
   // Reject comment mutation
   const rejectCommentMutation = useMutation({
     mutationFn: async (commentId: number) => {
-      const response = await apiRequest('PATCH', `/api/admin/comments/${commentId}/reject`);
-      
-      if (!response.ok) {
-        throw new Error('خطا در رد نظر');
-      }
+      const response = await apiRequest(`/api/admin/comments/${commentId}/reject`, {
+        method: 'PATCH'
+      });
       
       return response.json();
     },
@@ -158,11 +154,9 @@ export default function AdminComments() {
   // Delete comment mutation
   const deleteCommentMutation = useMutation({
     mutationFn: async (commentId: number) => {
-      const response = await apiRequest('DELETE', `/api/admin/comments/${commentId}`);
-      
-      if (!response.ok) {
-        throw new Error('خطا در حذف نظر');
-      }
+      const response = await apiRequest(`/api/admin/comments/${commentId}`, {
+        method: 'DELETE'
+      });
       
       return response.json();
     },
