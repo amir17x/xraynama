@@ -23,7 +23,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import { useAuth } from '@/hooks/use-auth';
-import { User, KeyRound, AtSign, Lock } from 'lucide-react';
+import { User, KeyRound, AtSign, Lock, Heart, Play, MessageCircle, History, ListVideo } from 'lucide-react';
 
 // Login schema
 const loginSchema = z.object({
@@ -389,6 +389,3 @@ export default function AuthPage() {
     </>
   );
 }
-
-// Import these components for the UI
-import { Play, MessageCircle, History, ListVideo } from 'lucide-react';
