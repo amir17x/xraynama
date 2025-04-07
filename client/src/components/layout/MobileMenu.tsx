@@ -3,7 +3,6 @@ import { Link } from 'wouter';
 import { Dialog, Transition } from '@headlessui/react';
 import { X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import logoSvg from '@/assets/logo.svg';
 
 interface MobileMenuProps {
   isOpen: boolean;
@@ -38,9 +37,9 @@ export function MobileMenu({ isOpen, onClose, navItems }: MobileMenuProps) {
         >
           <Dialog.Panel className="fixed inset-y-0 left-0 right-0 w-full max-w-md mr-auto glass-effect shadow-xl">
             <div className="flex items-center justify-between px-4 py-3 border-b border-border">
-              <Link href="/" onClick={onClose}>
-                <img src={logoSvg} alt="Xraynama" className="h-8" />
-              </Link>
+              <Dialog.Title className="text-xl font-semibold text-foreground">
+                منو
+              </Dialog.Title>
               <Button variant="ghost" size="icon" onClick={onClose}>
                 <X className="h-6 w-6" />
               </Button>

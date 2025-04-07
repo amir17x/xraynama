@@ -13,7 +13,6 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { MobileMenu } from './MobileMenu';
-import logoSvg from '@/assets/logo.svg';
 
 export function Header() {
   const { user, isLoading, logoutMutation } = useAuth();
@@ -49,7 +48,7 @@ export function Header() {
         <div className="flex items-center">
           <div className="mr-4">
             <Link href="/" className="flex items-center">
-              <img src={logoSvg} alt="Xraynama" className="h-8" />
+              <span className="text-primary text-2xl font-bold">X<span className="text-foreground">raynama</span></span>
             </Link>
           </div>
           
