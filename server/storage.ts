@@ -266,7 +266,8 @@ export class MemStorage implements IStorage {
       id, 
       createdAt: now, 
       updatedAt: now,
-      avatar: insertUser.avatar || null
+      avatar: insertUser.avatar || null,
+      role: insertUser.role || 'user' // Default to 'user' if not specified
     };
     this.usersMap.set(id, user);
     return user;

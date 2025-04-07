@@ -117,6 +117,18 @@ export function Header() {
                       <Settings className="mr-2 h-4 w-4" />
                       <span>تنظیمات</span>
                     </DropdownMenuItem>
+                    
+                    {/* نمایش گزینه پنل ادمین فقط برای کاربران ادمین */}
+                    {user.role === 'admin' && (
+                      <>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem onClick={() => setLocation('/admin/dashboard')} className="text-primary font-semibold">
+                          <Settings className="mr-2 h-4 w-4" />
+                          <span>پنل مدیریت</span>
+                        </DropdownMenuItem>
+                      </>
+                    )}
+                    
                     <DropdownMenuSeparator />
                     <DropdownMenuItem onClick={handleLogout} disabled={logoutMutation.isPending}>
                       <LogOut className="mr-2 h-4 w-4" />
