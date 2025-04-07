@@ -2,10 +2,14 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { setupAuth } from "./auth";
+import { setupAdminRoutes } from "./admin";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Set up authentication routes
   setupAuth(app);
+  
+  // Set up admin routes
+  setupAdminRoutes(app);
 
   // Content routes
   app.get("/api/content", async (req, res, next) => {

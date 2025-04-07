@@ -21,6 +21,7 @@ export interface UserDocument extends Document {
   email: string;
   name?: string | null;
   avatar?: string | null;
+  role: 'user' | 'admin';
   createdAt: Date;
   updatedAt: Date;
 }
@@ -150,6 +151,7 @@ const userSchema = new Schema<UserDocument>({
   email: { type: String, required: true, unique: true },
   name: { type: String, default: null },
   avatar: { type: String, default: null },
+  role: { type: String, enum: ['user', 'admin'], default: 'user', required: true },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now }
 });

@@ -6,6 +6,9 @@ import { z } from "zod";
 export const contentTypeEnum = pgEnum('content_type', ['movie', 'series', 'animation', 'documentary']);
 export const qualityEnum = pgEnum('quality', ['480p', '720p', '1080p']);
 
+// Enums for user roles
+export const userRoleEnum = pgEnum('user_role', ['user', 'admin']);
+
 // Users Table
 export const users = pgTable("users", {
   id: serial("id").primaryKey(),
@@ -14,6 +17,7 @@ export const users = pgTable("users", {
   email: text("email").notNull().unique(),
   name: text("name"),
   avatar: text("avatar"),
+  role: userRoleEnum("role").default('user').notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });

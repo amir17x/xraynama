@@ -44,6 +44,9 @@ export interface IStorage {
   getUserByEmail(email: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
   updateUser(id: number, user: Partial<User>): Promise<User | undefined>;
+  deleteUser(id: number): Promise<void>;
+  getAllUsers(): Promise<User[]>;
+  getFilteredUsers(page: number, limit: number, search: string, role: string | null): Promise<{ users: User[], totalUsers: number, totalPages: number }>;
   
   // Password reset operations
   createVerificationCode(email: string): Promise<string>;
@@ -60,6 +63,8 @@ export interface IStorage {
   getLatestContent(limit?: number): Promise<Content[]>;
   getTopRatedContent(limit?: number): Promise<Content[]>;
   createContent(content: InsertContent): Promise<Content>;
+  deleteContent(id: number): Promise<void>;
+  getFilteredContent(page: number, limit: number, search: string, type: string | null): Promise<{ content: Content[], totalItems: number, totalPages: number }>;
 
   // Seasons operations
   getSeasonsByContentId(contentId: number): Promise<Season[]>;
@@ -79,12 +84,14 @@ export interface IStorage {
   getGenresByContentId(contentId: number): Promise<Genre[]>;
   createGenre(genre: InsertGenre): Promise<Genre>;
   addGenreToContent(contentId: number, genreId: number): Promise<void>;
+  deleteGenre(id: number): Promise<void>;
 
   // Tags operations
   getAllTags(): Promise<Tag[]>;
   getTagsByContentId(contentId: number): Promise<Tag[]>;
   createTag(tag: InsertTag): Promise<Tag>;
   addTagToContent(contentId: number, tagId: number): Promise<void>;
+  deleteTag(id: number): Promise<void>;
 
   // Ratings operations
   getRatingsByContentId(contentId: number): Promise<Rating[]>;
@@ -96,11 +103,21 @@ export interface IStorage {
   getReviewsByContentId(contentId: number): Promise<Review[]>;
   createReview(review: InsertReview): Promise<Review>;
   approveReview(id: number): Promise<void>;
+  rejectReview(id: number): Promise<void>;
+  deleteReview(id: number): Promise<void>;
+  getReviewsCount(): Promise<number>;
+  getPendingReviewsCount(): Promise<number>;
+  getFilteredReviews(page: number, limit: number, search: string, status: string): Promise<{ reviews: any[], totalItems: number, totalPages: number }>;
 
   // Comments operations
   getCommentsByContentId(contentId: number): Promise<Comment[]>;
   createComment(comment: InsertComment): Promise<Comment>;
   approveComment(id: number): Promise<void>;
+  rejectComment(id: number): Promise<void>;
+  deleteComment(id: number): Promise<void>;
+  getCommentsCount(): Promise<number>;
+  getPendingCommentsCount(): Promise<number>;
+  getFilteredComments(page: number, limit: number, search: string, status: string): Promise<{ comments: any[], totalItems: number, totalPages: number }>;
 
   // Watchlist operations
   getUserWatchlist(userId: number): Promise<Content[]>;
@@ -126,13 +143,6 @@ export interface IStorage {
   createPlaylist(playlist: InsertPlaylist): Promise<Playlist>;
   addToPlaylist(playlistId: number, contentId: number, order: number): Promise<void>;
   removeFromPlaylist(playlistId: number, contentId: number): Promise<void>;
-  
-  // Password reset operations
-  createVerificationCode(email: string): Promise<string>;
-  verifyCode(email: string, code: string): Promise<boolean>;
-  createResetToken(email: string): Promise<string>;
-  verifyResetToken(email: string, token: string): Promise<boolean>;
-  resetPassword(email: string, newPassword: string): Promise<boolean>;
 
   // Session store
   sessionStore: any;
@@ -275,6 +285,48 @@ export class MemStorage implements IStorage {
     return updatedUser;
   }
 
+  async deleteUser(id: number): Promise<void> {
+    this.usersMap.delete(id);
+  }
+
+  async getAllUsers(): Promise<User[]> {
+    return Array.from(this.usersMap.values());
+  }
+
+  async getFilteredUsers(page: number, limit: number, search: string, role: string | null): Promise<{ users: User[], totalUsers: number, totalPages: number }> {
+    let users = Array.from(this.usersMap.values());
+    
+    // Apply search filter
+    if (search) {
+      const lowerSearch = search.toLowerCase();
+      users = users.filter(user => 
+        user.username.toLowerCase().includes(lowerSearch) || 
+        user.email.toLowerCase().includes(lowerSearch) ||
+        (user.name && user.name.toLowerCase().includes(lowerSearch))
+      );
+    }
+    
+    // Apply role filter
+    if (role) {
+      users = users.filter(user => user.role === role);
+    }
+    
+    // Sort by creation date, newest first
+    users = users.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+    
+    // Calculate pagination
+    const totalUsers = users.length;
+    const totalPages = Math.ceil(totalUsers / limit);
+    const offset = (page - 1) * limit;
+    const paginatedUsers = users.slice(offset, offset + limit);
+    
+    return {
+      users: paginatedUsers,
+      totalUsers,
+      totalPages
+    };
+  }
+
   // Content methods
   async getAllContent(limit: number = 10, offset: number = 0): Promise<Content[]> {
     return Array.from(this.contentMap.values())
@@ -378,6 +430,44 @@ export class MemStorage implements IStorage {
     return content;
   }
 
+  async deleteContent(id: number): Promise<void> {
+    this.contentMap.delete(id);
+  }
+
+  async getFilteredContent(page: number, limit: number, search: string, type: string | null): Promise<{ content: Content[], totalItems: number, totalPages: number }> {
+    let content = Array.from(this.contentMap.values());
+    
+    // Apply search filter
+    if (search) {
+      const lowerSearch = search.toLowerCase();
+      content = content.filter(item => 
+        item.title.toLowerCase().includes(lowerSearch) || 
+        item.englishTitle.toLowerCase().includes(lowerSearch) ||
+        (item.description && item.description.toLowerCase().includes(lowerSearch))
+      );
+    }
+    
+    // Apply type filter
+    if (type) {
+      content = content.filter(item => item.type === type);
+    }
+    
+    // Sort by creation date, newest first
+    content = content.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+    
+    // Calculate pagination
+    const totalItems = content.length;
+    const totalPages = Math.ceil(totalItems / limit);
+    const offset = (page - 1) * limit;
+    const paginatedContent = content.slice(offset, offset + limit);
+    
+    return {
+      content: paginatedContent,
+      totalItems,
+      totalPages
+    };
+  }
+
   // Seasons methods
   async getSeasonsByContentId(contentId: number): Promise<Season[]> {
     return Array.from(this.seasonsMap.values())
@@ -474,6 +564,18 @@ export class MemStorage implements IStorage {
     const id = this.currentIds.contentGenres++;
     this.contentGenresMap.set(id, { contentId, genreId });
   }
+  
+  async deleteGenre(id: number): Promise<void> {
+    // Delete the genre
+    this.genresMap.delete(id);
+    
+    // Delete all associations with content
+    Array.from(this.contentGenresMap.entries())
+      .filter(([_, item]) => item.genreId === id)
+      .forEach(([key, _]) => {
+        this.contentGenresMap.delete(key);
+      });
+  }
 
   // Tags methods
   async getAllTags(): Promise<Tag[]> {
@@ -506,6 +608,18 @@ export class MemStorage implements IStorage {
   async addTagToContent(contentId: number, tagId: number): Promise<void> {
     const id = this.currentIds.contentTags++;
     this.contentTagsMap.set(id, { contentId, tagId });
+  }
+  
+  async deleteTag(id: number): Promise<void> {
+    // Delete the tag
+    this.tagsMap.delete(id);
+    
+    // Delete all associations with content
+    Array.from(this.contentTagsMap.entries())
+      .filter(([_, item]) => item.tagId === id)
+      .forEach(([key, _]) => {
+        this.contentTagsMap.delete(key);
+      });
   }
 
   // Ratings methods
@@ -568,8 +682,90 @@ export class MemStorage implements IStorage {
   async approveReview(id: number): Promise<void> {
     const review = this.reviewsMap.get(id);
     if (review) {
-      this.reviewsMap.set(id, { ...review, isApproved: true, updatedAt: new Date() });
+      this.reviewsMap.set(id, { ...review, isApproved: true, isRejected: false, updatedAt: new Date() });
     }
+  }
+  
+  async rejectReview(id: number): Promise<void> {
+    const review = this.reviewsMap.get(id);
+    if (review) {
+      this.reviewsMap.set(id, { ...review, isApproved: false, isRejected: true, updatedAt: new Date() });
+    }
+  }
+  
+  async deleteReview(id: number): Promise<void> {
+    this.reviewsMap.delete(id);
+  }
+  
+  async getReviewsCount(): Promise<number> {
+    return this.reviewsMap.size;
+  }
+  
+  async getPendingReviewsCount(): Promise<number> {
+    return Array.from(this.reviewsMap.values()).filter(review => 
+      !review.isApproved && !review.isRejected
+    ).length;
+  }
+  
+  async getFilteredReviews(page: number, limit: number, search: string, status: string): Promise<{ reviews: any[], totalItems: number, totalPages: number }> {
+    let reviews = Array.from(this.reviewsMap.values());
+    
+    // Apply status filter
+    if (status === 'pending') {
+      reviews = reviews.filter(review => !review.isApproved && !review.isRejected);
+    } else if (status === 'approved') {
+      reviews = reviews.filter(review => review.isApproved === true);
+    } else if (status === 'rejected') {
+      reviews = reviews.filter(review => review.isRejected === true);
+    }
+    
+    // Apply search filter
+    if (search) {
+      const lowerSearch = search.toLowerCase();
+      reviews = reviews.filter(review => 
+        review.text.toLowerCase().includes(lowerSearch) || 
+        (review.title && review.title.toLowerCase().includes(lowerSearch))
+      );
+    }
+    
+    // Sort by creation date, newest first
+    reviews = reviews.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+    
+    // Get user and content details for each review
+    const reviewsWithDetails = reviews.map(review => {
+      const user = this.usersMap.get(review.userId);
+      const content = this.contentMap.get(review.contentId);
+      
+      return {
+        ...review,
+        user: user ? {
+          id: user.id,
+          username: user.username,
+          email: user.email,
+          avatar: user.avatar,
+          role: user.role
+        } : null,
+        content: content ? {
+          id: content.id,
+          title: content.title,
+          englishTitle: content.englishTitle,
+          type: content.type,
+          poster: content.poster
+        } : null
+      };
+    });
+    
+    // Calculate pagination
+    const totalItems = reviewsWithDetails.length;
+    const totalPages = Math.ceil(totalItems / limit);
+    const offset = (page - 1) * limit;
+    const paginatedReviews = reviewsWithDetails.slice(offset, offset + limit);
+    
+    return {
+      reviews: paginatedReviews,
+      totalItems,
+      totalPages
+    };
   }
 
   // Comments methods
@@ -595,8 +791,89 @@ export class MemStorage implements IStorage {
   async approveComment(id: number): Promise<void> {
     const comment = this.commentsMap.get(id);
     if (comment) {
-      this.commentsMap.set(id, { ...comment, isApproved: true, updatedAt: new Date() });
+      this.commentsMap.set(id, { ...comment, isApproved: true, isRejected: false, updatedAt: new Date() });
     }
+  }
+
+  async rejectComment(id: number): Promise<void> {
+    const comment = this.commentsMap.get(id);
+    if (comment) {
+      this.commentsMap.set(id, { ...comment, isApproved: false, isRejected: true, updatedAt: new Date() });
+    }
+  }
+
+  async deleteComment(id: number): Promise<void> {
+    this.commentsMap.delete(id);
+  }
+
+  async getCommentsCount(): Promise<number> {
+    return this.commentsMap.size;
+  }
+
+  async getPendingCommentsCount(): Promise<number> {
+    return Array.from(this.commentsMap.values()).filter(comment => 
+      !comment.isApproved && !comment.isRejected
+    ).length;
+  }
+
+  async getFilteredComments(page: number, limit: number, search: string, status: string): Promise<{ comments: any[], totalItems: number, totalPages: number }> {
+    let comments = Array.from(this.commentsMap.values());
+    
+    // Apply status filter
+    if (status === 'pending') {
+      comments = comments.filter(comment => !comment.isApproved && !comment.isRejected);
+    } else if (status === 'approved') {
+      comments = comments.filter(comment => comment.isApproved === true);
+    } else if (status === 'rejected') {
+      comments = comments.filter(comment => comment.isRejected === true);
+    }
+    
+    // Apply search filter
+    if (search) {
+      const lowerSearch = search.toLowerCase();
+      comments = comments.filter(comment => 
+        comment.text.toLowerCase().includes(lowerSearch)
+      );
+    }
+    
+    // Sort by creation date, newest first
+    comments = comments.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+    
+    // Get user and content details for each comment
+    const commentsWithDetails = comments.map(comment => {
+      const user = this.usersMap.get(comment.userId);
+      const content = this.contentMap.get(comment.contentId);
+      
+      return {
+        ...comment,
+        user: user ? {
+          id: user.id,
+          username: user.username,
+          email: user.email,
+          avatar: user.avatar,
+          role: user.role
+        } : null,
+        content: content ? {
+          id: content.id,
+          title: content.title,
+          englishTitle: content.englishTitle,
+          type: content.type,
+          poster: content.poster
+        } : null
+      };
+    });
+    
+    // Calculate pagination
+    const totalItems = commentsWithDetails.length;
+    const totalPages = Math.ceil(totalItems / limit);
+    const offset = (page - 1) * limit;
+    const paginatedComments = commentsWithDetails.slice(offset, offset + limit);
+    
+    return {
+      comments: paginatedComments,
+      totalItems,
+      totalPages
+    };
   }
 
   // Watchlist methods
