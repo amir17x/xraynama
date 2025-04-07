@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { ContentType } from "@/types";
 import { ContentCard } from "@/components/common/ContentCard";
 import { 
@@ -10,6 +10,7 @@ import {
 } from "@/components/icons/RoundedIcons";
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
+import SlideIndicator from "./SlideIndicator";
 
 interface FeaturedContentSectionProps {
   title: string;
@@ -29,24 +30,54 @@ const FeaturedContentSection: React.FC<FeaturedContentSectionProps> = ({
   moreLink,
 }) => {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const itemsPerView = 4; // تعداد آیتم‌های قابل مشاهده در هر مرحله
+  const totalSlides = content ? Math.ceil(content.length / itemsPerView) : 0;
 
-  const handleScrollRight = () => {
+  const scrollToSlide = (slideIndex: number) => {
     if (scrollContainerRef.current) {
-      scrollContainerRef.current.scrollBy({
-        left: -300,
+      const cardWidth = scrollContainerRef.current.offsetWidth / itemsPerView;
+      const newPosition = slideIndex * cardWidth * itemsPerView;
+      
+      scrollContainerRef.current.scrollTo({
+        left: newPosition,
         behavior: 'smooth'
       });
+      
+      setCurrentSlide(slideIndex);
     }
+  };
+
+  const handleScrollRight = () => {
+    const newIndex = Math.max(0, currentSlide - 1);
+    scrollToSlide(newIndex);
   };
   
   const handleScrollLeft = () => {
-    if (scrollContainerRef.current) {
-      scrollContainerRef.current.scrollBy({
-        left: 300,
-        behavior: 'smooth'
-      });
-    }
+    const newIndex = Math.min(totalSlides - 1, currentSlide + 1);
+    scrollToSlide(newIndex);
   };
+
+  // آپدیت کردن currentSlide بر اساس اسکرول
+  useEffect(() => {
+    const handleScroll = () => {
+      if (scrollContainerRef.current) {
+        const cardWidth = scrollContainerRef.current.offsetWidth / itemsPerView;
+        const scrollPosition = scrollContainerRef.current.scrollLeft;
+        const newSlide = Math.round(scrollPosition / (cardWidth * itemsPerView));
+        
+        if (newSlide !== currentSlide) {
+          setCurrentSlide(newSlide);
+        }
+      }
+    };
+
+    const scrollContainer = scrollContainerRef.current;
+    if (scrollContainer) {
+      scrollContainer.addEventListener("scroll", handleScroll);
+      return () => scrollContainer.removeEventListener("scroll", handleScroll);
+    }
+  }, [currentSlide]);
 
   // Render skeletons for loading state
   if (isLoading) {
@@ -132,13 +163,14 @@ const FeaturedContentSection: React.FC<FeaturedContentSectionProps> = ({
             size="icon" 
             className="group absolute left-[-20px] top-1/2 transform -translate-y-1/2 rounded-full h-10 w-10 z-10 bg-blue-950/40 backdrop-blur-sm border-blue-900/50 hover:bg-blue-900/60 transition-all hover:scale-110"
             onClick={handleScrollRight}
+            disabled={currentSlide === 0}
           >
             <ChevronRightIcon className="h-5 w-5 text-blue-500 group-hover:text-blue-400" />
           </Button>
           
           <div 
             ref={scrollContainerRef}
-            className="flex gap-4 overflow-x-auto pb-4 scrollbar-none"
+            className="flex gap-4 overflow-x-auto pb-4 scrollbar-none scroll-smooth"
             style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
           >
             {content.map((item) => (
@@ -154,10 +186,21 @@ const FeaturedContentSection: React.FC<FeaturedContentSectionProps> = ({
             size="icon" 
             className="group absolute right-[-20px] top-1/2 transform -translate-y-1/2 rounded-full h-10 w-10 z-10 bg-blue-950/40 backdrop-blur-sm border-blue-900/50 hover:bg-blue-900/60 transition-all hover:scale-110"
             onClick={handleScrollLeft}
+            disabled={currentSlide === totalSlides - 1}
           >
             <ChevronLeftIcon className="h-5 w-5 text-blue-500 group-hover:text-blue-400" />
           </Button>
         </div>
+        
+        {/* نشانگر اسلاید */}
+        {totalSlides > 1 && (
+          <SlideIndicator
+            totalSlides={totalSlides}
+            currentSlide={currentSlide}
+            onSlideChange={scrollToSlide}
+            className="mt-4"
+          />
+        )}
       </div>
     </div>
   );
