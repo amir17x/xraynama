@@ -22,8 +22,8 @@ const mailerSend = new MailerSend({
 // تابع ارسال ایمیل با کد تایید
 async function sendVerificationEmail(email: string, code: string): Promise<boolean> {
   try {
-    // از آدرس ایمیل پیش‌فرض MailerSend یا یک آدرس تأیید شده استفاده می‌کنیم
-    const sender = new Sender("noreply@mailersend.com", "XrayNama");
+    // استفاده از آدرس نمونه در مستندات رسمی
+    const sender = new Sender("hello@mailersend.com", "XrayNama");
     const recipients = [new Recipient(email)];
     
     const emailParams = new EmailParams()
@@ -67,8 +67,8 @@ async function sendVerificationEmail(email: string, code: string): Promise<boole
 // تابع ارسال ایمیل تایید تغییر رمز عبور
 async function sendPasswordChangeConfirmation(email: string): Promise<boolean> {
   try {
-    // از آدرس ایمیل پیش‌فرض MailerSend یا یک آدرس تأیید شده استفاده می‌کنیم
-    const sender = new Sender("noreply@mailersend.com", "XrayNama");
+    // استفاده از آدرس نمونه در مستندات رسمی
+    const sender = new Sender("hello@mailersend.com", "XrayNama");
     const recipients = [new Recipient(email)];
     
     const emailParams = new EmailParams()
