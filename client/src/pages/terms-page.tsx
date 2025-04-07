@@ -16,29 +16,29 @@ export default function TermsPage() {
       <Header />
       
       <main className="container mx-auto px-4 py-12">
-        <div className="max-w-4xl mx-auto">
+        <div className="max-w-4xl mx-auto rtl text-right">
           <h1 className="text-3xl font-bold text-foreground mb-6">قوانین و مقررات</h1>
           <p className="text-muted-foreground mb-10">
             لطفاً قوانین و مقررات استفاده از وبسایت Xraynama را با دقت مطالعه کنید. استفاده از خدمات این وبسایت به معنی پذیرش این قوانین است.
           </p>
           
           <Tabs defaultValue="terms" className="glass-effect rounded-lg p-4">
-            <TabsList className="grid grid-cols-2 md:grid-cols-4 gap-2 bg-transparent mb-4">
-              <TabsTrigger value="terms" className="flex items-center data-[state=active]:glass-effect">
-                <FileText className="ml-2 h-4 w-4" />
-                شرایط استفاده
+            <TabsList className="grid grid-cols-2 md:grid-cols-4 gap-2 bg-transparent mb-4 rtl">
+              <TabsTrigger value="terms" className="flex items-center justify-center data-[state=active]:glass-effect">
+                <span>شرایط استفاده</span>
+                <FileText className="mr-0 ml-2 h-4 w-4" />
               </TabsTrigger>
-              <TabsTrigger value="privacy" className="flex items-center data-[state=active]:glass-effect">
-                <Eye className="ml-2 h-4 w-4" />
-                حریم خصوصی
+              <TabsTrigger value="privacy" className="flex items-center justify-center data-[state=active]:glass-effect">
+                <span>حریم خصوصی</span>
+                <Eye className="mr-0 ml-2 h-4 w-4" />
               </TabsTrigger>
-              <TabsTrigger value="copyright" className="flex items-center data-[state=active]:glass-effect">
-                <Copyright className="ml-2 h-4 w-4" />
-                حق نشر
+              <TabsTrigger value="copyright" className="flex items-center justify-center data-[state=active]:glass-effect">
+                <span>حق نشر</span>
+                <Copyright className="mr-0 ml-2 h-4 w-4" />
               </TabsTrigger>
-              <TabsTrigger value="notifications" className="flex items-center data-[state=active]:glass-effect">
-                <Bell className="ml-2 h-4 w-4" />
-                اعلانات
+              <TabsTrigger value="notifications" className="flex items-center justify-center data-[state=active]:glass-effect">
+                <span>اعلانات</span>
+                <Bell className="mr-0 ml-2 h-4 w-4" />
               </TabsTrigger>
             </TabsList>
             
@@ -64,7 +64,7 @@ export default function TermsPage() {
                 <p className="text-muted-foreground mb-2">
                   کاربران موظف هستند:
                 </p>
-                <ul className="list-disc list-inside mb-4 text-muted-foreground">
+                <ul className="list-disc list-inside mb-4 text-muted-foreground rtl text-right" style={{listStylePosition: 'inside'}}>
                   <li>از استفاده از وبسایت برای اهداف غیرقانونی خودداری کنند.</li>
                   <li>از ارسال محتوای نامناسب، توهین‌آمیز یا تهدیدکننده خودداری کنند.</li>
                   <li>از هک، تلاش برای نفوذ یا آسیب به سیستم‌های وبسایت خودداری کنند.</li>
@@ -96,7 +96,7 @@ export default function TermsPage() {
                 <p className="text-muted-foreground mb-4">
                   Xraynama ممکن است اطلاعات زیر را از کاربران جمع‌آوری کند:
                 </p>
-                <ul className="list-disc list-inside mb-4 text-muted-foreground">
+                <ul className="list-disc list-inside mb-4 text-muted-foreground rtl text-right" style={{listStylePosition: 'inside'}}>
                   <li>اطلاعات شخصی مانند نام، ایمیل و اطلاعات تماس که به صورت داوطلبانه توسط کاربر ارائه می‌شود.</li>
                   <li>اطلاعات ورود مانند آدرس IP، مرورگر، سیستم عامل و صفحات بازدید شده.</li>
                   <li>تاریخچه تماشا و ترجیحات محتوایی برای بهبود تجربه کاربری.</li>
@@ -109,7 +109,7 @@ export default function TermsPage() {
                 <p className="text-muted-foreground mb-2">
                   ما از اطلاعات جمع‌آوری شده برای اهداف زیر استفاده می‌کنیم:
                 </p>
-                <ul className="list-disc list-inside mb-4 text-muted-foreground">
+                <ul className="list-disc list-inside mb-4 text-muted-foreground rtl text-right" style={{listStylePosition: 'inside'}}>
                   <li>ارائه، نگهداری و بهبود خدمات وبسایت.</li>
                   <li>شخصی‌سازی تجربه کاربری و توصیه محتوا بر اساس ترجیحات کاربر.</li>
                   <li>ارتباط با کاربران درباره به‌روزرسانی‌ها، تغییرات یا محتوای جدید.</li>
@@ -123,7 +123,7 @@ export default function TermsPage() {
                 <p className="text-muted-foreground mb-4">
                   Xraynama اطلاعات شخصی کاربران را با اشخاص ثالث به اشتراک نمی‌گذارد، مگر در موارد زیر:
                 </p>
-                <ul className="list-disc list-inside mb-4 text-muted-foreground">
+                <ul className="list-disc list-inside mb-4 text-muted-foreground rtl text-right" style={{listStylePosition: 'inside'}}>
                   <li>با رضایت صریح کاربر.</li>
                   <li>با ارائه‌دهندگان خدمات که برای عملکرد وبسایت ضروری هستند.</li>
                   <li>در صورت الزام قانونی یا درخواست مراجع قضایی.</li>
@@ -179,7 +179,7 @@ export default function TermsPage() {
                 <p className="text-muted-foreground mb-4">
                   Xraynama ممکن است انواع مختلف اعلانات را برای کاربران ارسال کند، از جمله:
                 </p>
-                <ul className="list-disc list-inside mb-4 text-muted-foreground">
+                <ul className="list-disc list-inside mb-4 text-muted-foreground rtl text-right" style={{listStylePosition: 'inside'}}>
                   <li>اعلانات سیستمی مربوط به حساب کاربری و امنیت.</li>
                   <li>اطلاعیه‌های به‌روزرسانی سرویس و تغییرات در قوانین.</li>
                   <li>اعلانات مربوط به محتوای جدید یا محتوای درخواستی.</li>
@@ -210,11 +210,11 @@ export default function TermsPage() {
             </TabsContent>
           </Tabs>
           
-          <Card className="glass-effect mt-8">
+          <Card className="glass-effect mt-8 rtl text-right">
             <CardHeader>
-              <CardTitle className="flex items-center">
-                <Shield className="mr-2 h-5 w-5 text-primary" />
-                تعهد ما به کاربران
+              <CardTitle className="flex items-center justify-end">
+                <span>تعهد ما به کاربران</span>
+                <Shield className="mr-0 ml-2 h-5 w-5 text-primary" />
               </CardTitle>
               <CardDescription>
                 ما متعهد هستیم به حفظ حقوق کاربران و ارائه خدمات با کیفیت
@@ -225,21 +225,21 @@ export default function TermsPage() {
                 تیم Xraynama به طور مداوم در تلاش است تا:
               </p>
               <ul className="space-y-2 text-muted-foreground">
-                <li className="flex">
-                  <span className="text-primary ml-2">•</span>
-                  امنیت اطلاعات کاربران را با استفاده از استانداردهای بالای امنیتی تضمین کند.
+                <li className="flex justify-end">
+                  <span>امنیت اطلاعات کاربران را با استفاده از استانداردهای بالای امنیتی تضمین کند.</span>
+                  <span className="text-primary mr-0 ml-2">•</span>
                 </li>
-                <li className="flex">
-                  <span className="text-primary ml-2">•</span>
-                  محتوای با کیفیت و متنوع را برای سلیقه‌های مختلف فراهم آورد.
+                <li className="flex justify-end">
+                  <span>محتوای با کیفیت و متنوع را برای سلیقه‌های مختلف فراهم آورد.</span>
+                  <span className="text-primary mr-0 ml-2">•</span>
                 </li>
-                <li className="flex">
-                  <span className="text-primary ml-2">•</span>
-                  به بازخوردها و پیشنهادات کاربران توجه کرده و در جهت بهبود سرویس تلاش کند.
+                <li className="flex justify-end">
+                  <span>به بازخوردها و پیشنهادات کاربران توجه کرده و در جهت بهبود سرویس تلاش کند.</span>
+                  <span className="text-primary mr-0 ml-2">•</span>
                 </li>
-                <li className="flex">
-                  <span className="text-primary ml-2">•</span>
-                  شفافیت در سیاست‌ها و تصمیمات را حفظ کند.
+                <li className="flex justify-end">
+                  <span>شفافیت در سیاست‌ها و تصمیمات را حفظ کند.</span>
+                  <span className="text-primary mr-0 ml-2">•</span>
                 </li>
               </ul>
               <p className="mt-4 text-sm text-muted-foreground">
