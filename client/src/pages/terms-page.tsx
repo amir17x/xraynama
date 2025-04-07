@@ -111,22 +111,18 @@ export default function TermsPage() {
                 <p className="text-muted-foreground mb-4">
                   <span className="text-primary">X</span>raynama ممکن است اطلاعات زیر را از کاربران جمع‌آوری کند:
                 </p>
-                <ul className="space-y-2 pr-6 mb-4 text-muted-foreground">
-                  <li className="flex items-start">
-                    <span className="text-primary ml-2 mt-1">•</span>
-                    <span>اطلاعات شخصی مانند نام، ایمیل و اطلاعات تماس که به صورت داوطلبانه توسط کاربر ارائه می‌شود.</span>
+                <ul className="space-y-2 pr-6 mb-4 text-muted-foreground text-right">
+                  <li className="mr-4 pr-2 border-r-2 border-primary">
+                    اطلاعات شخصی مانند نام، ایمیل و اطلاعات تماس که به صورت داوطلبانه توسط کاربر ارائه می‌شود.
                   </li>
-                  <li className="flex items-start">
-                    <span className="text-primary ml-2 mt-1">•</span>
-                    <span>اطلاعات ورود مانند آدرس IP، مرورگر، سیستم عامل و صفحات بازدید شده.</span>
+                  <li className="mr-4 pr-2 border-r-2 border-primary">
+                    اطلاعات ورود مانند آدرس IP، مرورگر، سیستم عامل و صفحات بازدید شده.
                   </li>
-                  <li className="flex items-start">
-                    <span className="text-primary ml-2 mt-1">•</span>
-                    <span>تاریخچه تماشا و ترجیحات محتوایی برای بهبود تجربه کاربری.</span>
+                  <li className="mr-4 pr-2 border-r-2 border-primary">
+                    تاریخچه تماشا و ترجیحات محتوایی برای بهبود تجربه کاربری.
                   </li>
-                  <li className="flex items-start">
-                    <span className="text-primary ml-2 mt-1">•</span>
-                    <span>کوکی‌ها و فناوری‌های مشابه برای بهبود عملکرد وبسایت.</span>
+                  <li className="mr-4 pr-2 border-r-2 border-primary">
+                    کوکی‌ها و فناوری‌های مشابه برای بهبود عملکرد وبسایت.
                   </li>
                 </ul>
               </section>
@@ -136,26 +132,21 @@ export default function TermsPage() {
                 <p className="text-muted-foreground mb-2">
                   ما از اطلاعات جمع‌آوری شده برای اهداف زیر استفاده می‌کنیم:
                 </p>
-                <ul className="space-y-2 pr-6 mb-4 text-muted-foreground">
-                  <li className="flex items-start">
-                    <span className="text-primary ml-2 mt-1">•</span>
-                    <span>ارائه، نگهداری و بهبود خدمات وبسایت.</span>
+                <ul className="space-y-2 pr-6 mb-4 text-muted-foreground text-right">
+                  <li className="mr-4 pr-2 border-r-2 border-primary">
+                    ارائه، نگهداری و بهبود خدمات وبسایت.
                   </li>
-                  <li className="flex items-start">
-                    <span className="text-primary ml-2 mt-1">•</span>
-                    <span>شخصی‌سازی تجربه کاربری و توصیه محتوا بر اساس ترجیحات کاربر.</span>
+                  <li className="mr-4 pr-2 border-r-2 border-primary">
+                    شخصی‌سازی تجربه کاربری و توصیه محتوا بر اساس ترجیحات کاربر.
                   </li>
-                  <li className="flex items-start">
-                    <span className="text-primary ml-2 mt-1">•</span>
-                    <span>ارتباط با کاربران درباره به‌روزرسانی‌ها، تغییرات یا محتوای جدید.</span>
+                  <li className="mr-4 pr-2 border-r-2 border-primary">
+                    ارتباط با کاربران درباره به‌روزرسانی‌ها، تغییرات یا محتوای جدید.
                   </li>
-                  <li className="flex items-start">
-                    <span className="text-primary ml-2 mt-1">•</span>
-                    <span>تحلیل الگوهای استفاده برای بهبود عملکرد وبسایت.</span>
+                  <li className="mr-4 pr-2 border-r-2 border-primary">
+                    تحلیل الگوهای استفاده برای بهبود عملکرد وبسایت.
                   </li>
-                  <li className="flex items-start">
-                    <span className="text-primary ml-2 mt-1">•</span>
-                    <span>شناسایی و جلوگیری از فعالیت‌های تقلب‌آمیز یا غیرمجاز.</span>
+                  <li className="mr-4 pr-2 border-r-2 border-primary">
+                    شناسایی و جلوگیری از فعالیت‌های تقلب‌آمیز یا غیرمجاز.
                   </li>
                 </ul>
               </section>
@@ -165,22 +156,18 @@ export default function TermsPage() {
                 <p className="text-muted-foreground mb-4">
                   <span className="text-primary">X</span>raynama اطلاعات شخصی کاربران را با اشخاص ثالث به اشتراک نمی‌گذارد، مگر در موارد زیر:
                 </p>
-                <ul className="space-y-2 pr-6 mb-4 text-muted-foreground">
-                  <li className="flex items-start">
-                    <span className="text-primary ml-2 mt-1">•</span>
-                    <span>با رضایت صریح کاربر.</span>
+                <ul className="space-y-2 pr-6 mb-4 text-muted-foreground text-right">
+                  <li className="mr-4 pr-2 border-r-2 border-primary">
+                    با رضایت صریح کاربر.
                   </li>
-                  <li className="flex items-start">
-                    <span className="text-primary ml-2 mt-1">•</span>
-                    <span>با ارائه‌دهندگان خدمات که برای عملکرد وبسایت ضروری هستند.</span>
+                  <li className="mr-4 pr-2 border-r-2 border-primary">
+                    با ارائه‌دهندگان خدمات که برای عملکرد وبسایت ضروری هستند.
                   </li>
-                  <li className="flex items-start">
-                    <span className="text-primary ml-2 mt-1">•</span>
-                    <span>در صورت الزام قانونی یا درخواست مراجع قضایی.</span>
+                  <li className="mr-4 pr-2 border-r-2 border-primary">
+                    در صورت الزام قانونی یا درخواست مراجع قضایی.
                   </li>
-                  <li className="flex items-start">
-                    <span className="text-primary ml-2 mt-1">•</span>
-                    <span>برای محافظت از حقوق، مالکیت یا امنیت <span className="text-primary">X</span>raynama، کاربران یا عموم مردم.</span>
+                  <li className="mr-4 pr-2 border-r-2 border-primary">
+                    برای محافظت از حقوق، مالکیت یا امنیت <span className="text-primary">X</span>raynama، کاربران یا عموم مردم.
                   </li>
                 </ul>
               </section>
@@ -233,22 +220,18 @@ export default function TermsPage() {
                 <p className="text-muted-foreground mb-4">
                   <span className="text-primary">X</span>raynama ممکن است انواع مختلف اعلانات را برای کاربران ارسال کند، از جمله:
                 </p>
-                <ul className="space-y-2 pr-6 mb-4 text-muted-foreground">
-                  <li className="flex items-start">
-                    <span className="text-primary ml-2 mt-1">•</span>
-                    <span>اعلانات سیستمی مربوط به حساب کاربری و امنیت.</span>
+                <ul className="space-y-2 pr-6 mb-4 text-muted-foreground text-right">
+                  <li className="mr-4 pr-2 border-r-2 border-primary">
+                    اعلانات سیستمی مربوط به حساب کاربری و امنیت.
                   </li>
-                  <li className="flex items-start">
-                    <span className="text-primary ml-2 mt-1">•</span>
-                    <span>اطلاعیه‌های به‌روزرسانی سرویس و تغییرات در قوانین.</span>
+                  <li className="mr-4 pr-2 border-r-2 border-primary">
+                    اطلاعیه‌های به‌روزرسانی سرویس و تغییرات در قوانین.
                   </li>
-                  <li className="flex items-start">
-                    <span className="text-primary ml-2 mt-1">•</span>
-                    <span>اعلانات مربوط به محتوای جدید یا محتوای درخواستی.</span>
+                  <li className="mr-4 pr-2 border-r-2 border-primary">
+                    اعلانات مربوط به محتوای جدید یا محتوای درخواستی.
                   </li>
-                  <li className="flex items-start">
-                    <span className="text-primary ml-2 mt-1">•</span>
-                    <span>خبرنامه‌ها و پیشنهادات ویژه (در صورت عضویت).</span>
+                  <li className="mr-4 pr-2 border-r-2 border-primary">
+                    خبرنامه‌ها و پیشنهادات ویژه (در صورت عضویت).
                   </li>
                 </ul>
               </section>
