@@ -24,7 +24,7 @@ const mailerSend = new MailerSend({
 });
 
 // تنظیمات Resend API که برای ارسال ایمیل استفاده می‌شود
-const resendClient = new Resend(process.env.RESEND_API_KEY);
+const resendClient = new Resend(process.env.RESEND_API_KEY || 're_3mFqT3XE_FpRHgqxiovECchWc82T1bhCJ');
 
 // ترنسپورتر Nodemailer برای پشتیبانی از کد قبلی (استفاده نمی‌شود)
 const transporter = nodemailer.createTransport({
@@ -66,11 +66,10 @@ async function sendVerificationEmail(email: string, code: string): Promise<boole
     try {
       // استفاده از Resend API برای ارسال ایمیل (راه‌حل اصلی)
       const { data, error } = await resendClient.emails.send({
-        from: 'XrayNama <onboarding@resend.dev>',
+        from: 'onboarding@resend.dev',
         to: [email],
-        subject: 'کد تایید برای بازیابی رمز عبور',
+        subject: 'Hello World',
         html: htmlContent,
-        text: textContent,
       });
       
       if (error) {
@@ -155,11 +154,10 @@ async function sendPasswordChangeConfirmation(email: string): Promise<boolean> {
     try {
       // استفاده از Resend API برای ارسال ایمیل (راه‌حل اصلی)
       const { data, error } = await resendClient.emails.send({
-        from: 'XrayNama <onboarding@resend.dev>',
+        from: 'onboarding@resend.dev',
         to: [email],
-        subject: 'تایید تغییر رمز عبور',
+        subject: 'Hello World',
         html: htmlContent,
-        text: textContent,
       });
       
       if (error) {
