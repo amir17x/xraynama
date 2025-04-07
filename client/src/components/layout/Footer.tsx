@@ -6,7 +6,9 @@ export function Footer() {
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div>
-            <h3 className="text-xl font-bold text-foreground mb-4">Xraynama</h3>
+            <h3 className="text-xl font-bold mb-4">
+              <span className="text-primary">X</span><span className="text-foreground">raynama</span>
+            </h3>
             <p className="text-muted-foreground mb-4">
               پلتفرم رایگان پخش و دانلود انیمیشن، فیلم، سریال و مستند
             </p>
@@ -61,7 +63,7 @@ export function Footer() {
         </div>
         
         <div className="border-t border-border mt-8 pt-8 text-center text-muted-foreground">
-          <p>تمامی حقوق این وبسایت متعلق به Xraynama می‌باشد. &copy; ۱۴۰۲</p>
+          <p>تمامی حقوق این وبسایت متعلق به <span className="text-primary">X</span>raynama می‌باشد. &copy; ۱۴۰۲</p>
         </div>
       </div>
     </footer>
