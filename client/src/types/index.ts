@@ -9,6 +9,8 @@ export interface ContentType {
   poster: string;
   backdrop?: string;
   imdbRating?: string;
+  hasPersianDubbing?: boolean;
+  hasPersianSubtitle?: boolean;
   createdAt: string;
   updatedAt: string;
 }

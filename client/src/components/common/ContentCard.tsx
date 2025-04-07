@@ -163,6 +163,28 @@ export function ContentCard({
             )}>
               {getTypeLabel(content.type)}
             </div>
+            
+            {/* Media Feature Badges */}
+            <div className="absolute bottom-16 left-4 flex gap-1.5">
+              {content.hasPersianDubbing && (
+                <div className="bg-[#00a651]/90 text-white backdrop-blur-sm w-7 h-7 flex items-center justify-center rounded-full shadow-md" title="دوبله فارسی">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"></path>
+                    <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+                    <line x1="12" y1="19" x2="12" y2="22"></line>
+                  </svg>
+                </div>
+              )}
+              {content.hasPersianSubtitle && (
+                <div className="bg-[#4d6bd8]/90 text-white backdrop-blur-sm w-7 h-7 flex items-center justify-center rounded-full shadow-md" title="زیرنویس فارسی">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <rect x="2" y="6" width="20" height="12" rx="2"></rect>
+                    <path d="M8 13h8"></path>
+                    <path d="M10 17v-4"></path>
+                  </svg>
+                </div>
+              )}
+            </div>
             <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black to-transparent">
               <div className="flex justify-between items-center">
                 <div className="flex items-center">
@@ -226,6 +248,28 @@ export function ContentCard({
             getTypeColor(content.type)
           )}>
             {getTypeLabel(content.type)}
+          </div>
+          
+          {/* Media Feature Badges */}
+          <div className="absolute top-10 left-2 flex flex-col gap-1.5">
+            {content.hasPersianDubbing && (
+              <div className="bg-[#00a651]/90 text-white backdrop-blur-sm w-7 h-7 flex items-center justify-center rounded-full shadow-md" title="دوبله فارسی">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"></path>
+                  <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+                  <line x1="12" y1="19" x2="12" y2="22"></line>
+                </svg>
+              </div>
+            )}
+            {content.hasPersianSubtitle && (
+              <div className="bg-[#4d6bd8]/90 text-white backdrop-blur-sm w-7 h-7 flex items-center justify-center rounded-full shadow-md" title="زیرنویس فارسی">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="2" y="6" width="20" height="12" rx="2"></rect>
+                  <path d="M8 13h8"></path>
+                  <path d="M10 17v-4"></path>
+                </svg>
+              </div>
+            )}
           </div>
           <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black to-transparent">
             <div className="flex justify-between items-center">

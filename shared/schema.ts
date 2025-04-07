@@ -30,6 +30,8 @@ export const content = pgTable("content", {
   poster: text("poster").notNull(),
   backdrop: text("backdrop"),
   imdbRating: text("imdb_rating"),
+  hasPersianDubbing: boolean("has_persian_dubbing").default(false).notNull(),
+  hasPersianSubtitle: boolean("has_persian_subtitle").default(false).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
