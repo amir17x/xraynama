@@ -21,6 +21,7 @@ import TopIMDBPage from "@/pages/top-imdb-page";
 import ForgotPasswordPage from "@/pages/forgot-password";
 import VerifyCodePage from "@/pages/verify-code";
 import ResetPasswordPage from "@/pages/reset-password";
+import TestReviews from "@/pages/TestReviews";
 
 // Admin pages
 import AdminDashboard from "@/pages/admin/Dashboard";
@@ -40,6 +41,7 @@ function Router() {
       <Route path="/search" component={SearchPage} />
       <Route path="/top-imdb" component={TopIMDBPage} />
       <ProtectedRoute path="/profile" component={ProfilePage} />
+      <Route path="/test-reviews" component={TestReviews} />
       
       {/* Password reset pages */}
       <Route path="/forgot-password" component={ForgotPasswordPage} />

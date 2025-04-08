@@ -81,11 +81,9 @@ export function setupAdminRoutes(app: Express) {
   // آمار نظرات
   app.get("/api/admin/stats/comments", isAdmin, async (req, res) => {
     try {
-      const comments = await storage.getAllComments();
-      const totalComments = comments.length;
-      
-      // تعداد نظرات در انتظار تایید
-      const pendingComments = comments.filter(comment => !comment.isApproved).length;
+      // از متدهای موجود استفاده می‌کنیم
+      const totalComments = await storage.getCommentsCount();
+      const pendingComments = await storage.getPendingCommentsCount();
       
       res.json({
         total: totalComments,
@@ -100,11 +98,9 @@ export function setupAdminRoutes(app: Express) {
   // آمار نقدها
   app.get("/api/admin/stats/reviews", isAdmin, async (req, res) => {
     try {
-      const reviews = await storage.getAllReviews();
-      const totalReviews = reviews.length;
-      
-      // تعداد نقدهای در انتظار تایید
-      const pendingReviews = reviews.filter(review => !review.isApproved).length;
+      // از متدهای موجود استفاده می‌کنیم
+      const totalReviews = await storage.getReviewsCount();
+      const pendingReviews = await storage.getPendingReviewsCount();
       
       res.json({
         total: totalReviews,
@@ -822,13 +818,15 @@ export function setupAdminRoutes(app: Express) {
   // دریافت تمام نظرات
   app.get("/api/admin/comments", isAdmin, async (req, res) => {
     try {
-      const comments = await storage.getAllComments();
+      // استفاده از متد getFilteredComments برای دریافت همه نظرات
+      const result = await storage.getFilteredComments(1, 1000, "", "");
+      const comments = result.comments;
       
       // اطلاعات کاربر و محتوای مرتبط با هر نظر را اضافه می‌کنیم
       const commentsWithDetails = await Promise.all(
         comments.map(async (comment) => {
           const user = await storage.getUser(comment.userId);
-          const content = await storage.getContent(comment.contentId);
+          const content = await storage.getContentById(comment.contentId);
           
           return {
             ...comment,
@@ -905,13 +903,15 @@ export function setupAdminRoutes(app: Express) {
   // دریافت تمام نقدها
   app.get("/api/admin/reviews", isAdmin, async (req, res) => {
     try {
-      const reviews = await storage.getAllReviews();
+      // استفاده از متد getFilteredReviews برای دریافت همه نقدها
+      const result = await storage.getFilteredReviews(1, 1000, "", "");
+      const reviews = result.reviews;
       
       // اطلاعات کاربر و محتوای مرتبط با هر نقد را اضافه می‌کنیم
       const reviewsWithDetails = await Promise.all(
         reviews.map(async (review) => {
           const user = await storage.getUser(review.userId);
-          const content = await storage.getContent(review.contentId);
+          const content = await storage.getContentById(review.contentId);
           
           return {
             ...review,

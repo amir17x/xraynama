@@ -178,8 +178,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/content/:id/comments", async (req, res, next) => {
     try {
       const contentId = parseInt(req.params.id);
+      
+      // دریافت نظرات با استفاده از storage
       const comments = await storage.getCommentsByContentId(contentId);
-      res.json(comments);
+      
+      // افزودن اطلاعات کاربر به هر نظر
+      const commentsWithUserInfo = await Promise.all(
+        comments.map(async (comment) => {
+          // دریافت اطلاعات کاربر
+          const user = await storage.getUserById(comment.userId);
+          
+          return {
+            ...comment,
+            userName: user ? user.name : 'کاربر ناشناس',
+            userAvatar: user ? user.avatar : undefined
+          };
+        })
+      );
+      
+      res.json(commentsWithUserInfo);
     } catch (error) {
       next(error);
     }
@@ -217,8 +234,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/content/:id/reviews", async (req, res, next) => {
     try {
       const contentId = parseInt(req.params.id);
+      
+      // دریافت نقدها با استفاده از storage
       const reviews = await storage.getReviewsByContentId(contentId);
-      res.json(reviews);
+      
+      // افزودن اطلاعات کاربر به هر نقد
+      const reviewsWithUserInfo = await Promise.all(
+        reviews.map(async (review) => {
+          // دریافت اطلاعات کاربر
+          const user = await storage.getUserById(review.userId);
+          
+          return {
+            ...review,
+            userName: user ? user.name : 'کاربر ناشناس',
+            userAvatar: user ? user.avatar : undefined
+          };
+        })
+      );
+      
+      res.json(reviewsWithUserInfo);
     } catch (error) {
       next(error);
     }
@@ -231,21 +265,42 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       const contentId = parseInt(req.params.id);
-      const { text } = req.body;
+      const { text, title, score, hasContainsSpoiler } = req.body;
       
       if (!text || text.trim().length === 0) {
         return res.status(400).json({ message: "متن نقد نمی‌تواند خالی باشد" });
       }
       
+      if (!title || title.trim().length === 0) {
+        return res.status(400).json({ message: "عنوان نقد نمی‌تواند خالی باشد" });
+      }
+      
+      // اطمینان از معتبر بودن امتیاز
+      const validScore = parseFloat(score) || 5;
+      if (validScore < 0 || validScore > 5) {
+        return res.status(400).json({ message: "امتیاز باید عددی بین 0 تا 5 باشد" });
+      }
+      
       const review = await storage.createReview({
         userId: req.user!.id,
         contentId,
+        title,
         text,
-        isApproved: false
+        score: validScore,
+        hasContainsSpoiler: !!hasContainsSpoiler,
+        isApproved: false,
+        isRejected: false,
+        createdAt: new Date(),
+        updatedAt: new Date()
       });
+      
+      // دریافت اطلاعات کاربر برای پاسخ
+      const user = await storage.getUserById(req.user!.id);
       
       res.status(201).json({
         ...review,
+        userName: user ? user.name : 'کاربر ناشناس',
+        userAvatar: user ? user.avatar : undefined,
         message: "نقد شما با موفقیت ثبت شد و پس از تایید نمایش داده خواهد شد"
       });
     } catch (error) {
