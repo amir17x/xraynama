@@ -19,10 +19,35 @@ export function PortalOverride({ children, triggerRef }: PortalOverrideProps) {
     const handlePosition = () => {
       if (triggerRef.current && ref.current) {
         const rect = triggerRef.current.getBoundingClientRect();
+        const isRTL = document.dir === 'rtl' || document.documentElement.dir === 'rtl';
+        
         ref.current.style.position = 'fixed';
         ref.current.style.top = `${rect.bottom}px`;
-        ref.current.style.right = '1rem';
-        ref.current.style.left = 'auto';
+        
+        // اگر المان اصلی در هدر باشد (کاربر)، تنظیم موقعیت متناسب با RTL/LTR
+        const isProfileMenu = ref.current.querySelector('.right-aligned');
+        
+        if (isProfileMenu) {
+          if (isRTL) {
+            // منوی پروفایل در RTL باید سمت راست المان قرار بگیرد
+            ref.current.style.right = `1rem`;
+            ref.current.style.left = 'auto';
+          } else {
+            // منوی پروفایل در LTR باید سمت چپ المان قرار بگیرد
+            ref.current.style.left = `0px`;
+            ref.current.style.right = 'auto';
+          }
+        } else {
+          // برای بقیه منوها، طبق منطق RTL/LTR
+          if (isRTL) {
+            ref.current.style.right = `${window.innerWidth - rect.right}px`;
+            ref.current.style.left = 'auto';
+          } else {
+            ref.current.style.left = `${rect.left}px`;
+            ref.current.style.right = 'auto';
+          }
+        }
+        
         ref.current.style.zIndex = '9999';
       }
     };

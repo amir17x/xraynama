@@ -62,12 +62,12 @@
   
   /* استایل یکپارچه برای همه دکمه‌ها و المان‌های هدر */
   .unified-button {
-    @apply px-4 py-2 rounded-md bg-[#006bd6]/10 hover:bg-[#006bd6]/20 text-[#006bd6] font-medium border border-[#006bd6]/20 hover:border-[#006bd6]/30 transition-all duration-300;
+    @apply px-4 py-2 rounded-md bg-background/80 hover:bg-[#006bd6]/20 hover:text-[#006bd6] font-medium border border-border hover:border-[#006bd6]/30 transition-all duration-300;
   }
   
   /* استایل برای دکمه‌های آیکون‌دار کوچکتر */
   .unified-icon-button {
-    @apply p-2 rounded-md bg-[#006bd6]/10 hover:bg-[#006bd6]/20 text-[#006bd6] border border-[#006bd6]/20 hover:border-[#006bd6]/30 transition-all duration-300;
+    @apply p-2 rounded-md bg-background/80 hover:bg-[#006bd6]/20 text-foreground hover:text-[#006bd6] border border-border hover:border-[#006bd6]/30 transition-all duration-300;
   }
   
   /* طرح شیشه‌ای و شفاف برای هدر */
@@ -158,20 +158,40 @@
   }
 }
 
-/* اصلاح منوی کاربری */
-[data-radix-popper-content-wrapper] {
+/* اصلاح منوی کاربری - برای RTL */
+html[dir='rtl'] [data-radix-popper-content-wrapper],
+html:where([dir='rtl']) [data-radix-popper-content-wrapper] {
   transform: none !important;
   right: 0 !important;
   left: auto !important;
   top: 64px !important;
   position: fixed !important;
   width: auto !important;
-  margin-right: 1rem;
 }
 
-.profile-dropdown {
-  position: absolute !important;
+/* اصلاح منوی کاربری - برای LTR */
+html:not([dir='rtl']) [data-radix-popper-content-wrapper] {
+  transform: none !important;
+  left: 0 !important;
+  right: auto !important;
+  top: 64px !important;
+  position: fixed !important;
+  width: auto !important;
+}
+
+.portal-override {
+  /* برای کلاس‌های اضافه شده به المان منو توسط PortalOverride */
+  max-width: 300px;
+}
+
+/* کلاس برای منوهایی که باید در راست قرار بگیرند (در RTL) */
+html[dir="rtl"] .right-aligned {
   right: 0 !important;
   left: auto !important;
-  width: auto !important;
+}
+
+/* کلاس برای منوهایی که باید در چپ قرار بگیرند (در LTR) */
+html:not([dir="rtl"]) .right-aligned {
+  left: 0 !important;
+  right: auto !important;
 }

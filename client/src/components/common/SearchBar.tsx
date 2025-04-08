@@ -88,6 +88,7 @@ export function AdvancedSearchButton() {
       size="sm"
       className="unified-button"
       onClick={handleAdvancedSearch}
+      style={{ fontWeight: "500" }}
     >
       جستجوی پیشرفته
     </Button>

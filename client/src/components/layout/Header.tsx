@@ -149,7 +149,7 @@ export function Header() {
                 
                 {isMenuOpen && (
                   <PortalOverride triggerRef={triggerRef}>
-                    <div className="w-48 bg-popover border rounded-md shadow-md p-1 text-popover-foreground animate-fade-in">
+                    <div className="w-48 bg-popover border rounded-md shadow-md p-1 text-popover-foreground animate-fade-in right-aligned">
                       <button 
                         className="w-full flex items-center p-2 rounded hover:bg-[#006bd6]/10 hover:text-[#006bd6] text-sm transition-all duration-300"
                         onClick={() => { setLocation('/profile'); setIsMenuOpen(false); }}
