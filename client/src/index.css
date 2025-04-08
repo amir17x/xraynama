@@ -2,6 +2,65 @@
 @tailwind components;
 @tailwind utilities;
 
+/* استایل‌های سفارشی برای پس‌زمینه سه‌بعدی */
+.blue-sphere-bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow: hidden;
+  z-index: 0;
+  pointer-events: none;
+  background-color: #000000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.blue-sphere {
+  position: absolute;
+  width: 600px;
+  height: 600px;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, #0080ff, #0044aa, #001155, #000022);
+  box-shadow: 
+    0 0 100px 20px rgba(0, 102, 204, 0.5),
+    0 0 200px 50px rgba(0, 119, 255, 0.3),
+    0 0 300px 100px rgba(0, 68, 170, 0.2);
+  opacity: 0.85;
+  animation: rotate 80s linear infinite, pulse 10s ease-in-out infinite;
+}
+
+@keyframes rotate {
+  from {
+    transform: translate(-50%, -50%) rotate(0deg);
+  }
+  to {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    box-shadow: 
+      0 0 100px 20px rgba(0, 102, 204, 0.5),
+      0 0 200px 50px rgba(0, 119, 255, 0.3),
+      0 0 300px 100px rgba(0, 68, 170, 0.2);
+    opacity: 0.85;
+  }
+  50% {
+    box-shadow: 
+      0 0 150px 30px rgba(0, 102, 204, 0.6),
+      0 0 250px 60px rgba(0, 119, 255, 0.4),
+      0 0 350px 120px rgba(0, 68, 170, 0.3);
+    opacity: 0.9;
+  }
+}
+
 /* انیمیشن‌های پیشرفته برای صفحه جزئیات محتوا */
 .content-backdrop-animate {
   animation: contentFadeIn 0.8s ease-out;

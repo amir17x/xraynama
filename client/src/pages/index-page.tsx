@@ -12,72 +12,12 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 
-// کامپوننت پس‌زمینه سه‌بعدی
+// کامپوننت پس‌زمینه کره آبی
 const SplineBackground: React.FC = () => {
-  const containerRef = useRef<HTMLDivElement>(null);
-  
-  useEffect(() => {
-    // اطمینان از اینکه کد در سمت مرورگر اجرا می‌شود
-    if (typeof window === 'undefined') return;
-    
-    // بارگذاری اسکریپت Spline
-    const loadSplineViewer = async () => {
-      try {
-        // بررسی اینکه آیا قبلاً اسکریپت بارگذاری شده است
-        if (!document.getElementById('spline-script')) {
-          // ایجاد اسکریپت
-          const script = document.createElement('script');
-          script.id = 'spline-script';
-          script.type = 'module';
-          script.src = 'https://unpkg.com/@splinetool/viewer@1.9.82/build/spline-viewer.js';
-          document.head.appendChild(script);
-          
-          // انتظار برای بارگذاری اسکریپت
-          await new Promise((resolve) => {
-            script.onload = resolve;
-          });
-        }
-        
-        // اضافه کردن المان spline-viewer به صورت دستی
-        if (containerRef.current) {
-          setTimeout(() => {
-            if (containerRef.current && !containerRef.current.querySelector('spline-viewer')) {
-              const container = containerRef.current;
-              container.innerHTML = '';
-              
-              const splineViewer = document.createElement('div');
-              splineViewer.innerHTML = `
-                <spline-viewer 
-                  loading-anim-type="spinner-small-dark" 
-                  url="https://prod.spline.design/heOPRtDTGel6wqDu/scene.splinecode" 
-                  style="width: 100%; height: 100%; opacity: 0.5;"
-                ></spline-viewer>
-              `;
-              
-              container.appendChild(splineViewer.firstChild as Node);
-            }
-          }, 500);
-        }
-      } catch (error) {
-        console.error('خطا در بارگذاری Spline viewer:', error);
-      }
-    };
-    
-    loadSplineViewer();
-    
-    // پاکسازی در هنگام unmount شدن کامپوننت
-    return () => {
-      if (containerRef.current) {
-        containerRef.current.innerHTML = '';
-      }
-    };
-  }, []);
-  
   return (
-    <div 
-      ref={containerRef}
-      className="fixed inset-0 z-0 pointer-events-none overflow-hidden"
-    ></div>
+    <div className="blue-sphere-bg">
+      <div className="blue-sphere"></div>
+    </div>
   );
 };
 
