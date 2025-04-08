@@ -1,0 +1,84 @@
+حتماً! در ادامه یک **پرامپت حرفه‌ای و دقیق** نوشتم که می‌تونی به ابزار هوش مصنوعی یا توسعه‌دهنده بدی تا بخش "تماس با ما" سایتت رو بازطراحی کنه و از **طراحی گلاسمورفیسم** مشابه بخش "ثبت نام و ورود" استفاده کنه:
+
+---
+
+### **Prompt برای بازطراحی بخش "تماس با ما" با طراحی گلاسمورفیسم:**
+
+> I need to redesign the **"Contact Us"** section of my website using the **Glassmorphism** design style, similar to the **"Sign Up" and "Login"** sections I previously designed. The goal is to create a modern, sleek look with a semi-transparent background, soft blur effects, rounded corners, and smooth transitions.
+> 
+> Here's what I need for the "Contact Us" section:
+> 
+> 1. **Background Design**:
+>   - Apply a **semi-transparent background** with a **blurred effect** (`backdrop-filter: blur`). Ensure the content within the section is clearly readable despite the blurred background.
+>   - The background should have a subtle **frosted glass** effect, creating a soft, modern look without detracting from the form elements.
+> 
+> 2. **Form Elements**:
+>   - The form fields (e.g., **Name**, **Email**, and **Message**) should have a **transparent background** with a **slight blur** behind them. Ensure the text inputs remain legible and visually appealing with a smooth and soft shadow effect around the input fields.
+>   - Use rounded corners on form fields to match the overall Glassmorphism style. Add a **subtle glow** or **border on focus** to highlight the input field when clicked, making the form interactive and visually consistent with the design.
+> 
+> 3. **Buttons**:
+>   - The submit button should have a **frosted glass effect** with a **subtle hover animation**. When hovered, the button should **scale up** slightly or change its background color with smooth transitions.
+>   - Use soft **rounded corners** for the button to maintain consistency with the rest of the form elements.
+> 
+> 4. **Spacing and Layout**:
+>   - Ensure proper **padding and margin** within the form to create ample space around the elements. This will help maintain the clean and minimalist design of the Glassmorphism style.
+>   - Keep the **layout responsive**, ensuring the form looks great on mobile, tablet, and desktop screens, with smooth scaling and no design breaks.
+> 
+> 5. **Hover and Focus Effects**:
+>   - Apply smooth **hover transitions** on the form elements (fields and buttons), so the user experience feels seamless and polished.
+>   - Use **soft shadows** or **glow effects** around elements to give them a floating appearance when hovered or focused on.
+> 
+> 6. **Test for Performance**:
+>   - Ensure the Glassmorphism effects do not negatively impact the website's performance, particularly on mobile devices. Optimize the blur effect and transitions to minimize resource usage.
+
+### **Suggested CSS Example for the "Contact Us" Section**:
+```css
+.contact-form {
+  background: rgba(255, 255, 255, 0.1); /* Semi-transparent background */
+  backdrop-filter: blur(10px); /* Frosted glass effect */
+  border-radius: 15px;
+  padding: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.contact-form input, .contact-form textarea {
+  background: rgba(255, 255, 255, 0.2); /* Semi-transparent background for inputs */
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: 10px;
+  padding: 10px;
+  color: #fff;
+  transition: all 0.3s ease;
+}
+
+.contact-form input:focus, .contact-form textarea:focus {
+  outline: none;
+  border-color: rgba(255, 255, 255, 0.8);
+  box-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+}
+
+.contact-form button {
+  background: rgba(0, 255, 255, 0.2); /* Frosted effect for button */
+  color: #fff;
+  padding: 12px 20px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.2s ease, background-color 0.3s ease;
+}
+
+.contact-form button:hover {
+  transform: scale(1.05);
+  background-color: rgba(0, 255, 255, 0.3);
+}
+```
+
+---
+
+### نکات مهم:
+- **گلاسمورفیسم (Glassmorphism):** طراحی باید به صورت شیشه‌ای و با پس‌زمینه مات و محو انجام بشه، و تمام المان‌ها باید با طراحی دیگر بخش‌های سایت هماهنگ باشن.
+- **تست در دستگاه‌های مختلف:** این طراحی باید بر روی انواع دستگاه‌ها، از جمله موبایل و دسکتاپ به خوبی نمایش داده بشه.
+- **عملکرد بهینه:** باید مطمئن بشی که این طراحی باعث کندی یا مشکلات در بارگذاری سایت نشه، به خصوص در موبایل‌ها.
+- **خوانایی:** مهم است که تمام فرم‌ها و متن‌ها با وضوح بالا دیده بشن و مشکل خوانایی نداشته باشیم.
+
+این پرامپت می‌تونه به ابزار هوش مصنوعی یا توسعه‌دهنده کمک کنه تا بخش "تماس با ما" رو با طراحی گلاسمورفیسم مدرن و جذاب بازطراحی کنه.

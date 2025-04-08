@@ -81,6 +81,10 @@ app.use("/api", (req, res, next) => {
  * - Register routes in parallel where possible
  * - Implement graceful error handling
  */
+
+// Force development mode for Vite in Replit
+process.env.NODE_ENV = "development";
+
 (async () => {
   // Setup error handler middleware
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
@@ -119,11 +123,8 @@ app.use("/api", (req, res, next) => {
   const server = await registerRoutes(app);
   
   // Setup Vite or static serving
-  if (app.get("env") === "development") {
-    await setupVite(app, server);
-  } else {
-    serveStatic(app);
-  }
+  // Always use Vite in development mode on Replit
+  await setupVite(app, server);
   
   // Wait for MongoDB connection to complete in parallel
   await mongoConnectionPromise.catch(error => {

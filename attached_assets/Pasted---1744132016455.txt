@@ -1,0 +1,101 @@
+حتماً! در ادامه پرامپت دقیق و حرفه‌ای برای **بخش "گزارش خطا"** با طراحی گلاسمورفیسم مشابه بخش‌های دیگر سایت آورده شده است. این پرامپت می‌تواند به ابزار هوش مصنوعی یا توسعه‌دهنده کمک کند تا این بخش را بازطراحی کند:
+
+---
+
+### **Prompt برای بازطراحی بخش "گزارش خطا" با طراحی گلاسمورفیسم:**
+
+> I need to redesign the **"Report an Error"** section of my website using the **Glassmorphism** design style, similar to the **"Sign Up" and "Login"** sections I previously designed. The goal is to create a modern, sleek look with a semi-transparent background, soft blur effects, rounded corners, and smooth transitions to enhance user interaction and visual appeal.
+> 
+> Here's what I need for the "Report an Error" section:
+> 
+> 1. **Background Design**:
+>   - Apply a **semi-transparent background** with a **blurred effect** (`backdrop-filter: blur`). Ensure the content remains legible and easy to read despite the blurred background.
+>   - The background should have a **frosted glass effect** that gives a subtle, modern look without overshadowing the form fields or text. It should feel clean and minimalistic.
+> 
+> 2. **Form Elements**:
+>   - The form fields (e.g., **Error Title**, **Description**, and **Email**) should have a **semi-transparent background** with a subtle blur effect behind them. Ensure these fields remain legible and easy to use, and maintain a clean, polished look.
+>   - Use **rounded corners** for all input fields and text areas to match the overall Glassmorphism aesthetic. Add a **subtle border or shadow effect** to provide depth and highlight the fields, making them stand out.
+> 
+> 3. **Submit Button**:
+>   - The submit button should have a **frosted glass effect** similar to the form elements, with smooth transitions when hovered over. On hover, the button can **scale up slightly** or change its background color with a soft transition.
+>   - Ensure the button is clearly distinguishable and stands out with a **rounded design** to maintain consistency with the rest of the form elements.
+> 
+> 4. **Spacing and Layout**:
+>   - Ensure ample **padding and margins** around the form fields to create space and prevent the section from feeling cramped. This will allow the Glassmorphism effect to stand out and prevent visual clutter.
+>   - The layout should be **responsive**, adjusting smoothly for mobile, tablet, and desktop screens, ensuring that all form elements are appropriately scaled and accessible on different devices.
+> 
+> 5. **Hover and Focus Effects**:
+>   - Apply smooth **hover effects** on the form fields and button to create a polished user experience. For example, when hovering over input fields, the borders can **glow or change color** slightly, and the button can have a subtle **scale-up effect**.
+>   - Ensure that **focus** on the input fields is clearly visible, with a soft shadow or glow effect to show the user where they are typing.
+> 
+> 6. **Error Message Design**:
+>   - If the user submits the form with missing or incorrect information, display an **error message** using a clear, visually distinctive style. The error message should be in a **red or orange color** with a subtle glass effect, maintaining the consistency of the overall design.
+>   - Add a smooth **fade-in and fade-out effect** when displaying or hiding the error messages to keep the transitions fluid and visually appealing.
+
+### **Suggested CSS Example for the "Report an Error" Section**:
+
+```css
+.error-report-form {
+  background: rgba(255, 255, 255, 0.1); /* Semi-transparent background */
+  backdrop-filter: blur(10px); /* Frosted glass effect */
+  border-radius: 15px;
+  padding: 25px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.error-report-form input, .error-report-form textarea {
+  background: rgba(255, 255, 255, 0.2); /* Semi-transparent background for inputs */
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: 10px;
+  padding: 10px;
+  color: #fff;
+  transition: all 0.3s ease;
+}
+
+.error-report-form input:focus, .error-report-form textarea:focus {
+  outline: none;
+  border-color: rgba(255, 255, 255, 0.8);
+  box-shadow: 0 0 10px rgba(255, 0, 0, 0.5); /* Subtle red glow for focus */
+}
+
+.error-report-form button {
+  background: rgba(0, 255, 255, 0.2); /* Frosted effect for button */
+  color: #fff;
+  padding: 12px 20px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.2s ease, background-color 0.3s ease;
+}
+
+.error-report-form button:hover {
+  transform: scale(1.05);
+  background-color: rgba(0, 255, 255, 0.3);
+}
+
+.error-message {
+  color: red;
+  background: rgba(255, 0, 0, 0.1); /* Semi-transparent red background */
+  border-radius: 10px;
+  padding: 10px;
+  margin-top: 10px;
+  display: none; /* Hidden by default */
+  transition: opacity 0.3s ease;
+}
+
+.error-message.visible {
+  display: block;
+  opacity: 1;
+}
+```
+
+---
+
+### نکات مهم:
+- **گلاسمورفیسم (Glassmorphism):** طراحی باید به صورت شیشه‌ای و با پس‌زمینه مات و محو انجام بشه، و تمام المان‌ها باید با طراحی دیگر بخش‌های سایت هماهنگ باشن.
+- **تست در دستگاه‌های مختلف:** این طراحی باید بر روی انواع دستگاه‌ها، از جمله موبایل و دسکتاپ به خوبی نمایش داده بشه.
+- **عملکرد بهینه:** باید مطمئن بشی که این طراحی باعث کندی یا مشکلات در بارگذاری سایت نشه، به خصوص در موبایل‌ها.
+- **خوانایی و دسترسی:** فرم‌ها و پیام‌های خطا باید خوانا و قابل دسترسی برای همه کاربران باشند.
+
+این پرامپت به ابزار هوش مصنوعی یا توسعه‌دهنده کمک می‌کنه تا بخش "گزارش خطا" رو با طراحی گلاسمورفیسم مدرن و جذاب بازطراحی کنه.

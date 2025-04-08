@@ -1,0 +1,78 @@
+ Glassmorphism design principles. The sections listed below should feature semi-transparent backgrounds, blurred effects, smooth transitions, and modern UI elements. Please analyze and redesign these sections in the site's HTML, CSS, and JavaScript files to implement Glassmorphism for a sleek and modern look:
+
+Sections to redesign:
+
+Quick Access (دسترسی سریع)
+
+Apply glassmorphism effect to the container holding quick access links (e.g., "New Movies," "Trending," "Favorites"). Use a soft background blur and rounded edges to highlight the links. Add subtle hover effects for better user interaction.
+
+New Movies (فیلم‌های جدید)
+
+Redesign the "New Movies" section by using a semi-transparent background with a blur effect for movie posters and titles. Ensure the layout is clean and minimalist, with soft borders around the thumbnails. Add smooth transitions when hovering over movie cards, and display details like title, year, and rating on hover.
+
+Popular Series (سریال‌های محبوب)
+
+Apply Glassmorphism to the series section. Use transparent, blurred containers for each series, along with rounded corners and a subtle shadow to create depth. Add hover effects to reveal additional information about each series, such as the cast or episode count.
+
+Animations (انیمیشن‌ها)
+
+Add Glassmorphism to the animation section, making sure each animation card has a glassy background with blurred edges. Ensure that titles and previews are readable with appropriate contrast and hover effects to show additional info, such as release year or description.
+
+Documentaries (مستندها)
+
+For the documentaries section, implement a glassmorphism effect for the background of each documentary card. The backdrop should have a blurred effect, and the content (e.g., documentary title, year, and description) should be legible, with smooth hover transitions.
+
+Top IMDB (برترین‌های IMDB)
+
+Apply the glassmorphism style to the "Top IMDB" section, ensuring that movie or series ratings are clear and visually appealing. Each item should have a subtle glass background with a blurred effect and soft edges, allowing the IMDB rating to stand out while maintaining readability.
+
+Categories (دسته‌بندی‌ها)
+
+For each genre (Action, Comedy, Drama, Sci-Fi, Horror, etc.), use a semi-transparent glass-like background for category cards or list items. Add a blur effect to the background and a smooth hover effect for interaction, displaying the genre’s name and a brief description upon hover.
+
+Action (اکشن), Comedy (کمدی), Drama (درام), Sci-Fi (علمی-تخیلی), Horror (ترسناک)
+
+Redesign these genre sections with a glassmorphism layout, ensuring that movie thumbnails within each genre are displayed clearly with a subtle blur effect applied to the background. The text, such as movie titles and ratings, should contrast well for readability.
+
+Support (پشتیبانی)
+
+Apply a blurred glass effect to the support section, giving it a modern feel. Use a semi-transparent container for contact forms or links, with rounded corners and smooth hover transitions on the contact buttons and links.
+
+Contact Us (تماس با ما)
+
+Implement glassmorphism for the "Contact Us" section by applying a blurred, semi-transparent background to the form container. Ensure that the form fields (name, email, message) are clearly readable with a soft shadow around the input fields and smooth hover effects.
+
+Report an Error (گزارش خطا)
+
+Design the "Report an Error" section using the glassmorphism effect for the background of the error report form. Add transparency with a blur effect, ensuring form fields are legible and the submit button has a smooth hover transition.
+
+Request Content (درخواست محتوا)
+
+Implement glassmorphism in the "Request Content" section with a transparent background, soft blur effect, and modern rounded corners. The request form should be user-friendly with smooth transitions on the input fields and submit buttons.
+
+Terms and Conditions (قوانین و مقررات)
+
+Redesign the terms and conditions section with a glassmorphism effect applied to the background, giving the text a subtle transparency and blur. Ensure the legal text is readable and doesn’t appear distorted, and that the design matches the overall site theme.
+
+FAQs (سوالات متداول)
+
+Apply the glass effect to the FAQ section, giving each question and answer a modern, blurred backdrop. Add smooth transitions and subtle hover effects to the FAQ items to enhance user experience while keeping the text legible.
+
+Important Considerations:
+
+All the sections should remain responsive, adapting to mobile, tablet, and desktop screens with smooth transitions.
+
+Performance optimization is essential; ensure the glassmorphism effect is applied without significantly affecting load times or causing lag, especially for mobile users.
+
+Contrast and readability should be maintained throughout all sections, ensuring that text is legible against the semi-transparent backgrounds.
+
+Consistency is key; all sections should follow the same Glassmorphism style for a unified, modern look.
+
+نکات مهم:
+طراحی شیشه‌ای (Glassmorphism): این طراحی باید به طور یکسان در تمام بخش‌ها و صفحات سایت اعمال بشه، به‌طوری که از نظر بصری یکپارچه و مدرن به نظر بیاد.
+
+عملکرد: باید دقت کنی که انیمیشن‌ها و اثرات شیشه‌ای باعث کندی یا کاهش سرعت سایت نشه، به خصوص در موبایل‌ها.
+
+خوانایی: مهمه که متن‌ها، عناوین و اطلاعات بر روی پس‌زمینه شیشه‌ای واضح و خوانا بمونه.
+
+این پرامپت دقیقاً تمام بخش‌های سایت رو برای بازطراحی با Glassmorphism توضیح داده. می‌تونی این رو به ابزار هوش مصنوعی یا توسعه‌دهنده بدهی تا تمامی این تغییرات رو برای سایتت اعمال کنه.

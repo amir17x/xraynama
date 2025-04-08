@@ -23,8 +23,8 @@ const SlideIndicator: React.FC<SlideIndicatorProps> = ({
           className={cn(
             "transition-all duration-300 ease-in-out focus:outline-none",
             index === currentSlide
-              ? "w-8 h-2 bg-blue-500 rounded-md" 
-              : "w-2 h-2 bg-gray-400 hover:bg-gray-300 rounded-full"
+              ? "w-8 h-2 bg-[#00BFFF] rounded-md shadow-[0_0_8px_rgba(0,191,255,0.6)]" 
+              : "w-2 h-2 bg-gray-500/50 hover:bg-[#00BFFF]/30 rounded-full backdrop-blur-sm"
           )}
           aria-label={`رفتن به اسلاید ${index + 1}`}
         />

@@ -143,7 +143,7 @@ export function ContentCard({
     return (
       <Link href={`/content/${content.englishTitle.replace(/[^a-zA-Z0-9]/g, '')}`}>
         <div className={cn(
-          "fluent-card bg-card border border-border rounded-lg overflow-hidden shadow-lg content-enter hover:shadow-xl hover:shadow-primary/20 transition-all duration-500",
+          "fluent-card glass-effect rounded-lg overflow-hidden content-enter transition-all duration-300",
           className
         )}>
           <div className="relative group">
@@ -151,10 +151,11 @@ export function ContentCard({
               <img 
                 src={content.poster}
                 alt={content.title} 
-                className="w-full h-full object-cover transform transition-transform duration-500 group-hover:scale-110" 
+                className="w-full h-full object-cover transform transition-all duration-300 ease-out group-hover:scale-105" 
               />
-              <div className="shimmer-effect opacity-0 group-hover:opacity-100"></div>
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-all duration-500"></div>
+              {/* اضافه کردن یک لایه دائمی برای جلوگیری از چشمک زدن */}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/30 to-transparent opacity-30 transition-opacity duration-300 group-hover:opacity-100"></div>
+              <div className="shimmer-effect opacity-0 group-hover:opacity-20 transition-opacity duration-300"></div>
             </div>
             
             {/* Year Badge */}
@@ -249,7 +250,7 @@ export function ContentCard({
   return (
     <Link href={`/content/${content.englishTitle.replace(/[^a-zA-Z0-9]/g, '')}`}>
       <div className={cn(
-        "fluent-card flex-shrink-0 w-60 rounded-lg overflow-hidden bg-card border border-border shadow-lg transform transition-all duration-500 ease-out hover:shadow-xl hover:shadow-primary/20 hover:-translate-y-1 content-enter hover-float pulse-on-hover",
+        "fluent-card glass-effect flex-shrink-0 w-60 rounded-lg overflow-hidden transform transition-all duration-300 ease-out hover:-translate-y-1 content-enter",
         className
       )}>
         <div className="relative group">
@@ -257,10 +258,11 @@ export function ContentCard({
             <img 
               src={content.poster}
               alt={content.title} 
-              className="w-full h-full object-cover transform transition-all duration-700 ease-out group-hover:scale-110 filter group-hover:brightness-110" 
+              className="w-full h-full object-cover transform transition-all duration-500 ease-out group-hover:scale-105 filter group-hover:brightness-110" 
             />
-            <div className="shimmer-effect opacity-0 group-hover:opacity-100"></div>
-            <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+            {/* اضافه کردن یک لایه دائمی برای جلوگیری از چشمک زدن */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/30 to-transparent opacity-30 transition-opacity duration-300 group-hover:opacity-100"></div>
+            <div className="shimmer-effect opacity-0 group-hover:opacity-20 transition-opacity duration-300"></div>
           </div>
           
           {/* Year Badge */}

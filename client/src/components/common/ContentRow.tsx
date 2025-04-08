@@ -47,12 +47,12 @@ export function ContentRow({ title, moreLink, content, isLoading = false }: Cont
   };
 
   return (
-    <section className="mb-12">
+    <section className="content-section-glass mb-12">
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-2xl font-bold text-foreground">{title}</h2>
         {moreLink && (
-          <Link href={moreLink} className="text-primary hover:text-primary/90 transition duration-200">
-            مشاهده همه <ChevronLeft className="inline-block h-4 w-4" />
+          <Link href={moreLink} className="text-[#00BFFF] hover:text-white transition duration-300 flex items-center">
+            مشاهده همه <ChevronLeft className="inline-block h-4 w-4 mr-1" />
           </Link>
         )}
       </div>

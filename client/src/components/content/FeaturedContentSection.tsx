@@ -137,70 +137,76 @@ const FeaturedContentSection: React.FC<FeaturedContentSectionProps> = ({
   };
 
   return (
-    <div className="py-6 bg-dark-lighter/30">
+    <div className="py-8 mb-6">
       <div className="container mx-auto px-4">
-        <div className="flex justify-between items-center mb-4">
-          <div className="flex items-center gap-2">
-            {renderIcon()}
-            <h2 className="text-xl font-medium text-white">{title}</h2>
+        <div className="content-section-glass mb-6">
+          <div className="flex justify-between items-center mb-4">
+            <div className="flex items-center gap-2">
+              {icon && (
+                <div className="glassmorphic-icon p-2">
+                  {renderIcon()}
+                </div>
+              )}
+              <h2 className="text-xl font-medium text-white">{title}</h2>
+            </div>
+            
+            {moreLink && (
+              <div className="flex items-center gap-1 group">
+                <ChevronLeftIcon className="h-4 w-4 text-[#00BFFF] group-hover:text-white transition-colors" />
+                <Button asChild variant="link" size="sm" className="p-0 h-auto text-sm text-[#00BFFF] hover:text-white transition-colors">
+                  <Link href={moreLink}>مشاهده همه</Link>
+                </Button>
+              </div>
+            )}
           </div>
           
-          {moreLink && (
-            <div className="flex items-center gap-1 group">
-              <ChevronLeftIcon className="h-4 w-4 text-blue-500 group-hover:text-blue-400 transition-colors" />
-              <Button asChild variant="link" size="sm" className="p-0 h-auto text-sm text-blue-500 hover:text-blue-400 transition-colors">
-                <Link href={moreLink}>مشاهده همه</Link>
-              </Button>
+          {subtitle && <p className="text-sm text-muted-foreground mb-4">{subtitle}</p>}
+        
+          <div className="relative">
+            <Button 
+              variant="outline" 
+              size="icon" 
+              className="group absolute left-[-20px] top-1/2 transform -translate-y-1/2 rounded-full h-10 w-10 z-10 glassmorphic-icon hover:bg-[#00BFFF]/20 transition-all hover:scale-110"
+              onClick={handleScrollRight}
+              disabled={currentSlide === 0}
+            >
+              <ChevronRightIcon className="h-5 w-5 text-[#00BFFF] group-hover:text-white" />
+            </Button>
+            
+            <div 
+              ref={scrollContainerRef}
+              className="flex gap-4 overflow-x-auto pb-4 scrollbar-none scroll-smooth"
+              style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+            >
+              {content.map((item) => (
+                <ContentCard
+                  key={item.id}
+                  content={item}
+                />
+              ))}
             </div>
+            
+            <Button 
+              variant="outline" 
+              size="icon" 
+              className="group absolute right-[-20px] top-1/2 transform -translate-y-1/2 rounded-full h-10 w-10 z-10 glassmorphic-icon hover:bg-[#00BFFF]/20 transition-all hover:scale-110"
+              onClick={handleScrollLeft}
+              disabled={currentSlide === totalSlides - 1}
+            >
+              <ChevronLeftIcon className="h-5 w-5 text-[#00BFFF] group-hover:text-white" />
+            </Button>
+          </div>
+          
+          {/* نشانگر اسلاید */}
+          {totalSlides > 1 && (
+            <SlideIndicator
+              totalSlides={totalSlides}
+              currentSlide={currentSlide}
+              onSlideChange={scrollToSlide}
+              className="mt-4"
+            />
           )}
         </div>
-        
-        {subtitle && <p className="text-sm text-muted-foreground mb-4">{subtitle}</p>}
-        
-        <div className="relative">
-          <Button 
-            variant="outline" 
-            size="icon" 
-            className="group absolute left-[-20px] top-1/2 transform -translate-y-1/2 rounded-full h-10 w-10 z-10 bg-blue-950/40 backdrop-blur-sm border-blue-900/50 hover:bg-blue-900/60 transition-all hover:scale-110"
-            onClick={handleScrollRight}
-            disabled={currentSlide === 0}
-          >
-            <ChevronRightIcon className="h-5 w-5 text-blue-500 group-hover:text-blue-400" />
-          </Button>
-          
-          <div 
-            ref={scrollContainerRef}
-            className="flex gap-4 overflow-x-auto pb-4 scrollbar-none scroll-smooth"
-            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
-          >
-            {content.map((item) => (
-              <ContentCard
-                key={item.id}
-                content={item}
-              />
-            ))}
-          </div>
-          
-          <Button 
-            variant="outline" 
-            size="icon" 
-            className="group absolute right-[-20px] top-1/2 transform -translate-y-1/2 rounded-full h-10 w-10 z-10 bg-blue-950/40 backdrop-blur-sm border-blue-900/50 hover:bg-blue-900/60 transition-all hover:scale-110"
-            onClick={handleScrollLeft}
-            disabled={currentSlide === totalSlides - 1}
-          >
-            <ChevronLeftIcon className="h-5 w-5 text-blue-500 group-hover:text-blue-400" />
-          </Button>
-        </div>
-        
-        {/* نشانگر اسلاید */}
-        {totalSlides > 1 && (
-          <SlideIndicator
-            totalSlides={totalSlides}
-            currentSlide={currentSlide}
-            onSlideChange={scrollToSlide}
-            className="mt-4"
-          />
-        )}
       </div>
     </div>
   );

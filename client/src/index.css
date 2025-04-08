@@ -304,12 +304,23 @@
 }
 
 @layer components {
+  /* استایل گلاسمورفیسم جدید - برای تمام بخش‌های محتوایی با انیمیشن بهبود یافته */
   .glass-effect {
-    @apply bg-card/70 backdrop-blur-md border border-white/5;
+    @apply bg-card/60 backdrop-blur-md border border-white/5 transition-all duration-300 ease-out shadow-lg;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2), 0 2px 8px rgba(0, 0, 0, 0.1), inset 0 0 0 1px rgba(0, 191, 255, 0.05);
+    will-change: transform, box-shadow, background-color;
+  }
+  
+  .glass-effect:hover {
+    @apply bg-card/70;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25), 0 4px 16px rgba(0, 0, 0, 0.15), inset 0 0 0 1px rgba(0, 191, 255, 0.1);
+    transform: translateY(-4px);
   }
   
   .fluent-card {
-    @apply transition-all duration-300;
+    @apply transition-all duration-300 ease-out;
+    backface-visibility: hidden;
+    -webkit-font-smoothing: subpixel-antialiased;
   }
   
   /* کلاس‌های استایل مشترک برای کارت‌های محتوا */
@@ -454,7 +465,11 @@
   }
   
   .fluent-card:hover {
-    @apply transform -translate-y-1 shadow-lg;
+    @apply shadow-lg;
+    transform: translateY(-4px);
+    box-shadow: 
+      0 10px 25px -5px rgba(0, 0, 0, 0.3),
+      0 5px 10px -5px rgba(0, 191, 255, 0.2);
   }
   
   .scrollbar-hide::-webkit-scrollbar {
@@ -498,8 +513,36 @@
     @apply bg-card rounded-lg border border-border p-4 shadow-md;
   }
   
+  /* استایل گلاسمورفیسم برای کارت‌ها و باکس‌های محتوا */
   .card-container-glass {
-    @apply bg-card/70 backdrop-blur-md rounded-lg border border-white/5 p-4 shadow-md;
+    @apply bg-card/50 backdrop-blur-lg rounded-lg border border-white/10 p-4 transition-all duration-300;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2), 0 4px 8px rgba(0, 0, 0, 0.1), inset 0 0 0 1px rgba(0, 191, 255, 0.05);
+  }
+  
+  .card-container-glass:hover {
+    @apply bg-card/60;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.25), 0 5px 15px rgba(0, 0, 0, 0.15), inset 0 0 0 1px rgba(0, 191, 255, 0.1);
+    transform: translateY(-2px);
+  }
+  
+  /* استایل گلاسمورفیسم برای بخش‌های مختلف محتوا */
+  .content-section-glass {
+    @apply relative overflow-hidden rounded-xl transition-all duration-500 border border-white/10 bg-card/40 backdrop-blur-md p-6;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2), 0 5px 15px rgba(0, 0, 0, 0.1);
+  }
+  
+  .content-section-glass::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, 
+      rgba(0, 191, 255, 0) 0%, 
+      rgba(0, 191, 255, 0.2) 50%, 
+      rgba(0, 191, 255, 0) 100%
+    );
   }
   
   .flex-center {
@@ -581,14 +624,16 @@
 .shimmer-effect {
   background: linear-gradient(90deg, 
     transparent 0%, 
-    rgba(255, 255, 255, 0.1) 50%, 
+    rgba(0, 191, 255, 0.08) 50%, 
     transparent 100%
   );
   background-size: 200% 100%;
-  animation: shimmerGradient 2s infinite;
+  animation: shimmerGradient 2s cubic-bezier(0.4, 0.0, 0.2, 1) infinite;
   position: absolute;
   inset: 0;
   z-index: 0;
+  pointer-events: none; /* جلوگیری از تداخل با کلیک */
+  will-change: background-position; /* بهبود عملکرد انیمیشن */
 }
 
 /* کلاس‌های انیمیشن */

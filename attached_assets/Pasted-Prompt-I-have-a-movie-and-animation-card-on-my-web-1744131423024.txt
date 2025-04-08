@@ -1,0 +1,56 @@
+Prompt برای رفع مشکل چشمک زدن کارت و افزودن انیمیشن نرم:
+I have a movie and animation card on my website. When the user hovers over the card, the content (like the movie title, poster, or description) displays smoothly. However, when the mouse leaves the card, it starts to flicker or turn black briefly before returning to its normal state, which doesn't feel smooth and affects the user experience negatively.
+
+I would like you to fix this issue by:
+
+Eliminating the flicker or unwanted transition when the mouse leaves the card. Ensure that the card does not turn black or glitch. The card content should return to its original state smoothly without any sudden changes.
+
+Apply a soft and smooth transition effect when the mouse enters and leaves the card. The transition should be seamless, with a subtle fade or scale-up/scale-down animation on hover. This will make the hover effect feel more polished and fluid.
+
+Use CSS transitions (e.g., transition: transform 0.3s ease, opacity 0.3s ease) to ensure the hover effect is smooth, and the card returns to its original state gradually after the mouse leaves.
+
+Ensure that the background color, text opacity, and shadow effects are applied consistently with the transition, preventing any glitches or visible delays in the visual transition.
+
+Add proper timing functions to the hover animation to ensure smooth easing and that the card transitions back to its initial state without sudden jumps.
+
+Test and ensure the solution works across different browsers and devices, making sure it doesn't cause any issues on mobile or tablet.
+
+Animation example suggestion:
+css
+Copy
+Edit
+.card {
+  position: relative;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.card:hover {
+  transform: scale(1.05);
+  background-color: rgba(255, 255, 255, 0.2);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+}
+
+.card:not(:hover) {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+This example uses a scale effect, a subtle shadow, and a background fade when the user hovers over the card. The transitions should be smooth and there should be no flickering or sudden changes when the mouse leaves the card.
+
+نکات مهم:
+انتقال روان و بدون چشمک زدن: انتقال بین وضعیت‌ها باید بدون هیچ گونه پرش یا مشکل باشد.
+
+آزمایش در مرورگرها: این تغییرات باید در همه مرورگرها و دستگاه‌ها به درستی کار کند.
+
+عملکرد بهینه: انیمیشن‌ها نباید باعث کند شدن سایت یا ایجاد لگ شوند.
+
+این پرامپت می‌تونه مشکل چشمک زدن و انتقال نامناسب رو برطرف کنه و انیمیشن روانی برای کارت‌ها اعمال کنه تا تجربه کاربری بهبود پیدا کنه.
+
+
+
+
+
+
+
+

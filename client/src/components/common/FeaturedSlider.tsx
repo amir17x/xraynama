@@ -174,8 +174,8 @@ export function FeaturedSlider({ content, isLoading = false }: FeaturedSliderPro
   const currentContent = content[currentIndex];
 
   return (
-    <section className="mb-12">
-      <div className="relative h-[500px] md:h-[550px] rounded-2xl overflow-hidden shadow-2xl">
+    <section className="content-section-glass mb-12 overflow-hidden backdrop-blur-xl">
+      <div className="relative h-[500px] md:h-[550px] rounded-xl overflow-hidden">
         {/* Featured background image */}
         <div className="absolute inset-0">
           <img 
@@ -183,8 +183,8 @@ export function FeaturedSlider({ content, isLoading = false }: FeaturedSliderPro
             className="w-full h-full object-cover" 
             alt={currentContent.title}
           />
-          {/* Gradient overlay */}
-          <div className="absolute inset-0 bg-gradient-to-t from-background via-background/70 to-transparent"></div>
+          {/* Glassmorphism overlay */}
+          <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/60 to-background/20 backdrop-blur-sm"></div>
         </div>
         
         {/* Featured content info */}
