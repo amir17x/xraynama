@@ -193,7 +193,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Comments and reviews routes
   app.get("/api/content/:id/comments", async (req, res, next) => {
     try {
-      const contentId = parseInt(req.params.id);
+      // بررسی معتبر بودن ObjectId
+      const contentId = req.params.id;
+      
+      // تایید اینکه آیا contentId یک ObjectId معتبر است
+      const mongoose = require('mongoose');
+      if (!mongoose.Types.ObjectId.isValid(contentId)) {
+        return res.status(400).json({ message: "شناسه محتوا نامعتبر است" });
+      }
       
       // دریافت نظرات با استفاده از storage
       const comments = await storage.getCommentsByContentId(contentId);
@@ -249,7 +256,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/content/:id/reviews", async (req, res, next) => {
     try {
-      const contentId = parseInt(req.params.id);
+      // بررسی معتبر بودن ObjectId
+      const contentId = req.params.id;
+      
+      // تایید اینکه آیا contentId یک ObjectId معتبر است
+      const mongoose = require('mongoose');
+      if (!mongoose.Types.ObjectId.isValid(contentId)) {
+        return res.status(400).json({ message: "شناسه محتوا نامعتبر است" });
+      }
       
       // دریافت نقدها با استفاده از storage
       const reviews = await storage.getReviewsByContentId(contentId);

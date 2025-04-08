@@ -1,0 +1,75 @@
+Absolutely! Here's the **English version** of the same visual/UI design prompt, written clearly and professionally so you can use it for documentation, AI tools, or task assignment (e.g., Jira, Notion, GitHub Issues, etc.):
+
+---
+
+## 🎨 Prompt: Visual Redesign of Movie Detail Page
+
+You are a UI/UX designer and frontend developer tasked with redesigning the movie detail page (based on the attached screenshot) to make it **visually appealing, modern, modular, and consistent** with a clean UI/UX design system.
+
+---
+
+### 🔧 Tech Stack Overview:
+- **Frontend Framework:** React.js + TypeScript  
+- **Styling:** TailwindCSS  
+- **UI Components:** Shadcn UI  
+- **Routing:** wouter  
+- **API/Data Management:** @tanstack/react-query  
+- **Project Structure:** Monorepo (`client` / `server` / `shared`)
+
+---
+
+### 📌 Design Requirements & Suggestions:
+
+#### 1. **Improve Visual Hierarchy**
+- Use proper typography (font size, weight, and spacing) to emphasize key metadata: **title**, **IMDB rating**, **year**, and **genre**.
+- Present technical data (director, cast, language, country, duration) in a **clean 2-column layout**.
+- Add small icons (🎬 Director, 🎤 Cast, 🌍 Language, 🕒 Duration) for clarity and friendliness.
+
+#### 2. **Handle Missing Data Elegantly**
+- Instead of showing repeated text like “Not Available”, use muted placeholders like `—` or “Unknown” with subtle styling.
+- Optionally display a **skeleton loader** when content is loading asynchronously.
+
+#### 3. **Poster & Trailer Section**
+- Make the movie poster stand out with subtle shadow or blurred background effects.
+- Enable hover or zoom-in effect on the poster for desktop.
+- Trailer button should use an eye-catching design with 🎥 icon and hover effects.
+
+#### 4. **Use Official Rating Icons (IMDb / Rotten Tomatoes)**
+- Include **IMDb rating** with gold badge and official styling (⭐ 8.0 IMDb).
+- Optionally display **Rotten Tomatoes** score with 🍅 icon and red badge.
+- Use **colored badges** to represent score ranges:
+  - Green for 80+
+  - Orange for 60–79
+  - Red for <60
+
+#### 5. **Download Box & Streaming Options**
+- Display different streaming versions (e.g., Persian Dub, Subtitled Original) in a tabbed or accordion interface.
+- Show file quality and size using chips (e.g., `1080p`, `1.2GB`).
+- Buttons should follow a consistent design system (using Shadcn UI's `<Button>` component).
+
+#### 6. **Design Consistency & Icons**
+- Use Tailwind utilities for spacing, colors, border-radius, shadows, etc.
+- Keep the interface **dark mode friendly**, with color highlights:
+  - Yellow for rating
+  - Blue for actions
+  - White/gray for text
+
+#### 7. **Responsive & Modular Layout**
+- Fully responsive layout:
+  - Poster on the left, metadata on the right (desktop)
+  - Stacked layout on mobile
+- Use `flex` or `grid` to build modular sections.
+- Components should be **reusable and atomic** for use across other parts of the app.
+
+#### 8. **Optional Enhancements**
+- Genre tags as **pill-style badges**
+- Add “Add to Favorites” button with heart icon 🤍 (toggleable)
+- Display a timeline or progress bar for watched sections (if applicable)
+
+---
+
+Would you like me to:
+- turn this into a proper **Jira task or markdown document**?
+- OR generate the **React + Tailwind component code** that follows this spec?
+
+Let me know what you want next 🙌

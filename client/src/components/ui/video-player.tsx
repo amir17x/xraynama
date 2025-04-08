@@ -8,11 +8,20 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { QualitySource } from '@shared/schema';
+// Quality source interface
+interface QualitySource {
+  id?: number;
+  contentId?: number;
+  episodeId?: number;
+  quality: string;
+  type: string;
+  sourceUrl: string;
+}
 
-interface VideoPlayerProps {
-  sources: QualitySource[];
-  title: string;
+export interface VideoPlayerProps {
+  url?: string;
+  sources?: QualitySource[];
+  title?: string;
   autoPlay?: boolean;
   onProgress?: (progress: number) => void;
   onComplete?: () => void;
@@ -31,8 +40,9 @@ interface VideoPlayerProps {
 }
 
 const VideoPlayer: React.FC<VideoPlayerProps> = ({
-  sources,
-  title,
+  url,
+  sources = [],
+  title = 'ویدیو',
   autoPlay = false,
   onProgress,
   onComplete,
@@ -55,10 +65,11 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
   const videoRef = useRef<HTMLVideoElement>(null);
   const playerRef = useRef<HTMLDivElement>(null);
   
-  // Find the matching quality source
-  const currentSource = sources.find(
-    (source) => source.quality === selectedQuality && source.type === 'stream'
-  ) || sources[0];
+  // Find the matching quality source or use direct URL
+  const videoSource = url || (sources.length > 0 ? 
+    sources.find((source) => source.quality === selectedQuality && source.type === 'stream')?.sourceUrl || 
+    sources[0]?.sourceUrl 
+    : undefined);
 
   // Handle play/pause
   const togglePlay = () => {
@@ -329,7 +340,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
     >
       <video
         ref={videoRef}
-        src={currentSource?.sourceUrl}
+        src={videoSource}
         poster={poster}
         className="w-full h-full"
         autoPlay={autoPlay}
@@ -460,7 +471,9 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent className="min-w-[8rem] bg-dark-card border-dark-border">
-                {[...new Set(sources.filter(s => s.type === 'stream').map(s => s.quality))].map((quality) => (
+                {Array.from(
+                  new Set(sources.filter(s => s.type === 'stream').map(s => s.quality))
+                ).map((quality) => (
                   <DropdownMenuItem
                     key={quality}
                     onClick={() => handleQualityChange(quality)}

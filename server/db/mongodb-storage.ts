@@ -577,9 +577,24 @@ export class MongoDBStorage implements IStorage {
   }
 
   // Reviews operations
-  async getReviewsByContentId(contentId: number): Promise<Review[]> {
+  async getReviewsByContentId(contentId: string | number): Promise<Review[]> {
     try {
-      const reviews = await ReviewModel.find({ contentId, isApproved: true })
+      // اگر contentId از نوع عدد باشد، آن را به ObjectId تبدیل میکنیم
+      let objectId;
+      
+      if (typeof contentId === 'number') {
+        console.warn("Warning: contentId was passed as a number. Convert it to a valid MongoDB ObjectId before use.");
+        return [];
+      } else {
+        try {
+          objectId = new mongoose.Types.ObjectId(contentId);
+        } catch (err) {
+          console.error(`Invalid ObjectId format: ${contentId}`, err);
+          return [];
+        }
+      }
+      
+      const reviews = await ReviewModel.find({ contentId: objectId, isApproved: true })
         .sort({ createdAt: -1 });
       
       return reviews.map(this.mongoReviewToReview);
@@ -668,9 +683,24 @@ export class MongoDBStorage implements IStorage {
   }
 
   // Comments operations
-  async getCommentsByContentId(contentId: number): Promise<Comment[]> {
+  async getCommentsByContentId(contentId: string | number): Promise<Comment[]> {
     try {
-      const comments = await CommentModel.find({ contentId, isApproved: true })
+      // اگر contentId از نوع عدد باشد، آن را به ObjectId تبدیل میکنیم
+      let objectId;
+      
+      if (typeof contentId === 'number') {
+        console.warn("Warning: contentId was passed as a number. Convert it to a valid MongoDB ObjectId before use.");
+        return [];
+      } else {
+        try {
+          objectId = new mongoose.Types.ObjectId(contentId);
+        } catch (err) {
+          console.error(`Invalid ObjectId format: ${contentId}`, err);
+          return [];
+        }
+      }
+      
+      const comments = await CommentModel.find({ contentId: objectId, isApproved: true })
         .sort({ createdAt: -1 });
       
       return comments.map(this.mongoCommentToComment);

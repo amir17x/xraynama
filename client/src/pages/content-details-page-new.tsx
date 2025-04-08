@@ -5,7 +5,6 @@ import { useAuth } from "@/hooks/use-auth";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { Content } from "@shared/schema";
-import { ContentType } from "@/types";
 import { 
   Tabs, 
   TabsContent, 
@@ -92,7 +91,7 @@ const ContentDetailsPage: React.FC<ContentDetailsPageProps> = () => {
     data: content, 
     isLoading: contentLoading,
     error: contentError
-  } = useQuery<ContentType>({
+  } = useQuery<Content>({
     queryKey: [`/api/content/${contentId}`],
   });
   

@@ -1,5 +1,5 @@
 export interface ContentType {
-  id: number;
+  id: string | number;
   title: string;
   englishTitle: string;
   type: 'movie' | 'series' | 'animation' | 'documentary';
@@ -13,6 +13,18 @@ export interface ContentType {
   hasPersianSubtitle?: boolean;
   createdAt: string;
   updatedAt: string;
+  
+  // فیلدهای اضافی برای نمایش جزئیات بیشتر
+  director?: string;
+  actors?: string[] | string;
+  genres?: string[] | string;
+  language?: string;
+  country?: string;
+  awards?: string;
+  genre?: string[] | string;
+  trailer?: string;
+  fullDescription?: string;
+  tags?: string[] | string;
 }
 
 export interface ContentWithDetails extends ContentType {
