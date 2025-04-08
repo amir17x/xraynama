@@ -27,13 +27,23 @@ import TestReviews from "@/pages/TestReviews";
 
 // New categorized pages
 import IndexPage from "@/pages/index-page";
+import AllContentPage from "@/pages/all-content-page";
+import AdvancedSearchPage from "@/pages/advanced-search-page";
+import CategoriesPage from "@/pages/categories/CategoriesPage";
+
+// New glassmorphism pages
+import NewMoviesPage from "@/pages/movies/MoviesPage";
+import NewSeriesPage from "@/pages/series/SeriesPage";
+import NewAnimationsPage from "@/pages/animations/AnimationsPage";
+import NewDocumentariesPage from "@/pages/documentaries/DocumentariesPage";
+import ArtistsPage from "@/pages/artists/ArtistsPage";
+import AppPage from "@/pages/app/AppPage";
+
+// Legacy categorized pages (will be replaced)
 import MoviesPage from "@/pages/movies-page";
 import SeriesPage from "@/pages/series-page";
 import AnimationsPage from "@/pages/animations-page";
 import DocumentariesPage from "@/pages/documentaries-page";
-import AllContentPage from "@/pages/all-content-page";
-import AdvancedSearchPage from "@/pages/advanced-search-page";
-import CategoriesPage from "@/pages/categories/CategoriesPage";
 
 // Admin pages
 import AdminDashboard from "@/pages/admin/Dashboard";
@@ -59,13 +69,17 @@ function Router() {
       
       {/* New categorized pages */}
       <Route path="/index" component={IndexPage} />
-      <Route path="/movies" component={MoviesPage} />
-      <Route path="/series" component={SeriesPage} />
-      <Route path="/animations" component={AnimationsPage} />
-      <Route path="/documentaries" component={DocumentariesPage} />
       <Route path="/all-content" component={AllContentPage} />
       <Route path="/advanced-search" component={AdvancedSearchPage} />
       <Route path="/categories/:categoryId?" component={CategoriesPage} />
+      
+      {/* Glassmorphism UI pages */}
+      <Route path="/movies" component={NewMoviesPage} />
+      <Route path="/series" component={NewSeriesPage} />
+      <Route path="/animations" component={NewAnimationsPage} />
+      <Route path="/documentaries" component={NewDocumentariesPage} />
+      <Route path="/artists" component={ArtistsPage} />
+      <Route path="/app" component={AppPage} />
       
       {/* Password reset pages */}
       <Route path="/forgot-password" component={ForgotPasswordPage} />

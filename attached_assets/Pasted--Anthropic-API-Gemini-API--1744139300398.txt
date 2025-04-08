@@ -1,0 +1,93 @@
+برای تغییر استفاده از **Anthropic API** به **Gemini API** در کد شما، باید درخواست‌ها و تنظیمات مربوط به API را به **Gemini** تغییر دهید. در زیر یک **پرامپت** ارائه می‌شود که برای استفاده از **Gemini API** به جای **Anthropic API** طراحی شده است.
+
+---
+
+### **پرامپت برای تغییر از Anthropic API به Gemini API:**
+
+> **Goal:**  
+Change the implementation in the application to use **Gemini API** instead of **Anthropic API**.
+
+---
+
+#### **1. تغییر در درخواست‌ها و استفاده از Gemini API:**
+
+- ابتدا باید کتابخانه یا پکیج **Gemini** را به پروژه خود اضافه کنید. اگر از **Node.js** استفاده می‌کنید، به طور مثال می‌توانید از پکیج‌های مخصوص **Gemini API** استفاده کنید.
+
+```bash
+npm install gemini-api-client
+```
+
+#### **2. تغییر در کد استفاده از API:**
+
+در کد شما، نیاز دارید که درخواست‌هایی که به **Anthropic API** ارسال می‌شود، به **Gemini API** تغییر دهند. به عنوان مثال، تغییرات در بخش‌های زیر را اعمال کنید:
+
+```javascript
+// ابتدا پکیج Gemini API را ایمپورت می‌کنید
+const Gemini = require('gemini-api-client');
+
+// تنظیمات برای اتصال به Gemini API
+const gemini = new Gemini({
+  apiKey: 'YOUR_GEMINI_API_KEY',  // جایگزین کنید با کلید API واقعی
+});
+
+// تابعی که درخواست به Gemini API می‌دهد
+async function getRecommendations(query) {
+  try {
+    // درخواست به Gemini API
+    const response = await gemini.getRecommendations(query);  // تغییر از anthropic به gemini
+    console.log('Recommendations:', response);
+    return response;
+  } catch (error) {
+    console.error('Error fetching data from Gemini:', error);
+  }
+}
+
+// استفاده از تابع جدید
+getRecommendations("Search query example");
+```
+
+#### **3. تغییر در توکن‌های امنیتی و کلیدهای API:**
+
+- به جای استفاده از **API key** که برای **Anthropic** بود، باید **API key** مربوط به **Gemini** را در کد خود قرار دهید.
+- کلید API خود را از وب‌سایت رسمی **Gemini** دریافت کرده و در کد جایگزین کنید.
+
+#### **4. رفع مشکلات و تست API:**
+
+- بعد از تغییرات در کد، باید بررسی کنید که **Gemini API** به درستی درخواست‌ها را پردازش می‌کند و نتایج مورد انتظار را برمی‌گرداند.
+- برای تست، از دستور `console.log` استفاده کنید تا خروجی API را مشاهده کنید.
+
+#### **5. بهینه‌سازی و به روز رسانی سایر بخش‌ها:**
+
+- اگر بخش‌های دیگری از پروژه شما هم به **Anthropic API** وابسته هستند، باید تمام این بخش‌ها را نیز به **Gemini API** تغییر دهید.
+- اطمینان حاصل کنید که تمام پارامترها و تنظیمات **Gemini API** به درستی در کد شما اعمال شده باشند.
+
+---
+
+### **نمونه درخواست API برای استفاده از Gemini:**
+
+```javascript
+// فرض کنید این API برای جستجوی فیلم‌ها استفاده می‌شود
+async function fetchMovies(query) {
+  try {
+    const response = await gemini.searchMovies(query); // جستجو در Gemini
+    console.log('Fetched Movies:', response);
+    return response;
+  } catch (error) {
+    console.error('Failed to fetch movies:', error);
+  }
+}
+
+// استفاده از آن
+fetchMovies("Inception");
+```
+
+---
+
+### **6. تست عملکرد API جدید:**
+پس از اعمال تغییرات و استفاده از **Gemini API**، بهتر است عملکرد آن را در بخش‌های مختلف سایت یا اپلیکیشن خود بررسی کنید و اطمینان حاصل کنید که پاسخ‌دهی و تعامل با API به درستی انجام می‌شود.
+
+---
+
+### **نتیجه‌گیری:**
+با استفاده از این پرامپت، شما می‌توانید درخواست‌ها را از **Anthropic API** به **Gemini API** تغییر دهید و برای پروژه خود از **Gemini** به جای **Anthropic** استفاده کنید. اگر بخواهید اطلاعات بیشتری درباره روش‌های استفاده از **Gemini API** به دست آورید، می‌توانید مستندات آن را مطالعه کنید.
+

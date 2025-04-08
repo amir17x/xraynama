@@ -1,0 +1,215 @@
+برای حل مشکل و بازطراحی هدر و منوها به شکلی که مطابق با خواسته‌های شما باشد، این پرامپت دقیق و حرفه‌ای را می‌توان برای هوش مصنوعی ارائه کرد. در این پرامپت، تمام مشکلات از جمله تغییر سایز منوها هنگام اسکرول، باگ‌ها و طراحی استایل گلاسمورفیسم رفع خواهد شد.
+
+---
+
+### **پرامپت برای بازطراحی هدر و منوهای اعلانات و پروفایل با استایل گلاسمورفیسم**
+
+> **Goal:**  
+The goal is to redesign the **header** and the **notifications and profile menu** in a modern and sleek way using **Glassmorphism**. The design should be smooth and interactive with animations. The menu should open correctly and remain on the header without any glitches, and when scrolled, the menu should not shrink into a small rectangle. Instead, the dropdown menus (notifications and profile) should open properly and stay aligned near their respective buttons.
+
+---
+
+#### **1. Reset the Header Layout & Design:**
+
+**1.1 Clean Slate for Header:**
+- Completely reset the current **header design** and start from scratch to achieve a modern look.
+- Implement **Glassmorphism** for the header using a **frosted glass effect** to give it a sleek and minimal appearance.
+
+**1.2 Header Structure:**
+- Use a **fixed top header** that stays at the top of the page when scrolling.
+- The header should have a **transparent background** with a subtle **blur effect** using `backdrop-filter: blur(10px);` for the glass effect.
+- Make sure the **header layout** has sections like **Logo, Notifications, Profile, and Navigation** in a horizontal row, clearly spaced.
+
+```css
+header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    padding: 15px 30px;
+    z-index: 1000;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+```
+
+---
+
+#### **2. Notifications and Profile Menu Design:**
+
+**2.1 Menu Positioning and Behavior:**
+- Both the **notifications** and **profile menu** should be **hidden initially** and only appear when the user clicks on the corresponding button.
+- The menus should **open beneath the header** and **not be cut off** or overlap with other sections of the page.
+- When the user scrolls down, the menus should **stay fixed** in place near their respective buttons and **not shrink** into small rectangles.
+
+```css
+.menu {
+    display: none;
+    position: absolute;
+    top: 60px;
+    right: 0;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(6px);
+    padding: 10px;
+    border-radius: 12px;
+    width: 250px;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.menu.open {
+    display: block;
+    opacity: 1;
+    transform: translateY(10px);
+}
+
+.menu-item {
+    padding: 12px;
+    font-size: 14px;
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.menu-item:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+```
+
+---
+
+#### **3. Smooth Animation for Menu Opening and Closing:**
+
+**3.1 Animation for Smooth Opening:**
+- Use **CSS animations** for smooth transitions when opening the notifications and profile menus.
+- The menus should slide down smoothly when clicked and should not have any abrupt jumps or glitches.
+
+```css
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.menu.open {
+    animation: slideIn 0.3s ease-in-out forwards;
+}
+```
+
+---
+
+#### **4. Fixing the Shrinking Issue (Menu Size):**
+
+**4.1 Prevent Menu Shrinking:**
+- The menus should always stay as **rectangular cards**, even when scrolling. Avoid shrinking or reducing the size when the user scrolls down the page.
+- Use a **position: absolute** or **fixed** positioning to ensure the menus always appear in the right place.
+
+```css
+.menu {
+    position: absolute;
+    top: 60px;
+    width: 250px;
+    height: auto;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(6px);
+    padding: 20px;
+    border-radius: 12px;
+    z-index: 1000;
+    transition: opacity 0.3s ease-in-out;
+}
+
+.menu.open {
+    display: block;
+}
+```
+
+---
+
+#### **5. Enhancing Responsiveness & Alignment:**
+
+**5.1 Mobile Optimization:**
+- On smaller screens (e.g., mobile), ensure the **menu** and **header** adapt to the smaller viewports.
+- The **menu width** should adjust and not take up too much space.
+
+```css
+@media (max-width: 768px) {
+    header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .menu {
+        width: 200px;
+    }
+}
+```
+
+---
+
+#### **6. Interactive Elements and User Experience Enhancements:**
+
+**6.1 Hover Effects and Focus Styles:**
+- Add smooth **hover effects** for the notification and profile buttons to indicate interactivity.
+- Use subtle changes in color or background on hover, along with smooth transitions.
+
+```css
+button:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+    transform: scale(1.05);
+}
+
+button:focus {
+    outline: none;
+    box-shadow: 0 0 10px rgba(0, 0, 255, 0.5);
+}
+```
+
+---
+
+#### **7. Additional Enhancements and Debugging:**
+
+**7.1 Fixing Bugs:**
+- Ensure that both the **notifications and profile menus** do not overlap with any other elements on the page.
+- Use the `z-index` property carefully to ensure that the menus are displayed above all other content, without blocking any important areas of the page.
+
+```css
+.menu {
+    z-index: 1000;
+}
+```
+
+**7.2 Preventing Half-Open Menus:**
+- Add a **check** that ensures the menu opens fully when clicked and does not get cut off or remain partially open.
+
+```javascript
+document.querySelector('.notification-button').addEventListener('click', () => {
+    let menu = document.querySelector('.notification-menu');
+    if (menu.style.display === 'none' || !menu.style.display) {
+        menu.style.display = 'block';
+        menu.classList.add('open');
+    } else {
+        menu.style.display = 'none';
+        menu.classList.remove('open');
+    }
+});
+```
+
+---
+
+### **Summary:**
+- The **header** and **menu items** (notifications, profile) will be redesigned with **Glassmorphism** effects.
+- **Animations** will ensure smooth transitions for opening menus.
+- **Menu behavior** will be fixed, with no shrinking or glitches when scrolling.
+- The **responsive layout** will make sure everything works well on all screen sizes.
+- **Bugs and issues** such as menus not opening fully or overlapping with other content will be resolved.
+
+---
+
+این پرامپت دقیق و حرفه‌ای به هوش مصنوعی دستور می‌دهد که هدر سایت و منوهای اعلانات و پروفایل را به شکلی که شما خواسته‌اید بازطراحی کند و تمام باگ‌ها و مشکلات را برطرف نماید.

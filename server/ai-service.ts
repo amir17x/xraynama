@@ -44,25 +44,37 @@ export class AIRecommendationService {
       // تهیه متن برای مدل AI
       const prompt = this.buildRecommendationPrompt(user, userPreferences, allContent, allGenres, allTags);
       
+      // بررسی وجود کلید API
+      if (!process.env.ANTHROPIC_API_KEY || process.env.ANTHROPIC_API_KEY === 'invalid') {
+        throw new Error("ANTHROPIC_API_KEY is not available or invalid");
+      }
+
       // دریافت پاسخ از مدل
-      const response = await this.anthropic.messages.create({
-        model: 'claude-3-7-sonnet-20250219',
-        max_tokens: 1024,
-        system: `You are a content recommendation system for an Iranian movie/TV platform named "Xraynama". 
-                 You understand Persian culture, preferences, and viewing habits. 
-                 Your goal is to recommend the most relevant content based on user history and preferences.
-                 You must respond only with valid JSON containing an array of content IDs in this format:
-                 { "recommendations": [1, 42, 67, 13, 95] }`,
-        messages: [{
-          role: 'user',
-          content: prompt
-        }]
-      });
+      let responseText = '';
+      try {
+        const response = await this.anthropic.messages.create({
+          model: 'claude-3-7-sonnet-20250219',
+          max_tokens: 1024,
+          system: `You are a content recommendation system for an Iranian movie/TV platform named "Xraynama". 
+                   You understand Persian culture, preferences, and viewing habits. 
+                   Your goal is to recommend the most relevant content based on user history and preferences.
+                   You must respond only with valid JSON containing an array of content IDs in this format:
+                   { "recommendations": [1, 42, 67, 13, 95] }`,
+          messages: [{
+            role: 'user',
+            content: prompt
+          }]
+        });
+        
+        // پردازش پاسخ
+        responseText = typeof response.content[0] === 'object' && 'text' in response.content[0] 
+          ? response.content[0].text as string 
+          : '';
+      } catch (error) {
+        console.error("Error in Anthropic API call:", error);
+        throw error;
+      }
       
-      // پردازش پاسخ
-      const responseText = typeof response.content[0] === 'object' && 'text' in response.content[0] 
-        ? response.content[0].text as string 
-        : '';
       let recommendedIds: number[] = [];
       
       try {
@@ -129,24 +141,36 @@ export class AIRecommendationService {
       // ساخت پرامپت برای مدل AI
       const prompt = this.buildSimilarContentPrompt(contentItem, contentGenres, contentTags, otherContent);
       
-      // دریافت پاسخ از مدل
-      const response = await this.anthropic.messages.create({
-        model: 'claude-3-7-sonnet-20250219',
-        max_tokens: 1024,
-        system: `You are a content similarity expert for an Iranian movie/TV platform named "Xraynama". 
-                 You understand Persian culture and can identify similar movies and shows based on themes, genres, actors, and more.
-                 You must respond only with valid JSON containing an array of content IDs in this format:
-                 { "similar_content": [1, 42, 67, 13, 95] }`,
-        messages: [{
-          role: 'user',
-          content: prompt
-        }]
-      });
+      // بررسی وجود کلید API
+      if (!process.env.ANTHROPIC_API_KEY || process.env.ANTHROPIC_API_KEY === 'invalid') {
+        throw new Error("ANTHROPIC_API_KEY is not available or invalid");
+      }
       
-      // پردازش پاسخ
-      const responseText = typeof response.content[0] === 'object' && 'text' in response.content[0] 
-        ? response.content[0].text as string 
-        : '';
+      // دریافت پاسخ از مدل
+      let responseText = '';
+      try {
+        const response = await this.anthropic.messages.create({
+          model: 'claude-3-7-sonnet-20250219',
+          max_tokens: 1024,
+          system: `You are a content similarity expert for an Iranian movie/TV platform named "Xraynama". 
+                   You understand Persian culture and can identify similar movies and shows based on themes, genres, actors, and more.
+                   You must respond only with valid JSON containing an array of content IDs in this format:
+                   { "similar_content": [1, 42, 67, 13, 95] }`,
+          messages: [{
+            role: 'user',
+            content: prompt
+          }]
+        });
+        
+        // پردازش پاسخ
+        responseText = typeof response.content[0] === 'object' && 'text' in response.content[0] 
+          ? response.content[0].text as string 
+          : '';
+      } catch (error) {
+        console.error("Error in Anthropic API call:", error);
+        throw error;
+      }
+      
       let similarIds: number[] = [];
       
       try {

@@ -25,6 +25,11 @@ export interface ContentType {
   trailer?: string;
   fullDescription?: string;
   tags?: string[] | string;
+  
+  // فیلدهای اضافی برای صفحات جدید با استایل گلاسمورفیسم
+  viewCount?: number;
+  rating?: number;
+  network?: string;
 }
 
 export interface ContentWithDetails extends ContentType {
