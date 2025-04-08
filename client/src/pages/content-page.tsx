@@ -19,6 +19,31 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+
+interface ContentDetail {
+  id: string;
+  title: string;
+  englishTitle: string;
+  description: string;
+  fullDescription?: string;
+  type: string;
+  poster: string;
+  backdrop: string;
+  trailer?: string;
+  year: number;
+  duration: number;
+  imdbRating: number | string;
+  ageRating?: string;
+  director?: string;
+  actors?: string[];
+  genres?: string[];
+  country?: string;
+  languages?: string;
+  subtitles?: string[];
+  tags?: string[];
+  hasPersianDubbing?: boolean;
+  hasPersianSubtitle?: boolean;
+}
 import {
   Heart,
   Download,
@@ -58,7 +83,7 @@ export default function ContentPage() {
   const videoRef = useRef<HTMLVideoElement>(null);
   
   // استفاده از API Endpoint جدید برای دریافت محتوا با استفاده از slug
-  const { data: content, isLoading, error } = useQuery({
+  const { data: content, isLoading, error } = useQuery<ContentDetail>({
     queryKey: [`/api/content/slug/${slug}`],
     enabled: !!slug
   });
@@ -72,8 +97,8 @@ export default function ContentPage() {
   const [viewMode, setViewMode] = useState<"trailer" | "details">("details");
   
   // فالبک به داده‌های نمایشی در صورت مشکل در دریافت داده از API
-  const mockContent = {
-    id: slug,
+  const mockContent: ContentDetail = {
+    id: slug || "prestige",
     title: "پرستیژ",
     englishTitle: "The Prestige",
     description: "دو شعبده‌باز رقیب در لندن اواخر قرن نوزدهم تلاش می‌کنند تا بهترین ترفند را ارائه دهند و در این راه به مبارزه خطرناکی کشیده می‌شوند.",
@@ -81,7 +106,7 @@ export default function ContentPage() {
     year: 2006,
     duration: 130,
     type: "movie",
-    imdbRating: "8.5",
+    imdbRating: 8.5,
     director: "کریستوفر نولان",
     actors: ["کریستین بیل", "هیو جکمن", "اسکارلت جوهانسون", "مایکل کین"],
     genres: ["درام", "معمایی", "علمی تخیلی"],
@@ -313,7 +338,7 @@ export default function ContentPage() {
       <main className="bg-black/60 min-h-screen">
         {/* Content Header with Background */}
         <div 
-          className="relative bg-cover bg-center"
+          className="relative bg-cover bg-center content-backdrop-animate"
           style={{ 
             backgroundImage: `linear-gradient(to bottom, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.9) 90%), url(${displayContent && displayContent.backdrop})`,
             backgroundPosition: "top center",
@@ -383,7 +408,7 @@ export default function ContentPage() {
               // Content Details View
               <div className="grid grid-cols-1 md:grid-cols-12 gap-8 py-8">
                 {/* Poster Column */}
-                <div className="md:col-span-3 order-1 flex flex-col items-center md:items-start">
+                <div className="md:col-span-3 order-1 flex flex-col items-center md:items-start content-poster-animate">
                   <div className="relative">
                     <img 
                       src={displayContent && displayContent.poster} 
@@ -430,7 +455,7 @@ export default function ContentPage() {
                 </div>
                 
                 {/* Content Details Column */}
-                <div className="md:col-span-9 order-2">
+                <div className="md:col-span-9 order-2 content-details-animate">
                   <div className="flex flex-wrap gap-2 mb-3">
                     <Badge variant="outline" className="bg-primary/10 text-primary border-primary/30">
                       {displayContent && displayContent && displayContent.type === "movie" ? "فیلم" : 
@@ -462,7 +487,7 @@ export default function ContentPage() {
                     </p>
                   </div>
                   
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-y-4 gap-x-8 mb-8 text-sm">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-y-4 gap-x-8 mb-8 text-sm content-info-animate">
                     <div className="flex">
                       <div className="w-28 text-gray-400">کارگردان:</div>
                       <div className="flex-1 text-white">{displayContent && displayContent.director || 'اطلاعات موجود نیست'}</div>
@@ -501,7 +526,7 @@ export default function ContentPage() {
                   </div>
                   
                   {/* Tags */}
-                  <div className="mb-8">
+                  <div className="mb-8 content-info-animate delay-100">
                     <h3 className="text-sm font-medium text-gray-400 mb-2 flex items-center">
                       <Hash className="h-4 w-4 mr-1" />
                       برچسب‌ها:
@@ -518,7 +543,7 @@ export default function ContentPage() {
                   </div>
                   
                   {/* Download Box Section */}
-                  <div id="download-box" className="mt-8 mb-10 p-4 bg-black/40 rounded-lg border border-gray-800">
+                  <div id="download-box" className="mt-8 mb-10 p-4 bg-black/40 rounded-lg border border-gray-800 content-info-animate delay-200">
                     <div className="flex items-center justify-between mb-4">
                       <h3 className="text-lg font-bold text-white flex items-center">
                         <Download className="h-5 w-5 mr-2 text-primary" />
@@ -633,7 +658,7 @@ export default function ContentPage() {
         </div>
         
         {/* Recommended Content Section */}
-        <div className="container mx-auto px-4 py-10">
+        <div className="container mx-auto px-4 py-10 content-info-animate delay-300">
           <h2 className="text-xl font-bold text-white mb-6 flex items-center">
             <Users className="h-5 w-5 mr-2 text-primary" />
             فیلم‌های مشابه که ممکن است دوست داشته باشید

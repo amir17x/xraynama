@@ -1,15 +1,20 @@
 import { useState } from 'react';
 import { Link } from 'wouter';
-import { ContentType } from '@/types';
+import { ContentType, GenreType } from '@/types';
 import { Heart, Plus, Play, Download } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { apiRequest, queryClient } from '@/lib/queryClient';
+
+// تعریف ویژگی‌های اضافی برای ContentType
+interface ContentTypeExtended extends ContentType {
+  genres?: GenreType[] | string[];
+}
 import { useAuth } from '@/hooks/use-auth';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 
 interface ContentCardProps {
-  content: ContentType;
+  content: ContentTypeExtended;
   isInWatchlist?: boolean;
   isInFavorites?: boolean;
   className?: string;
@@ -46,14 +51,14 @@ export function ContentCard({
       setIsAddingToFavorites(true);
       
       if (isFavorite) {
-        await apiRequest("DELETE", `/api/content/${content.id}/favorites`);
+        await apiRequest({ method: "DELETE", url: `/api/content/${content.id}/favorites` });
         setIsFavorite(false);
         toast({
           title: "حذف از علاقه‌مندی‌ها",
           description: `${content.title} از لیست علاقه‌مندی‌های شما حذف شد`,
         });
       } else {
-        await apiRequest("POST", `/api/content/${content.id}/favorites`);
+        await apiRequest({ method: "POST", url: `/api/content/${content.id}/favorites` });
         setIsFavorite(true);
         toast({
           title: "افزودن به علاقه‌مندی‌ها",
@@ -92,13 +97,13 @@ export function ContentCard({
       setIsAddingToWatchlist(true);
       
       if (isInWatchlist) {
-        await apiRequest("DELETE", `/api/content/${content.id}/watchlist`);
+        await apiRequest({ method: "DELETE", url: `/api/content/${content.id}/watchlist` });
         toast({
           title: "حذف از لیست تماشا",
           description: `${content.title} از لیست تماشای شما حذف شد`,
         });
       } else {
-        await apiRequest("POST", `/api/content/${content.id}/watchlist`);
+        await apiRequest({ method: "POST", url: `/api/content/${content.id}/watchlist` });
         toast({
           title: "افزودن به لیست تماشا",
           description: `${content.title} به لیست تماشای شما اضافه شد`,
@@ -143,16 +148,18 @@ export function ContentCard({
     return (
       <Link href={`/content/${content.englishTitle.replace(/[^a-zA-Z0-9]/g, '')}`}>
         <div className={cn(
-          "fluent-card bg-card border border-border rounded-lg overflow-hidden shadow-lg",
+          "fluent-card bg-card border border-border rounded-lg overflow-hidden shadow-lg content-enter hover:shadow-xl hover:shadow-primary/20 transition-all duration-500",
           className
         )}>
-          <div className="relative">
+          <div className="relative group">
             <div className="aspect-video overflow-hidden">
               <img 
                 src={content.poster}
                 alt={content.title} 
-                className="w-full h-full object-cover transform transition-transform duration-500 hover:scale-110" 
+                className="w-full h-full object-cover transform transition-transform duration-500 group-hover:scale-110" 
               />
+              <div className="shimmer-effect opacity-0 group-hover:opacity-100"></div>
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-all duration-500"></div>
             </div>
             <div className="absolute top-2 right-2 bg-card/80 text-muted-foreground backdrop-blur-sm px-2 py-0.5 text-xs rounded-md">
               {content.year}
@@ -185,15 +192,22 @@ export function ContentCard({
                 </div>
               )}
             </div>
+            {/* دکمه پخش که با هاور ظاهر می‌شود */}
+            <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-500 ease-in-out transform scale-95 group-hover:scale-100">
+              <div className="w-14 h-14 rounded-full bg-primary/90 backdrop-blur-md flex items-center justify-center cursor-pointer shadow-lg shadow-primary/30 hover:bg-primary transition-all duration-300 hover:scale-110">
+                <Play className="h-6 w-6 text-white fill-white" />
+              </div>
+            </div>
+            
             <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black to-transparent">
               <div className="flex justify-between items-center">
-                <div className="flex items-center">
+                <div className="flex items-center bg-black/30 backdrop-blur-sm px-2 py-1 rounded-md">
                   <svg className="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
                     <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118l-2.8-2.034c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
                   </svg>
                   <span className="text-white text-sm ml-1">{content.imdbRating || "N/A"}</span>
                 </div>
-                <div className="flex items-center text-muted-foreground">
+                <div className="flex items-center backdrop-blur-sm bg-black/30 px-2 py-1 rounded-md text-white">
                   <span>{content.duration} دقیقه</span>
                 </div>
               </div>
@@ -204,11 +218,15 @@ export function ContentCard({
             <p className="text-muted-foreground text-sm mb-3">{content.englishTitle}</p>
             <p className="text-muted-foreground text-sm mb-4 line-clamp-2">{content.description}</p>
             <div className="flex space-x-2 rtl:space-x-reverse">
-              <Button className="bg-primary hover:bg-primary/90 text-white font-medium py-2 px-4 rounded-md transition duration-300 flex items-center flex-1 justify-center">
+              <Button className="bg-primary hover:bg-primary/90 text-white font-medium py-2 px-4 rounded-md transition-all duration-300 flex items-center flex-1 justify-center hover:shadow-lg hover:shadow-primary/30 transform hover:scale-105">
                 <Play className="mr-2 h-4 w-4" />
                 پخش
               </Button>
-              <Button variant="outline" size="icon">
+              <Button 
+                variant="outline" 
+                size="icon"
+                className="transition-all duration-300 transform hover:scale-110 hover:bg-primary/10 hover:text-primary hover:border-primary"
+              >
                 <Download className="h-4 w-4" />
               </Button>
               <Button 
@@ -216,6 +234,7 @@ export function ContentCard({
                 size="icon"
                 onClick={handleAddToFavorites}
                 disabled={isAddingToFavorites}
+                className="transition-all duration-300 transform hover:scale-110 hover:bg-primary/10 hover:border-primary"
               >
                 <Heart className={cn("h-4 w-4", isFavorite && "fill-primary text-primary")} />
               </Button>
@@ -229,16 +248,18 @@ export function ContentCard({
   return (
     <Link href={`/content/${content.englishTitle.replace(/[^a-zA-Z0-9]/g, '')}`}>
       <div className={cn(
-        "fluent-card flex-shrink-0 w-60 rounded-lg overflow-hidden bg-card border border-border shadow-lg",
+        "fluent-card flex-shrink-0 w-60 rounded-lg overflow-hidden bg-card border border-border shadow-lg transform transition-all duration-500 ease-out hover:shadow-xl hover:shadow-primary/20 hover:-translate-y-1 content-enter hover-float pulse-on-hover",
         className
       )}>
-        <div className="relative">
+        <div className="relative group">
           <div className="aspect-[2/3] overflow-hidden">
             <img 
               src={content.poster}
               alt={content.title} 
-              className="w-full h-full object-cover transform transition-transform duration-500 hover:scale-110" 
+              className="w-full h-full object-cover transform transition-all duration-700 ease-out group-hover:scale-110 filter group-hover:brightness-110" 
             />
+            <div className="shimmer-effect opacity-0 group-hover:opacity-100"></div>
+            <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
           </div>
           <div className="absolute top-2 right-2 bg-card/80 text-muted-foreground backdrop-blur-sm px-2 py-0.5 text-xs rounded-md">
             {content.year}
@@ -271,9 +292,16 @@ export function ContentCard({
               </div>
             )}
           </div>
+          {/* درکمه پخش که با هاور ظاهر می‌شود */}
+          <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-500 ease-in-out transform scale-95 group-hover:scale-100">
+            <div className="w-14 h-14 rounded-full bg-primary/90 backdrop-blur-md flex items-center justify-center cursor-pointer shadow-lg shadow-primary/30 hover:bg-primary transition-all duration-300 hover:scale-110">
+              <Play className="h-6 w-6 text-white fill-white" />
+            </div>
+          </div>
+
           <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black to-transparent">
             <div className="flex justify-between items-center">
-              <div className="flex items-center">
+              <div className="flex items-center bg-black/30 backdrop-blur-sm px-2 py-1 rounded-md">
                 <svg className="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
                   <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118l-2.8-2.034c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
                 </svg>
@@ -281,14 +309,14 @@ export function ContentCard({
               </div>
               <div className="flex space-x-1 rtl:space-x-reverse">
                 <button 
-                  className="p-1 text-white hover:text-primary transition duration-200"
+                  className="p-1.5 text-white bg-black/30 rounded-full backdrop-blur-sm hover:bg-primary/70 transition-all duration-300 transform hover:scale-110"
                   onClick={handleAddToFavorites}
                   disabled={isAddingToFavorites}
                 >
                   <Heart className={cn("h-4 w-4", isFavorite && "fill-primary")} />
                 </button>
                 <button 
-                  className="p-1 text-white hover:text-primary transition duration-200"
+                  className="p-1.5 text-white bg-black/30 rounded-full backdrop-blur-sm hover:bg-primary/70 transition-all duration-300 transform hover:scale-110"
                   onClick={handleAddToWatchlist}
                   disabled={isAddingToWatchlist}
                 >
@@ -299,9 +327,17 @@ export function ContentCard({
           </div>
         </div>
         <div className="p-4">
-          <h3 className="font-bold text-foreground mb-1 line-clamp-1">{content.title}</h3>
+          <h3 className="font-bold text-foreground mb-1 line-clamp-1 group-hover:text-primary transition-colors duration-300">{content.title}</h3>
           <p className="text-muted-foreground text-sm line-clamp-1">{content.englishTitle}</p>
-          {/* Genre tags would go here if we had them in the content type */}
+          {content.genres && content.genres.length > 0 && (
+            <div className="flex flex-wrap gap-1 mt-2">
+              {content.genres.slice(0, 2).map((genre, index) => (
+                <span key={index} className="text-xs bg-muted px-2 py-0.5 rounded-full text-muted-foreground">
+                  {typeof genre === 'string' ? genre : genre.name}
+                </span>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </Link>

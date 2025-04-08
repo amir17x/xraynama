@@ -2,6 +2,78 @@
 @tailwind components;
 @tailwind utilities;
 
+/* انیمیشن‌های پیشرفته برای صفحه جزئیات محتوا */
+.content-backdrop-animate {
+  animation: contentFadeIn 0.8s ease-out;
+}
+
+.content-poster-animate {
+  animation: contentSlideInRight 0.7s ease-out;
+}
+
+.content-details-animate {
+  animation: contentSlideInLeft 0.7s ease-out;
+}
+
+.content-info-animate {
+  opacity: 0;
+  animation: contentFadeInUp 0.7s ease-out 0.3s forwards;
+}
+
+.content-info-animate.delay-100 {
+  animation-delay: 0.5s;
+}
+
+.content-info-animate.delay-200 {
+  animation-delay: 0.7s;
+}
+
+.content-info-animate.delay-300 {
+  animation-delay: 0.9s;
+}
+
+@keyframes contentFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes contentSlideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes contentSlideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes contentFadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 
 
 @layer base {
@@ -163,6 +235,159 @@
   min-width: 12rem !important;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
   border-radius: 0.375rem !important;
+}
+
+/* انیمیشن‌های مدرن برای کارت‌های محتوا */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes floatEffect {
+  0% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulseGlow {
+  0% {
+    box-shadow: 0 0 0 0 rgba(0, 107, 214, 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(0, 107, 214, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(0, 107, 214, 0);
+  }
+}
+
+@keyframes shimmerGradient {
+  0% {
+    background-position: -100% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.shimmer-effect {
+  background: linear-gradient(90deg, 
+    transparent 0%, 
+    rgba(255, 255, 255, 0.1) 50%, 
+    transparent 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmerGradient 2s infinite;
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+/* کلاس‌های انیمیشن */
+.content-enter {
+  animation: fadeInUp 0.8s forwards;
+}
+
+.hover-float:hover {
+  animation: floatEffect 3s ease-in-out infinite;
+}
+
+.pulse-on-hover:hover {
+  animation: pulseGlow 1.5s infinite;
+}
+
+/* انیمیشن های صفحه جزئیات محتوا */
+@keyframes fadeInRight {
+  from {
+    opacity: 0;
+    transform: translateX(50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes fadeInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes blurIn {
+  from {
+    opacity: 0;
+    filter: blur(10px);
+  }
+  to {
+    opacity: 1;
+    filter: blur(0);
+  }
+}
+
+/* نکته: این انیمیشن‌ها در بالای فایل با نام‌های دیگری تعریف شده‌اند */
+/* 
+.content-poster-animate {
+  animation: fadeInRight 1s forwards;
+}
+
+.content-details-animate {
+  animation: fadeInLeft 1s forwards;
+}
+
+.content-info-animate {
+  animation: scaleIn 0.7s 0.3s forwards;
+  opacity: 0;
+}
+
+.content-backdrop-animate {
+  animation: blurIn 1.2s ease-out forwards;
+}
+*/
+
+/* تاخیر در آنیمیشن‌ها */
+.delay-100 {
+  animation-delay: 100ms;
+}
+.delay-200 {
+  animation-delay: 200ms;
+}
+.delay-300 {
+  animation-delay: 300ms;
+}
+.delay-400 {
+  animation-delay: 400ms;
+}
+.delay-500 {
+  animation-delay: 500ms;
 }
 
 /* اصلاح منوی بازشونده برای radix */
