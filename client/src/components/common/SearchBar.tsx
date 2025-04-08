@@ -49,7 +49,7 @@ export function SearchBar() {
             type="button"
             variant="ghost"
             size="icon"
-            className="absolute left-3 top-2.5 text-muted-foreground h-5 w-5 p-0"
+            className="unified-icon-button absolute left-3 top-2.5 text-muted-foreground h-5 w-5 p-0"
             onClick={handleClearSearch}
           >
             <X className="h-4 w-4" />
@@ -63,7 +63,7 @@ export function SearchBar() {
           type="button"
           variant="ghost"
           size="icon"
-          className={`${isMobile ? 'hidden' : 'block'} absolute -left-9 top-1.5 text-muted-foreground hover:text-primary transition duration-200 h-7 w-7 p-0`}
+          className={`${isMobile ? 'hidden' : 'block'} unified-icon-button absolute -left-9 top-1.5 text-muted-foreground h-7 w-7 p-0`}
           onClick={handleAdvancedSearch}
           title="جستجوی پیشرفته"
         >
@@ -169,7 +169,7 @@ export function NotificationsButton() {
           )}
           
           <div className="mt-2 text-center">
-            <Button variant="link" size="sm" className="text-primary text-xs">
+            <Button variant="link" size="sm" className="text-primary text-xs hover:text-[#006bd6]">
               مشاهده همه اعلانات
             </Button>
           </div>

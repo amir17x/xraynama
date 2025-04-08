@@ -132,6 +132,55 @@
     @apply transition-all duration-300;
   }
   
+  /* کلاس‌های استایل مشترک برای کارت‌های محتوا */
+  .content-badge {
+    @apply absolute text-white px-2 py-0.5 text-xs rounded-md backdrop-blur-sm;
+  }
+  
+  .content-year-badge {
+    @apply top-2 right-2 bg-card/80 text-muted-foreground;
+  }
+  
+  .content-type-badge {
+    @apply top-2 left-2;
+  }
+  
+  .content-feature-badge {
+    @apply text-white backdrop-blur-sm w-7 h-7 flex items-center justify-center rounded-full shadow-md;
+  }
+  
+  .content-play-button-container {
+    @apply absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-500 ease-in-out transform scale-95 group-hover:scale-100;
+  }
+  
+  .content-play-button {
+    @apply w-14 h-14 rounded-full bg-primary/90 backdrop-blur-md flex items-center justify-center cursor-pointer shadow-lg shadow-primary/30 hover:bg-primary transition-all duration-300 hover:scale-110;
+  }
+  
+  .content-info-badge {
+    @apply flex items-center bg-black/30 backdrop-blur-sm px-2 py-1 rounded-md text-white;
+  }
+  
+  .content-title {
+    @apply font-bold text-foreground mb-1 line-clamp-1 group-hover:text-primary transition-colors duration-300;
+  }
+  
+  .content-subtitle {
+    @apply text-muted-foreground text-sm mb-3 line-clamp-1;
+  }
+  
+  .content-description {
+    @apply text-muted-foreground text-sm mb-4 line-clamp-2;
+  }
+  
+  .content-primary-button {
+    @apply bg-primary hover:bg-primary/90 text-white font-medium py-2 px-4 rounded-md transition-all duration-300 flex items-center flex-1 justify-center hover:shadow-lg hover:shadow-primary/30 transform hover:scale-105;
+  }
+  
+  .content-icon-button {
+    @apply transition-all duration-300 transform hover:scale-110 hover:bg-primary/10 hover:text-primary hover:border-primary;
+  }
+  
   /* استایل یکپارچه برای همه دکمه‌ها و المان‌های هدر */
   .unified-button {
     @apply px-4 py-2 rounded-md bg-background/80 hover:bg-[#006bd6]/20 hover:text-[#006bd6] font-medium border border-border hover:border-[#006bd6]/30 transition-all duration-300;

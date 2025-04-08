@@ -132,7 +132,7 @@ export function Header() {
                 <Button 
                   ref={triggerRef}
                   variant="ghost" 
-                  className="flex items-center focus:outline-none"
+                  className="unified-icon-button flex items-center focus:outline-none"
                   onClick={() => setIsMenuOpen(!isMenuOpen)}
                 >
                   <Avatar className="w-8 h-8 border-2 border-primary">
@@ -150,7 +150,7 @@ export function Header() {
                 {isMenuOpen && (
                   <div style={{ right: '0', left: 'auto' }} className="profile-dropdown w-48 bg-popover border rounded-md shadow-md p-1 text-popover-foreground animate-fade-in z-50 absolute top-full mt-2">
                     <button 
-                      className="w-full flex items-center p-2 rounded hover:bg-[#006bd6]/10 hover:text-[#006bd6] text-sm transition-all duration-300"
+                      className="unified-button w-full flex items-center p-2 rounded text-sm"
                       onClick={() => { setLocation('/profile'); setIsMenuOpen(false); }}
                     >
                       <User className="ml-2 h-4 w-4" />
@@ -158,7 +158,7 @@ export function Header() {
                     </button>
                     
                     <button 
-                      className="w-full flex items-center p-2 rounded hover:bg-[#006bd6]/10 hover:text-[#006bd6] text-sm transition-all duration-300"
+                      className="unified-button w-full flex items-center p-2 rounded text-sm"
                       onClick={() => { setLocation('/profile?tab=favorites'); setIsMenuOpen(false); }}
                     >
                       <Heart className="ml-2 h-4 w-4" />
@@ -166,7 +166,7 @@ export function Header() {
                     </button>
                     
                     <button 
-                      className="w-full flex items-center p-2 rounded hover:bg-[#006bd6]/10 hover:text-[#006bd6] text-sm transition-all duration-300"
+                      className="unified-button w-full flex items-center p-2 rounded text-sm"
                       onClick={() => { setLocation('/profile?tab=playlists'); setIsMenuOpen(false); }}
                     >
                       <ListVideo className="ml-2 h-4 w-4" />
@@ -174,7 +174,7 @@ export function Header() {
                     </button>
                     
                     <button 
-                      className="w-full flex items-center p-2 rounded hover:bg-[#006bd6]/10 hover:text-[#006bd6] text-sm transition-all duration-300"
+                      className="unified-button w-full flex items-center p-2 rounded text-sm"
                       onClick={() => { setLocation('/profile?tab=settings'); setIsMenuOpen(false); }}
                     >
                       <Settings className="ml-2 h-4 w-4" />
@@ -197,7 +197,7 @@ export function Header() {
                     
                     <div className="h-px bg-muted my-1 -mx-1"></div>
                     <button 
-                      className="w-full flex items-center p-2 rounded hover:bg-[#006bd6]/10 hover:text-[#006bd6] text-sm transition-all duration-300"
+                      className="unified-button w-full flex items-center p-2 rounded text-sm"
                       onClick={() => { handleLogout(); setIsMenuOpen(false); }}
                       disabled={logoutMutation.isPending}
                     >

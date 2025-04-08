@@ -161,11 +161,15 @@ export function ContentCard({
               <div className="shimmer-effect opacity-0 group-hover:opacity-100"></div>
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-all duration-500"></div>
             </div>
-            <div className="absolute top-2 right-2 bg-card/80 text-muted-foreground backdrop-blur-sm px-2 py-0.5 text-xs rounded-md">
+            
+            {/* Year Badge */}
+            <div className="content-badge content-year-badge">
               {content.year}
             </div>
+            
+            {/* Type Badge */}
             <div className={cn(
-              "absolute top-2 left-2 text-white px-2 py-0.5 text-xs rounded-md",
+              "content-badge content-type-badge",
               getTypeColor(content.type)
             )}>
               {getTypeLabel(content.type)}
@@ -174,7 +178,7 @@ export function ContentCard({
             {/* Media Feature Badges */}
             <div className="absolute bottom-16 left-4 flex gap-1.5">
               {content.hasPersianDubbing && (
-                <div className="bg-[#00a651]/90 text-white backdrop-blur-sm w-7 h-7 flex items-center justify-center rounded-full shadow-md" title="دوبله فارسی">
+                <div className="content-feature-badge bg-[#00a651]/90" title="دوبله فارسی">
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"></path>
                     <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
@@ -183,7 +187,7 @@ export function ContentCard({
                 </div>
               )}
               {content.hasPersianSubtitle && (
-                <div className="bg-[#4d6bd8]/90 text-white backdrop-blur-sm w-7 h-7 flex items-center justify-center rounded-full shadow-md" title="زیرنویس فارسی">
+                <div className="content-feature-badge bg-[#4d6bd8]/90" title="زیرنویس فارسی">
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                     <rect x="2" y="6" width="20" height="12" rx="2"></rect>
                     <path d="M8 13h8"></path>
@@ -192,40 +196,42 @@ export function ContentCard({
                 </div>
               )}
             </div>
-            {/* دکمه پخش که با هاور ظاهر می‌شود */}
-            <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-500 ease-in-out transform scale-95 group-hover:scale-100">
-              <div className="w-14 h-14 rounded-full bg-primary/90 backdrop-blur-md flex items-center justify-center cursor-pointer shadow-lg shadow-primary/30 hover:bg-primary transition-all duration-300 hover:scale-110">
+            
+            {/* Play Button */}
+            <div className="content-play-button-container">
+              <div className="content-play-button">
                 <Play className="h-6 w-6 text-white fill-white" />
               </div>
             </div>
             
+            {/* Bottom Info Section */}
             <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black to-transparent">
               <div className="flex justify-between items-center">
-                <div className="flex items-center bg-black/30 backdrop-blur-sm px-2 py-1 rounded-md">
+                <div className="content-info-badge">
                   <svg className="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
                     <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118l-2.8-2.034c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
                   </svg>
                   <span className="text-white text-sm ml-1">{content.imdbRating || "N/A"}</span>
                 </div>
-                <div className="flex items-center backdrop-blur-sm bg-black/30 px-2 py-1 rounded-md text-white">
+                <div className="content-info-badge">
                   <span>{content.duration} دقیقه</span>
                 </div>
               </div>
             </div>
           </div>
           <div className="p-4">
-            <h3 className="font-bold text-foreground mb-1">{content.title}</h3>
-            <p className="text-muted-foreground text-sm mb-3">{content.englishTitle}</p>
-            <p className="text-muted-foreground text-sm mb-4 line-clamp-2">{content.description}</p>
+            <h3 className="content-title">{content.title}</h3>
+            <p className="content-subtitle">{content.englishTitle}</p>
+            <p className="content-description">{content.description}</p>
             <div className="flex space-x-2 rtl:space-x-reverse">
-              <Button className="bg-primary hover:bg-primary/90 text-white font-medium py-2 px-4 rounded-md transition-all duration-300 flex items-center flex-1 justify-center hover:shadow-lg hover:shadow-primary/30 transform hover:scale-105">
+              <Button className="content-primary-button">
                 <Play className="mr-2 h-4 w-4" />
                 پخش
               </Button>
               <Button 
                 variant="outline" 
                 size="icon"
-                className="transition-all duration-300 transform hover:scale-110 hover:bg-primary/10 hover:text-primary hover:border-primary"
+                className="content-icon-button"
               >
                 <Download className="h-4 w-4" />
               </Button>
@@ -234,7 +240,7 @@ export function ContentCard({
                 size="icon"
                 onClick={handleAddToFavorites}
                 disabled={isAddingToFavorites}
-                className="transition-all duration-300 transform hover:scale-110 hover:bg-primary/10 hover:border-primary"
+                className="content-icon-button"
               >
                 <Heart className={cn("h-4 w-4", isFavorite && "fill-primary text-primary")} />
               </Button>
@@ -261,11 +267,15 @@ export function ContentCard({
             <div className="shimmer-effect opacity-0 group-hover:opacity-100"></div>
             <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
           </div>
-          <div className="absolute top-2 right-2 bg-card/80 text-muted-foreground backdrop-blur-sm px-2 py-0.5 text-xs rounded-md">
+          
+          {/* Year Badge */}
+          <div className="content-badge content-year-badge">
             {content.year}
           </div>
+          
+          {/* Type Badge */}
           <div className={cn(
-            "absolute top-2 left-2 text-white px-2 py-0.5 text-xs rounded-md",
+            "content-badge content-type-badge",
             getTypeColor(content.type)
           )}>
             {getTypeLabel(content.type)}
@@ -274,7 +284,7 @@ export function ContentCard({
           {/* Media Feature Badges */}
           <div className="absolute top-10 left-2 flex flex-col gap-1.5">
             {content.hasPersianDubbing && (
-              <div className="bg-[#00a651]/90 text-white backdrop-blur-sm w-7 h-7 flex items-center justify-center rounded-full shadow-md" title="دوبله فارسی">
+              <div className="content-feature-badge bg-[#00a651]/90" title="دوبله فارسی">
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"></path>
                   <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
@@ -283,7 +293,7 @@ export function ContentCard({
               </div>
             )}
             {content.hasPersianSubtitle && (
-              <div className="bg-[#4d6bd8]/90 text-white backdrop-blur-sm w-7 h-7 flex items-center justify-center rounded-full shadow-md" title="زیرنویس فارسی">
+              <div className="content-feature-badge bg-[#4d6bd8]/90" title="زیرنویس فارسی">
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                   <rect x="2" y="6" width="20" height="12" rx="2"></rect>
                   <path d="M8 13h8"></path>
@@ -292,16 +302,18 @@ export function ContentCard({
               </div>
             )}
           </div>
-          {/* درکمه پخش که با هاور ظاهر می‌شود */}
-          <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-500 ease-in-out transform scale-95 group-hover:scale-100">
-            <div className="w-14 h-14 rounded-full bg-primary/90 backdrop-blur-md flex items-center justify-center cursor-pointer shadow-lg shadow-primary/30 hover:bg-primary transition-all duration-300 hover:scale-110">
+          
+          {/* Play Button */}
+          <div className="content-play-button-container">
+            <div className="content-play-button">
               <Play className="h-6 w-6 text-white fill-white" />
             </div>
           </div>
 
+          {/* Bottom Info Section */}
           <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black to-transparent">
             <div className="flex justify-between items-center">
-              <div className="flex items-center bg-black/30 backdrop-blur-sm px-2 py-1 rounded-md">
+              <div className="content-info-badge">
                 <svg className="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
                   <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118l-2.8-2.034c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
                 </svg>
@@ -327,8 +339,8 @@ export function ContentCard({
           </div>
         </div>
         <div className="p-4">
-          <h3 className="font-bold text-foreground mb-1 line-clamp-1 group-hover:text-primary transition-colors duration-300">{content.title}</h3>
-          <p className="text-muted-foreground text-sm line-clamp-1">{content.englishTitle}</p>
+          <h3 className="content-title">{content.title}</h3>
+          <p className="content-subtitle">{content.englishTitle}</p>
           {content.genres && content.genres.length > 0 && (
             <div className="flex flex-wrap gap-1 mt-2">
               {content.genres.slice(0, 2).map((genre, index) => (
