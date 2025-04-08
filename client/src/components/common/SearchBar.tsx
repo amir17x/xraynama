@@ -86,7 +86,7 @@ export function AdvancedSearchButton() {
     <Button
       variant="outline"
       size="sm"
-      className="text-white border-primary/30 bg-primary/20 hover:bg-primary/30 transition duration-200"
+      className="unified-button"
       onClick={handleAdvancedSearch}
     >
       جستجوی پیشرفته
@@ -137,7 +137,7 @@ export function NotificationsButton() {
       <Button
         variant="ghost"
         size="icon"
-        className="relative text-foreground hover:text-primary transition-colors"
+        className="unified-icon-button relative"
         onClick={() => setIsOpen(!isOpen)}
         aria-label="اعلانات"
       >

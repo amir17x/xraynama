@@ -6,13 +6,6 @@ import { Loader2, Menu, ChevronDown, User, Heart, ListVideo, Settings, LogOut, S
 import { PortalOverride } from '@/components/common/PortalOverride';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 import { MobileMenu } from './MobileMenu';
 
 export function Header() {
@@ -99,7 +92,7 @@ export function Header() {
               <Link 
                 key={item.href} 
                 href={item.href}
-                className="px-4 py-2 rounded-md hover:bg-muted text-foreground transition duration-200 mx-1"
+                className="unified-button mx-1"
               >
                 {item.label}
               </Link>
@@ -126,10 +119,10 @@ export function Header() {
             ) : !user ? (
               // Not logged in
               <div className="flex items-center">
-                <Link href="/auth" className="px-4 py-2 text-foreground hover:text-primary transition duration-200">
+                <Link href="/auth" className="unified-button">
                   ورود
                 </Link>
-                <Link href="/auth" className="px-4 py-2 text-white bg-primary hover:bg-primary/90 rounded-md transition duration-200">
+                <Link href="/auth" className="unified-button mx-2 bg-[#006bd6] hover:bg-[#006bd6]/90 border-[#006bd6]/70 text-white">
                   ثبت نام
                 </Link>
               </div>
@@ -158,7 +151,7 @@ export function Header() {
                   <PortalOverride triggerRef={triggerRef}>
                     <div className="w-48 bg-popover border rounded-md shadow-md p-1 text-popover-foreground animate-fade-in">
                       <button 
-                        className="w-full flex items-center p-2 rounded hover:bg-accent hover:text-accent-foreground text-sm"
+                        className="w-full flex items-center p-2 rounded hover:bg-[#006bd6]/10 hover:text-[#006bd6] text-sm transition-all duration-300"
                         onClick={() => { setLocation('/profile'); setIsMenuOpen(false); }}
                       >
                         <User className="ml-2 h-4 w-4" />
@@ -166,7 +159,7 @@ export function Header() {
                       </button>
                       
                       <button 
-                        className="w-full flex items-center p-2 rounded hover:bg-accent hover:text-accent-foreground text-sm"
+                        className="w-full flex items-center p-2 rounded hover:bg-[#006bd6]/10 hover:text-[#006bd6] text-sm transition-all duration-300"
                         onClick={() => { setLocation('/profile?tab=favorites'); setIsMenuOpen(false); }}
                       >
                         <Heart className="ml-2 h-4 w-4" />
@@ -174,7 +167,7 @@ export function Header() {
                       </button>
                       
                       <button 
-                        className="w-full flex items-center p-2 rounded hover:bg-accent hover:text-accent-foreground text-sm"
+                        className="w-full flex items-center p-2 rounded hover:bg-[#006bd6]/10 hover:text-[#006bd6] text-sm transition-all duration-300"
                         onClick={() => { setLocation('/profile?tab=playlists'); setIsMenuOpen(false); }}
                       >
                         <ListVideo className="ml-2 h-4 w-4" />
@@ -182,7 +175,7 @@ export function Header() {
                       </button>
                       
                       <button 
-                        className="w-full flex items-center p-2 rounded hover:bg-accent hover:text-accent-foreground text-sm"
+                        className="w-full flex items-center p-2 rounded hover:bg-[#006bd6]/10 hover:text-[#006bd6] text-sm transition-all duration-300"
                         onClick={() => { setLocation('/profile?tab=settings'); setIsMenuOpen(false); }}
                       >
                         <Settings className="ml-2 h-4 w-4" />
@@ -194,7 +187,7 @@ export function Header() {
                         <>
                           <div className="h-px bg-muted my-1 -mx-1"></div>
                           <button 
-                            className="w-full flex items-center p-2 rounded hover:bg-accent hover:text-accent-foreground text-sm text-primary font-semibold"
+                            className="w-full flex items-center p-2 rounded bg-[#006bd6]/10 text-[#006bd6] hover:bg-[#006bd6]/20 text-sm font-semibold transition-all duration-300"
                             onClick={() => { setLocation('/admin/dashboard'); setIsMenuOpen(false); }}
                           >
                             <ShieldAlert className="ml-2 h-4 w-4" />
@@ -205,7 +198,7 @@ export function Header() {
                       
                       <div className="h-px bg-muted my-1 -mx-1"></div>
                       <button 
-                        className="w-full flex items-center p-2 rounded hover:bg-accent hover:text-accent-foreground text-sm"
+                        className="w-full flex items-center p-2 rounded hover:bg-[#006bd6]/10 hover:text-[#006bd6] text-sm transition-all duration-300"
                         onClick={() => { handleLogout(); setIsMenuOpen(false); }}
                         disabled={logoutMutation.isPending}
                       >
@@ -225,7 +218,7 @@ export function Header() {
             <Button 
               variant="ghost" 
               size="icon"
-              className="text-foreground hover:text-primary" 
+              className="unified-icon-button" 
               onClick={() => setIsMobileMenuOpen(true)}
             >
               <Menu className="h-6 w-6" />

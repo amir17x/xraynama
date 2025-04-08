@@ -60,6 +60,16 @@
     @apply transition-all duration-300;
   }
   
+  /* استایل یکپارچه برای همه دکمه‌ها و المان‌های هدر */
+  .unified-button {
+    @apply px-4 py-2 rounded-md bg-[#006bd6]/10 hover:bg-[#006bd6]/20 text-[#006bd6] font-medium border border-[#006bd6]/20 hover:border-[#006bd6]/30 transition-all duration-300;
+  }
+  
+  /* استایل برای دکمه‌های آیکون‌دار کوچکتر */
+  .unified-icon-button {
+    @apply p-2 rounded-md bg-[#006bd6]/10 hover:bg-[#006bd6]/20 text-[#006bd6] border border-[#006bd6]/20 hover:border-[#006bd6]/30 transition-all duration-300;
+  }
+  
   /* طرح شیشه‌ای و شفاف برای هدر */
   .glass-header {
     @apply backdrop-blur-md shadow-sm border transition-all duration-500 ease-in-out;

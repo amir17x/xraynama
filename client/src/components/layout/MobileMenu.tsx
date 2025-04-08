@@ -40,7 +40,7 @@ export function MobileMenu({ isOpen, onClose, navItems }: MobileMenuProps) {
               <Dialog.Title className="text-xl font-semibold text-foreground">
                 منو
               </Dialog.Title>
-              <Button variant="ghost" size="icon" onClick={onClose}>
+              <Button variant="ghost" size="icon" className="unified-icon-button" onClick={onClose}>
                 <X className="h-6 w-6" />
               </Button>
             </div>
@@ -51,7 +51,7 @@ export function MobileMenu({ isOpen, onClose, navItems }: MobileMenuProps) {
                   <Link
                     key={item.href}
                     href={item.href}
-                    className="block px-3 py-2 rounded-md text-lg font-medium text-foreground hover:bg-muted transition duration-200"
+                    className="block px-3 py-2 rounded-md text-lg font-medium hover:bg-[#006bd6]/10 hover:text-[#006bd6] transition-all duration-300"
                     onClick={onClose}
                   >
                     {item.label}
