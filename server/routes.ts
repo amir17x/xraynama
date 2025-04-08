@@ -3,6 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { setupAuth } from "./auth";
 import { setupAdminRoutes } from "./admin";
+import { User } from '@shared/schema';
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Set up authentication routes
@@ -39,6 +40,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const content = await storage.getTopRatedContent(limit);
       res.json(content);
     } catch (error) {
+      next(error);
+    }
+  });
+
+  // Content recommendation routes with AI
+  app.get("/api/content/recommended", async (req, res, next) => {
+    try {
+      // دریافت توصیه‌های محتوا با هوش مصنوعی
+      const limit = req.query.limit ? parseInt(req.query.limit as string) : 5;
+      const userId = req.user ? (req.user as User).id : null;
+      
+      const content = await storage.getRecommendedContent(userId, limit);
+      res.json(content);
+    } catch (error) {
+      console.error("Error getting recommended content:", error);
+      next(error);
+    }
+  });
+  
+  app.get("/api/content/:id/similar", async (req, res, next) => {
+    try {
+      // دریافت محتواهای مشابه با محتوای فعلی با هوش مصنوعی
+      const contentId = parseInt(req.params.id);
+      const limit = req.query.limit ? parseInt(req.query.limit as string) : 5;
+      
+      const content = await storage.getSimilarContent(contentId, limit);
+      res.json(content);
+    } catch (error) {
+      console.error(`Error getting similar content for ID ${req.params.id}:`, error);
       next(error);
     }
   });

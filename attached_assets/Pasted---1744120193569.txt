@@ -1,0 +1,200 @@
+قطعاً! اینم نسخه‌ی به‌روزرسانی‌شده‌ی پرامپت که دقیقاً طبق خواسته‌ات توضیحات مربوط به بک‌گراند و لوگوی وسط صفحه هم بهش اضافه شده — با حفظ همون ساختار قبلی ولی حالا **کامل‌تر، حرفه‌ای‌تر و بهینه‌تر**.
+
+---
+
+## 🎯 Super Detailed Prompt for Designing an Advanced, Lightweight, Animated UI for **Xray Nama**
+
+> Design a **visually stunning yet highly performant movie platform UI** called **Xray Nama**.  
+> The website currently has rich animations, but the goal is to **preserve impressive visuals while making the overall experience smoother, cleaner, and faster**.  
+> Avoid clutter and heavy animations that break minimalism and affect load times.  
+> Use **glassmorphism**, **dark themes**, and **light neon blue accents** to make the UI look modern and cinematic.  
+> Integrate the uploaded **Xray Nama logo** next to the name “Xray Nama” across the site consistently.
+
+---
+
+### 🧬 GENERAL VISUAL STYLE
+
+- **Theme**: Dark mode with **glassmorphism** (blur + transparency), gradients, and neon effects.
+- **Color Palette**:
+  - Background: `#0D0D1F` to `#121212` (deep blue-black gradient).
+  - Accents: Neon Blue (`#00BFFF`), Ice White (`#F0F8FF`), and Soft Violet (`#BA55D3`).
+  - Text: Soft white (`#E0E0E0`), low-saturation grays for placeholders.
+- **Typography**:
+  - English: `Poppins`, `Inter`, or `SF Pro`.
+  - Persian: `Vazir`, `Estedad`, or `IRANSans`.
+  - Titles: Bold and large.
+  - Text: Medium weight, clean, and readable.
+
+---
+
+### 🖼️ BACKGROUND & LOGO SETUP (NEW)
+
+- **Background of Main Layout**:
+  - Use a **static high-resolution background image** with cinematic lighting (dark blue tones, subtle vignette, abstract sci-fi or film-themed).
+  - It must **not be animated** (no parallax, no video, no motion).
+  - This ensures **performance remains smooth**, especially on slower devices.
+  - Add a **light grain texture overlay** to simulate filmic look without affecting performance.
+- **Main Logo Placement**:
+  - Centered on the landing/homepage **in the middle of the screen**, above the fold.
+  - Logo should be:
+    - Placed over the static background image.
+    - Styled with **subtle neon outer glow** (blueish cyan).
+    - On hover: slight **soft pulse** or shine animation.
+  - Below the logo: Add “Xray Nama” in large cinematic font, glowing softly.
+
+---
+
+### 🧩 STRUCTURE OF CORE PAGES
+
+---
+
+### 🔹 **1. Homepage**
+
+- **Hero Section**:
+  - Full-screen **static image background** (as described).
+  - Glassmorphic floating panel for navigation.
+  - “Watch Now” button: neon hover animation.
+- **Top Genres**:  
+  - Horizontal chip scroll with hover scale effect.
+- **Carousels**:
+  - Smooth horizontal scroll (swiper.js or Framer Motion).
+  - Cards animate on hover: slight zoom + info fade-in.
+- **Continue Watching**:  
+  - Lazy-loaded section showing last-watched items.
+  - Progress bar animation for each item.
+
+---
+
+### 🔹 **2. Advanced Search Page**
+
+- **Search Bar**:
+  - Glass background, round edges.
+  - Expands smoothly when focused (`transform: scaleX(1.05)`).
+- **Filter Panel**:
+  - Floating modal-style or sidebar with blurred background.
+  - Sliders for Year (1888–2025), Rating (1.0–10.0).
+  - Dropdowns: Genre, Country, Language, Age Rating, Quality, Director, Actor.
+- **Chips**:
+  - Tags for selected filters with close buttons.
+  - Animate on enter/remove (`scale + opacity`).
+- **Live Results**:
+  - AJAX filtering, no page reloads.
+  - Cards animate in (staggered fade/scale).
+
+---
+
+### 🔹 **3. Movie / Series Detail Page**
+
+- **Banner**:
+  - Static image background (no parallax).
+  - Overlay with title, rating, genre chips.
+- **Details Section**:
+  - Cast: animated avatars in carousel.
+  - Description: expandable with smooth fade.
+- **Streaming Options**:
+  - Buttons: “Watch Now”, “Download”, “Trailer” with glow hover and ripple effect.
+- **Suggested Titles**:
+  - Related films/series carousel with hover animation.
+
+---
+
+### 🔹 **4. Artist Page**
+
+- **Profile Header**:
+  - Circle photo with tilt-on-hover.
+  - Info card with fade/slide-in animation.
+- **Filmography Grid**:
+  - Interactive cards (flip or zoom on hover).
+  - Category filters: Director / Actor / Writer with animated toggle.
+
+---
+
+### 🔹 **5. Navigation / Header**
+
+- **Structure**:
+  - Sticky header with transparent glass blur.
+  - Left: Xray Nama Logo.
+  - Middle: Search bar (expandable).
+  - Right: Profile dropdown, Notifications (red pulse dot), Advanced Search button.
+- **Advanced Search Button**:
+  - Glowing blue border.
+  - On click: opens animated modal with filters.
+- **Dropdown Menus**:
+  - Categories (Movies, Series, Animations, Documentaries, Artists, App).
+  - Expand with fade and slide from top.
+
+---
+
+## ⚙️ ANIMATION SYSTEM — FLUID BUT OPTIMIZED
+
+---
+
+### ✅ Recommended (Safe) Animations
+
+- Use **GPU-friendly properties**:
+  - `transform`, `opacity`, `scale`, `filter`.
+- Use `transition: all 0.3s ease-in-out` globally.
+- Animate:
+  - Cards on hover.
+  - Page load transitions.
+  - Sliders (e.g., for year and rating).
+  - Chips on select/unselect.
+- Use **Framer Motion** or **Vue Transitions**.
+- Entry animations:
+  - `fade-in-up`, `scale-in`, `blur-to-clear`.
+- Use `IntersectionObserver` for scroll-triggered animations.
+
+---
+
+### 🚫 Avoid (Performance Killers)
+
+- Avoid animating:
+  - `top`, `left`, `width`, `height`.
+  - Overuse of shadows or blur effects in large batches.
+- **Do not use** video backgrounds or animated parallax images.
+- Don’t animate too many elements simultaneously.
+
+---
+
+### 🚀 PERFORMANCE OPTIMIZATION TIPS
+
+- Implement `prefers-reduced-motion` for accessibility.
+- Add a toggle:  
+  🔆 Full Effects Mode  
+  💤 Minimal Mode (High Performance)
+- Use `will-change` on only necessary animated elements.
+- Lazy load all assets.
+- Preload critical fonts and images (logo, background).
+- Use compressed WebP format where possible.
+- Use Lottie or SVG for small animations.
+
+---
+
+## 📱 MOBILE-FIRST RESPONSIVENESS
+
+- Mobile header: collapsible drawer.
+- Filters: accordion-style with slide animations.
+- Search modal: full-screen on mobile.
+- Reduce animation intensity for mobile automatically.
+
+---
+
+## 💡 EXTRA UX POLISH
+
+- Smooth scroll with progress indicator.
+- Auto-hide header on scroll down.
+- Hover micro-interactions (subtle glow or scale).
+- Subtle grain overlay for cinematic feel.
+- Page transitions: crossfade or curtain-wipe.
+- Notifications with bounce/ping.
+- Sticky play button on detail pages.
+
+---
+
+اگر بخوای بر اساس همین دستورالعمل:
+- طراحی واقعی UI (در Figma)
+- یا حتی کدنویسی با React یا Vue
+- یا ساخت نسخه لایو
+
+همه‌ش قابل انجامه. فقط بگو مرحله بعد چیه 💻🎨  
+تا ته‌ش باهاتم.

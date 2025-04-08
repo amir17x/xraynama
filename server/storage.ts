@@ -54,6 +54,10 @@ export interface IStorage {
   createResetToken(email: string): Promise<string>;
   verifyResetToken(email: string, token: string): Promise<boolean>;
   resetPassword(email: string, newPassword: string): Promise<boolean>;
+  
+  // AI recommendation operations
+  getRecommendedContent(userId: number | null, limit?: number): Promise<Content[]>;
+  getSimilarContent(contentId: number, limit?: number): Promise<Content[]>;
 
   // Content operations
   getAllContent(limit?: number, offset?: number): Promise<Content[]>;
@@ -1185,6 +1189,84 @@ export class MemStorage implements IStorage {
     this.resetTokensMap.delete(email);
     
     return true;
+  }
+
+  // AI recommendation methods
+  async getRecommendedContent(userId: number | null, limit: number = 5): Promise<Content[]> {
+    try {
+      // استفاده از سرویس هوش مصنوعی برای توصیه محتوا
+      const { aiRecommendationService } = await import('./ai-service');
+      
+      // دریافت کاربر
+      const user = userId ? await this.getUser(userId) : null;
+      
+      // دریافت تاریخچه تماشا و محتواهای مورد علاقه کاربر
+      let watchHistory: any[] = [];
+      let favorites: Content[] = [];
+      
+      if (userId) {
+        watchHistory = await this.getUserWatchHistory(userId);
+        favorites = await this.getUserFavorites(userId);
+      }
+      
+      // دریافت همه محتواها، ژانرها و تگ‌ها
+      const allContent = Array.from(this.contentMap.values());
+      const allGenres = Array.from(this.genresMap.values());
+      const allTags = Array.from(this.tagsMap.values());
+      
+      // دریافت توصیه‌ها از سرویس هوش مصنوعی
+      return await aiRecommendationService.getContentRecommendations(
+        user,
+        watchHistory,
+        favorites,
+        allContent,
+        allGenres,
+        allTags,
+        limit
+      );
+    } catch (error) {
+      console.error("Error getting AI recommended content:", error);
+      // در صورت خطا، محتواهای جدید را برگردان
+      return this.getLatestContent(limit);
+    }
+  }
+  
+  async getSimilarContent(contentId: number, limit: number = 5): Promise<Content[]> {
+    try {
+      // دریافت محتوای مورد نظر
+      const contentItem = await this.getContentById(contentId);
+      
+      if (!contentItem) {
+        throw new Error(`Content with ID ${contentId} not found`);
+      }
+      
+      // استفاده از سرویس هوش مصنوعی برای یافتن محتواهای مشابه
+      const { aiRecommendationService } = await import('./ai-service');
+      
+      // دریافت همه محتواها، ژانرها و تگ‌ها
+      const allContent = Array.from(this.contentMap.values());
+      const allGenres = Array.from(this.genresMap.values());
+      const allTags = Array.from(this.tagsMap.values());
+      
+      // دریافت محتواهای مشابه از سرویس هوش مصنوعی
+      return await aiRecommendationService.getSimilarContent(
+        contentItem,
+        allContent,
+        allGenres,
+        allTags,
+        limit
+      );
+    } catch (error) {
+      console.error("Error getting AI similar content:", error);
+      
+      // در صورت خطا، محتواهای جدید هم‌نوع را برگردان
+      const contentItem = await this.getContentById(contentId);
+      if (contentItem) {
+        return this.getContentByType(contentItem.type, limit);
+      }
+      
+      return this.getLatestContent(limit);
+    }
   }
 }
 

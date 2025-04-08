@@ -23,7 +23,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import { useAuth } from '@/hooks/use-auth';
-import { User, KeyRound, AtSign, Lock, Heart, Play, MessageCircle, History, ListVideo } from 'lucide-react';
+import { User, KeyRound, AtSign, Lock, Heart, Play, MessageCircle, History, ListVideo, CheckCircle } from 'lucide-react';
 
 // Login schema
 const loginSchema = z.object({
@@ -105,15 +105,21 @@ export default function AuthPage() {
     <>
       <Header />
       
-      <main className="container mx-auto px-4 py-8 min-h-[calc(100vh-200px)] flex items-center justify-center">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 w-full max-w-5xl">
+      <main className="container mx-auto px-4 py-8 min-h-[calc(100vh-200px)] flex items-center justify-center relative">
+        {/* Background glow effect */}
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute w-1/2 h-1/2 top-0 left-[20%] bg-[#00BFFF]/20 rounded-full blur-[120px] opacity-50"></div>
+          <div className="absolute w-1/3 h-1/3 bottom-[15%] right-[5%] bg-[#00BFFF]/20 rounded-full blur-[120px] opacity-50"></div>
+        </div>
+        
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 w-full max-w-5xl relative z-10">
           {/* Auth forms */}
-          <Card className="border-muted shadow-xl">
-            <CardHeader>
-              <CardTitle className="text-2xl font-bold text-center">
+          <Card className="border-[#00BFFF]/20 bg-[#00142c]/80 backdrop-blur-lg shadow-[0_0_25px_rgba(0,191,255,0.15)] rounded-xl overflow-hidden">
+            <CardHeader className="pb-4">
+              <CardTitle className="text-2xl font-bold text-center text-white">
                 {activeTab === 'login' ? 'ورود به حساب کاربری' : 'ثبت‌نام در سایت'}
               </CardTitle>
-              <CardDescription className="text-center">
+              <CardDescription className="text-center text-[#CCDDEE]">
                 {activeTab === 'login' 
                   ? 'برای استفاده از امکانات ویژه وارد شوید'
                   : 'با چند کلیک ساده عضو شوید و از امکانات سایت بهره‌مند شوید'
@@ -123,9 +129,9 @@ export default function AuthPage() {
             
             <CardContent>
               <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-                <TabsList className="grid grid-cols-2 mb-6">
-                  <TabsTrigger value="login">ورود</TabsTrigger>
-                  <TabsTrigger value="register">ثبت‌نام</TabsTrigger>
+                <TabsList className="grid grid-cols-2 mb-6 bg-[#001c3d]/70 border border-[#00BFFF]/20 p-1">
+                  <TabsTrigger value="login" className="data-[state=active]:bg-[#00BFFF] data-[state=active]:text-white">ورود</TabsTrigger>
+                  <TabsTrigger value="register" className="data-[state=active]:bg-[#00BFFF] data-[state=active]:text-white">ثبت‌نام</TabsTrigger>
                 </TabsList>
                 
                 {/* Login Form */}
@@ -140,8 +146,8 @@ export default function AuthPage() {
                             <FormLabel>نام کاربری</FormLabel>
                             <FormControl>
                               <div className="relative">
-                                <User className="absolute right-3 top-2.5 h-5 w-5 text-muted-foreground" />
-                                <Input className="pr-10" placeholder="نام کاربری خود را وارد کنید" {...field} />
+                                <User className="absolute right-3 top-2.5 h-5 w-5 text-[#00BFFF]" />
+                                <Input className="pr-10 bg-[#001c3d]/50 border-[#00BFFF]/30 focus:border-[#00BFFF] focus:ring-[#00BFFF]/20" placeholder="نام کاربری خود را وارد کنید" {...field} />
                               </div>
                             </FormControl>
                             <FormMessage />
@@ -157,9 +163,9 @@ export default function AuthPage() {
                             <FormLabel>رمز عبور</FormLabel>
                             <FormControl>
                               <div className="relative">
-                                <KeyRound className="absolute right-3 top-2.5 h-5 w-5 text-muted-foreground" />
+                                <KeyRound className="absolute right-3 top-2.5 h-5 w-5 text-[#00BFFF]" />
                                 <Input 
-                                  className="pr-10" 
+                                  className="pr-10 bg-[#001c3d]/50 border-[#00BFFF]/30 focus:border-[#00BFFF] focus:ring-[#00BFFF]/20" 
                                   type="password" 
                                   placeholder="رمز عبور خود را وارد کنید" 
                                   {...field} 
@@ -183,7 +189,7 @@ export default function AuthPage() {
                       
                       <Button 
                         type="submit" 
-                        className="w-full"
+                        className="w-full bg-[#00BFFF] hover:bg-[#00BFFF]/90 text-white border border-[#00BFFF]/50 shadow-[0_0_15px_rgba(0,191,255,0.3)]"
                         disabled={loginMutation.isPending}
                       >
                         {loginMutation.isPending ? (
@@ -209,8 +215,8 @@ export default function AuthPage() {
                             <FormLabel>نام کاربری</FormLabel>
                             <FormControl>
                               <div className="relative">
-                                <User className="absolute right-3 top-2.5 h-5 w-5 text-muted-foreground" />
-                                <Input className="pr-10" placeholder="یک نام کاربری منحصر به فرد انتخاب کنید" {...field} />
+                                <User className="absolute right-3 top-2.5 h-5 w-5 text-[#00BFFF]" />
+                                <Input className="pr-10 bg-[#001c3d]/50 border-[#00BFFF]/30 focus:border-[#00BFFF] focus:ring-[#00BFFF]/20" placeholder="یک نام کاربری منحصر به فرد انتخاب کنید" {...field} />
                               </div>
                             </FormControl>
                             <FormMessage />
@@ -226,8 +232,8 @@ export default function AuthPage() {
                             <FormLabel>ایمیل</FormLabel>
                             <FormControl>
                               <div className="relative">
-                                <AtSign className="absolute right-3 top-2.5 h-5 w-5 text-muted-foreground" />
-                                <Input className="pr-10" type="email" placeholder="ایمیل خود را وارد کنید" {...field} />
+                                <AtSign className="absolute right-3 top-2.5 h-5 w-5 text-[#00BFFF]" />
+                                <Input className="pr-10 bg-[#001c3d]/50 border-[#00BFFF]/30 focus:border-[#00BFFF] focus:ring-[#00BFFF]/20" type="email" placeholder="ایمیل خود را وارد کنید" {...field} />
                               </div>
                             </FormControl>
                             <FormMessage />
@@ -242,7 +248,7 @@ export default function AuthPage() {
                           <FormItem>
                             <FormLabel>نام و نام خانوادگی</FormLabel>
                             <FormControl>
-                              <Input placeholder="نام و نام خانوادگی خود را وارد کنید" {...field} />
+                              <Input className="bg-[#001c3d]/50 border-[#00BFFF]/30 focus:border-[#00BFFF] focus:ring-[#00BFFF]/20" placeholder="نام و نام خانوادگی خود را وارد کنید" {...field} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -257,9 +263,9 @@ export default function AuthPage() {
                             <FormLabel>رمز عبور</FormLabel>
                             <FormControl>
                               <div className="relative">
-                                <Lock className="absolute right-3 top-2.5 h-5 w-5 text-muted-foreground" />
+                                <Lock className="absolute right-3 top-2.5 h-5 w-5 text-[#00BFFF]" />
                                 <Input 
-                                  className="pr-10" 
+                                  className="pr-10 bg-[#001c3d]/50 border-[#00BFFF]/30 focus:border-[#00BFFF] focus:ring-[#00BFFF]/20" 
                                   type="password" 
                                   placeholder="یک رمز عبور قوی انتخاب کنید" 
                                   {...field} 
@@ -279,9 +285,9 @@ export default function AuthPage() {
                             <FormLabel>تکرار رمز عبور</FormLabel>
                             <FormControl>
                               <div className="relative">
-                                <Lock className="absolute right-3 top-2.5 h-5 w-5 text-muted-foreground" />
+                                <Lock className="absolute right-3 top-2.5 h-5 w-5 text-[#00BFFF]" />
                                 <Input 
-                                  className="pr-10" 
+                                  className="pr-10 bg-[#001c3d]/50 border-[#00BFFF]/30 focus:border-[#00BFFF] focus:ring-[#00BFFF]/20" 
                                   type="password" 
                                   placeholder="رمز عبور را مجدداً وارد کنید" 
                                   {...field} 
@@ -295,7 +301,7 @@ export default function AuthPage() {
                       
                       <Button 
                         type="submit" 
-                        className="w-full"
+                        className="w-full bg-[#00BFFF] hover:bg-[#00BFFF]/90 text-white border border-[#00BFFF]/50 shadow-[0_0_15px_rgba(0,191,255,0.3)]"
                         disabled={registerMutation.isPending}
                       >
                         {registerMutation.isPending ? (
@@ -312,83 +318,96 @@ export default function AuthPage() {
             </CardContent>
             
             <CardFooter className="flex justify-center">
-              <p className="text-sm text-muted-foreground">
-                {activeTab === 'login' ? (
-                  <>
-                    حساب کاربری ندارید؟{' '}
-                    <button
-                      type="button"
-                      className="text-primary hover:underline"
-                      onClick={() => setActiveTab('register')}
-                    >
-                      ثبت‌نام کنید
-                    </button>
-                  </>
-                ) : (
-                  <>
-                    قبلاً ثبت‌نام کرده‌اید؟{' '}
-                    <button
-                      type="button"
-                      className="text-primary hover:underline"
-                      onClick={() => setActiveTab('login')}
-                    >
-                      وارد شوید
-                    </button>
-                  </>
-                )}
-              </p>
+              <div className="inline-flex items-center px-4 py-2 rounded-full bg-[#00BFFF]/10 border border-[#00BFFF]/30">
+                <p className="text-sm text-[#CCDDEE]">
+                  {activeTab === 'login' ? (
+                    <>
+                      حساب کاربری ندارید؟{' '}
+                      <button
+                        type="button"
+                        className="text-[#00BFFF] hover:underline font-medium"
+                        onClick={() => setActiveTab('register')}
+                      >
+                        ثبت‌نام کنید
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      قبلاً ثبت‌نام کرده‌اید؟{' '}
+                      <button
+                        type="button"
+                        className="text-[#00BFFF] hover:underline font-medium"
+                        onClick={() => setActiveTab('login')}
+                      >
+                        وارد شوید
+                      </button>
+                    </>
+                  )}
+                </p>
+              </div>
             </CardFooter>
           </Card>
           
           {/* Hero section */}
           <div className="hidden lg:flex flex-col justify-center">
-            <div className="glass-effect p-8 rounded-xl border border-border">
-              <h1 className="text-3xl font-bold mb-6 text-foreground">به Xraynama خوش آمدید</h1>
-              <p className="text-lg text-muted-foreground mb-6">
-                با عضویت در سایت ما از امکانات زیر بهره‌مند شوید:
-              </p>
+            <div className="p-8 rounded-xl border border-[#00BFFF]/20 bg-[#00142c]/80 backdrop-blur-lg shadow-[0_0_25px_rgba(0,191,255,0.1)] relative overflow-hidden">
+              {/* Background shapes */}
+              <div className="absolute -bottom-24 -left-24 w-48 h-48 bg-[#00BFFF]/10 rounded-full"></div>
+              <div className="absolute -top-32 -right-32 w-64 h-64 bg-[#00BFFF]/5 rounded-full"></div>
               
-              <ul className="space-y-4">
-                <li className="flex items-center">
-                  <span className="bg-primary/20 p-2 rounded-full mr-3">
-                    <Play className="h-5 w-5 text-primary" />
-                  </span>
-                  <span className="text-foreground">پخش آنلاین با کیفیت‌های مختلف</span>
-                </li>
-                <li className="flex items-center">
-                  <span className="bg-primary/20 p-2 rounded-full mr-3">
-                    <Heart className="h-5 w-5 text-primary" />
-                  </span>
-                  <span className="text-foreground">ایجاد لیست علاقه‌مندی‌ها</span>
-                </li>
-                <li className="flex items-center">
-                  <span className="bg-primary/20 p-2 rounded-full mr-3">
-                    <ListVideo className="h-5 w-5 text-primary" />
-                  </span>
-                  <span className="text-foreground">ساخت پلی‌لیست‌های شخصی</span>
-                </li>
-                <li className="flex items-center">
-                  <span className="bg-primary/20 p-2 rounded-full mr-3">
-                    <MessageCircle className="h-5 w-5 text-primary" />
-                  </span>
-                  <span className="text-foreground">نظر دادن و امتیازدهی به محتوا</span>
-                </li>
-                <li className="flex items-center">
-                  <span className="bg-primary/20 p-2 rounded-full mr-3">
-                    <History className="h-5 w-5 text-primary" />
-                  </span>
-                  <span className="text-foreground">دسترسی به تاریخچه تماشا</span>
-                </li>
-              </ul>
-              
-              <div className="mt-8 text-center">
-                <p className="text-sm text-muted-foreground">
-                  با ثبت‌نام در Xraynama، با تمامی{' '}
-                  <a href="/terms" className="text-primary hover:underline">
-                    قوانین و مقررات
-                  </a>{' '}
-                  سایت موافقت می‌کنید.
+              <div className="relative z-10">
+                <h1 className="text-3xl font-bold mb-6 text-white">
+                  به <span className="text-[#00BFFF]">Xraynama</span> خوش آمدید
+                </h1>
+                <p className="text-lg text-[#CCDDEE] mb-8">
+                  با عضویت در سایت ما از امکانات زیر بهره‌مند شوید:
                 </p>
+                
+                <ul className="space-y-5">
+                  <li className="flex items-center transform transition-transform hover:translate-x-1 duration-300">
+                    <span className="bg-[#00BFFF]/20 p-2.5 rounded-full ml-4 border border-[#00BFFF]/30">
+                      <Play className="h-5 w-5 text-[#00BFFF]" />
+                    </span>
+                    <span className="text-white text-lg">پخش آنلاین با کیفیت‌های مختلف</span>
+                  </li>
+                  <li className="flex items-center transform transition-transform hover:translate-x-1 duration-300">
+                    <span className="bg-[#00BFFF]/20 p-2.5 rounded-full ml-4 border border-[#00BFFF]/30">
+                      <Heart className="h-5 w-5 text-[#00BFFF]" />
+                    </span>
+                    <span className="text-white text-lg">ایجاد لیست علاقه‌مندی‌ها</span>
+                  </li>
+                  <li className="flex items-center transform transition-transform hover:translate-x-1 duration-300">
+                    <span className="bg-[#00BFFF]/20 p-2.5 rounded-full ml-4 border border-[#00BFFF]/30">
+                      <ListVideo className="h-5 w-5 text-[#00BFFF]" />
+                    </span>
+                    <span className="text-white text-lg">ساخت پلی‌لیست‌های شخصی</span>
+                  </li>
+                  <li className="flex items-center transform transition-transform hover:translate-x-1 duration-300">
+                    <span className="bg-[#00BFFF]/20 p-2.5 rounded-full ml-4 border border-[#00BFFF]/30">
+                      <MessageCircle className="h-5 w-5 text-[#00BFFF]" />
+                    </span>
+                    <span className="text-white text-lg">نظر دادن و امتیازدهی به محتوا</span>
+                  </li>
+                  <li className="flex items-center transform transition-transform hover:translate-x-1 duration-300">
+                    <span className="bg-[#00BFFF]/20 p-2.5 rounded-full ml-4 border border-[#00BFFF]/30">
+                      <History className="h-5 w-5 text-[#00BFFF]" />
+                    </span>
+                    <span className="text-white text-lg">دسترسی به تاریخچه تماشا</span>
+                  </li>
+                </ul>
+                
+                <div className="mt-10 text-center">
+                  <div className="inline-flex items-center px-4 py-2 rounded-full bg-[#00BFFF]/10 border border-[#00BFFF]/30">
+                    <CheckCircle className="text-[#00BFFF] w-5 h-5 ml-2" />
+                    <p className="text-sm text-[#CCDDEE]">
+                      با ثبت‌نام در Xraynama، با تمامی{' '}
+                      <a href="/terms" className="text-[#00BFFF] hover:underline">
+                        قوانین و مقررات
+                      </a>{' '}
+                      سایت موافقت می‌کنید
+                    </p>
+                  </div>
+                </div>
               </div>
             </div>
           </div>

@@ -1,4 +1,5 @@
 import { connectToMongoDB } from './mongo';
+import mongoose from 'mongoose';
 import { IStorage } from '../storage';
 import { 
   User, InsertUser, Content, InsertContent,
@@ -31,10 +32,9 @@ import {
   VerificationCode,
   ResetToken
 } from '../models/mongoose';
-
-import mongoose, { Schema, Document } from 'mongoose';
 import session from 'express-session';
 import * as connectMongoDBSession from 'connect-mongodb-session';
+import { Schema, Document } from 'mongoose';
 
 const MongoDBStore = connectMongoDBSession.default(session);
 
@@ -1374,6 +1374,206 @@ export class MongoDBStorage implements IStorage {
     } catch (error) {
       console.error('Error resetting password:', error);
       return false;
+    }
+  }
+
+  // AI recommendation methods
+  async getRecommendedContent(userId: number | null, limit: number = 5): Promise<Content[]> {
+    try {
+      // استفاده از سرویس هوش مصنوعی برای توصیه محتوا
+      const { aiRecommendationService } = await import('../ai-service');
+      
+      // دریافت کاربر
+      const user = userId ? await this.getUser(userId) : null;
+      
+      // دریافت تاریخچه تماشا و محتواهای مورد علاقه کاربر
+      let watchHistory: any[] = [];
+      let favorites: Content[] = [];
+      
+      if (userId) {
+        watchHistory = await this.getUserWatchHistory(userId);
+        favorites = await this.getUserFavorites(userId);
+      }
+      
+      // دریافت همه محتواها، ژانرها و تگ‌ها
+      const allContent = await ContentModel.find().lean();
+      const allGenres = await GenreModel.find().lean();
+      const allTags = await TagModel.find().lean();
+      
+      // تبدیل محتواها به فرمت مورد نیاز
+      const convertedContent: Content[] = allContent.map(content => {
+        const id = typeof content._id === 'string' ? 
+          parseInt(content._id.substring(0, 8), 16) : 
+          parseInt(content._id.toString().substring(0, 8), 16);
+          
+        return {
+          ...content,
+          id
+        } as unknown as Content;
+      });
+      
+      // تبدیل ژانرها به فرمت مورد نیاز
+      const convertedGenres: Genre[] = allGenres.map(genre => {
+        const id = typeof genre._id === 'string' ? 
+          parseInt(genre._id.substring(0, 8), 16) : 
+          parseInt(genre._id.toString().substring(0, 8), 16);
+          
+        return {
+          ...genre,
+          id
+        } as unknown as Genre;
+      });
+      
+      // تبدیل تگ‌ها به فرمت مورد نیاز
+      const convertedTags: Tag[] = allTags.map(tag => {
+        const id = typeof tag._id === 'string' ? 
+          parseInt(tag._id.substring(0, 8), 16) : 
+          parseInt(tag._id.toString().substring(0, 8), 16);
+          
+        return {
+          ...tag,
+          id
+        } as unknown as Tag;
+      });
+      
+      // دریافت توصیه‌ها از سرویس هوش مصنوعی
+      const recommendedContent = await aiRecommendationService.getContentRecommendations(
+        user,
+        watchHistory,
+        favorites,
+        convertedContent,
+        convertedGenres,
+        convertedTags,
+        limit
+      );
+      
+      // بازگرداندن نتایج
+      return recommendedContent;
+    } catch (error) {
+      console.error("Error getting AI recommended content:", error);
+      // در صورت خطا، محتواهای جدید را برگردان
+      return this.getLatestContent(limit);
+    }
+  }
+  
+  async getSimilarContent(contentId: number, limit: number = 5): Promise<Content[]> {
+    try {
+      // یافتن محتوا با بهترین تطابق
+      const allContent = await ContentModel.find().lean();
+      
+      // پیدا کردن محتوای موردنظر یا استفاده از شناسه ObjectId
+      let contentItem = null;
+      
+      // اگر contentId یک عدد است، سعی کنیم بهترین تطابق را پیدا کنیم
+      if (typeof contentId === 'number') {
+        contentItem = allContent.find(content => {
+          const id = typeof content._id === 'string' ? 
+            parseInt(content._id.substring(0, 8), 16) : 
+            parseInt(content._id.toString().substring(0, 8), 16);
+          return id === contentId;
+        });
+      }
+      
+      // اگر هنوز محتوا پیدا نشده، سعی کنیم با ObjectId پیدا کنیم
+      if (!contentItem) {
+        // در MongoDB مستقیماً از ObjectId استفاده می‌کنیم
+        try {
+          const hexId = contentId.toString(16).padStart(24, '0');
+          const objectId = new mongoose.Types.ObjectId(hexId);
+          contentItem = await ContentModel.findById(objectId).lean();
+        } catch (error) {
+          console.error("Error converting contentId to ObjectId:", error);
+        }
+      }
+      
+      if (!contentItem) {
+        throw new Error(`Content with ID ${contentId} not found`);
+      }
+      
+      // استفاده از سرویس هوش مصنوعی برای یافتن محتواهای مشابه
+      const { aiRecommendationService } = await import('../ai-service');
+      
+      // دریافت ژانرها و تگ‌ها
+      const allGenres = await GenreModel.find().lean();
+      const allTags = await TagModel.find().lean();
+      
+      // تبدیل محتوا به فرمت مورد نیاز
+      const id = typeof contentItem._id === 'string' ? 
+        parseInt(contentItem._id.substring(0, 8), 16) : 
+        parseInt(contentItem._id.toString().substring(0, 8), 16);
+        
+      const convertedContentItem = {
+        ...contentItem,
+        id
+      } as unknown as Content;
+      
+      // تبدیل محتواها به فرمت مورد نیاز
+      const convertedContent: Content[] = allContent.map(content => {
+        const id = typeof content._id === 'string' ? 
+          parseInt(content._id.substring(0, 8), 16) : 
+          parseInt(content._id.toString().substring(0, 8), 16);
+          
+        return {
+          ...content,
+          id
+        } as unknown as Content;
+      });
+      
+      // تبدیل ژانرها به فرمت مورد نیاز
+      const convertedGenres: Genre[] = allGenres.map(genre => {
+        const id = typeof genre._id === 'string' ? 
+          parseInt(genre._id.substring(0, 8), 16) : 
+          parseInt(genre._id.toString().substring(0, 8), 16);
+          
+        return {
+          ...genre,
+          id
+        } as unknown as Genre;
+      });
+      
+      // تبدیل تگ‌ها به فرمت مورد نیاز
+      const convertedTags: Tag[] = allTags.map(tag => {
+        const id = typeof tag._id === 'string' ? 
+          parseInt(tag._id.substring(0, 8), 16) : 
+          parseInt(tag._id.toString().substring(0, 8), 16);
+          
+        return {
+          ...tag,
+          id
+        } as unknown as Tag;
+      });
+      
+      // دریافت محتواهای مشابه از سرویس هوش مصنوعی
+      const similarContent = await aiRecommendationService.getSimilarContent(
+        convertedContentItem,
+        convertedContent,
+        convertedGenres,
+        convertedTags,
+        limit
+      );
+      
+      // بازگرداندن نتایج
+      return similarContent;
+    } catch (error) {
+      console.error("Error getting AI similar content:", error);
+      
+      // در صورت خطا، محتواهای جدید هم‌نوع را برگردان
+      if (typeof contentId === 'number') {
+        try {
+          // تبدیل به ObjectId
+          const hexId = contentId.toString(16).padStart(24, '0');
+          const objectId = new mongoose.Types.ObjectId(hexId);
+          const contentItem = await ContentModel.findById(objectId).lean();
+          
+          if (contentItem && contentItem.type) {
+            return this.getContentByType(contentItem.type, limit);
+          }
+        } catch (innerError) {
+          console.error("Inner error in fallback:", innerError);
+        }
+      }
+      
+      return this.getLatestContent(limit);
     }
   }
 }

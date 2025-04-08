@@ -147,11 +147,9 @@ export function Header() {
               ) : !user ? (
                 // Not logged in
                 <div className="flex items-center">
-                  <Link href="/auth" className="unified-button">
-                    ورود
-                  </Link>
-                  <Link href="/auth" className="mx-2 px-4 py-2 rounded-md bg-[#00BFFF] hover:bg-[#00BFFF]/90 text-white border border-[#00BFFF]/70 transition-all duration-300">
-                    ثبت نام
+                  <Link href="/auth" className="px-4 py-2 rounded-md bg-[#00BFFF] hover:bg-[#00BFFF]/90 text-white border border-[#00BFFF]/70 transition-all duration-300 flex items-center space-x-1 space-x-reverse">
+                    <User className="ml-1 h-4 w-4" />
+                    <span>ورود / ثبت نام</span>
                   </Link>
                 </div>
               ) : (
