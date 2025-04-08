@@ -56,6 +56,8 @@
     @apply bg-card/70 backdrop-blur-md border border-white/5;
   }
   
+  /* استایل اولیه برای هدر */
+  
   .fluent-card {
     @apply transition-all duration-300;
   }
