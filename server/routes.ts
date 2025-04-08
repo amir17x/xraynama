@@ -43,6 +43,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // جستجوی محتوا با استفاده از اسلاگ (عنوان انگلیسی)
+  app.get("/api/content/slug/:slug", async (req, res, next) => {
+    try {
+      const slug = req.params.slug;
+      const content = await storage.getContentBySlug(slug);
+      
+      if (!content) {
+        return res.status(404).json({ message: "محتوا یافت نشد" });
+      }
+      
+      res.json(content);
+    } catch (error) {
+      next(error);
+    }
+  });
+
   app.get("/api/content/:id", async (req, res, next) => {
     try {
       const contentId = parseInt(req.params.id);

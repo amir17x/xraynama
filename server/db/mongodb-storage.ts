@@ -151,6 +151,39 @@ export class MongoDBStorage implements IStorage {
     }
   }
 
+  async getContentBySlug(slug: string): Promise<Content | undefined> {
+    try {
+      // first try to see if this is a MongoDB ID
+      if (/^[0-9a-fA-F]{24}$/.test(slug)) {
+        try {
+          const content = await ContentModel.findById(slug);
+          if (content) {
+            return this.mongoContentToContent(content);
+          }
+        } catch (err) {
+          // If there's an error or not found as ID, continue to slug check
+        }
+      }
+      
+      // استفاده از englishTitle به‌جای شناسه MongoDB
+      // حذف فاصله‌ها و استفاده از regex برای تطبیق دقیق‌تر
+      const slugPattern = slug.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
+      
+      const contents = await ContentModel.find({});
+      const matchedContent = contents.find(content => {
+        const contentSlug = (content.englishTitle || "").replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
+        return contentSlug === slugPattern;
+      });
+      
+      if (!matchedContent) return undefined;
+      
+      return this.mongoContentToContent(matchedContent);
+    } catch (error) {
+      console.error('Error fetching content by slug:', error);
+      return undefined;
+    }
+  }
+
   async getContentByType(type: string, limit: number = 10, offset: number = 0): Promise<Content[]> {
     try {
       const contents = await ContentModel.find({ type })

@@ -50,11 +50,17 @@ import {
 } from "@/components/ui/select";
 
 export default function ContentPage() {
-  const { id } = useParams();
+  const { slug } = useParams();
   const [, navigate] = useLocation();
   const { user } = useAuth();
   const { toast } = useToast();
   const videoRef = useRef<HTMLVideoElement>(null);
+  
+  // استفاده از API Endpoint جدید برای دریافت محتوا با استفاده از slug
+  const { data: content, isLoading, error } = useQuery({
+    queryKey: [`/api/content/slug/${slug}`],
+    enabled: !!slug
+  });
   
   // State
   const [selectedTab, setSelectedTab] = useState<"info" | "comments">("info");
@@ -64,9 +70,9 @@ export default function ContentPage() {
   const [isFavorite, setIsFavorite] = useState(false);
   const [viewMode, setViewMode] = useState<"trailer" | "details">("details");
   
-  // Mock data for demonstration
+  // فالبک به داده‌های نمایشی در صورت مشکل در دریافت داده از API
   const mockContent = {
-    id: id,
+    id: slug,
     title: "پرستیژ",
     englishTitle: "The Prestige",
     description: "دو شعبده‌باز رقیب در لندن اواخر قرن نوزدهم تلاش می‌کنند تا بهترین ترفند را ارائه دهند و در این راه به مبارزه خطرناکی کشیده می‌شوند.",

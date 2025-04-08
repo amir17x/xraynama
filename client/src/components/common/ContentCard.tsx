@@ -141,7 +141,7 @@ export function ContentCard({
 
   if (layout === 'landscape') {
     return (
-      <Link href={`/content/${content.id}`}>
+      <Link href={`/content/${content.englishTitle.replace(/[^a-zA-Z0-9]/g, '')}`}>
         <div className={cn(
           "fluent-card bg-card border border-border rounded-lg overflow-hidden shadow-lg",
           className
@@ -227,7 +227,7 @@ export function ContentCard({
   }
 
   return (
-    <Link href={`/content/${content.id}`}>
+    <Link href={`/content/${content.englishTitle.replace(/[^a-zA-Z0-9]/g, '')}`}>
       <div className={cn(
         "fluent-card flex-shrink-0 w-60 rounded-lg overflow-hidden bg-card border border-border shadow-lg",
         className

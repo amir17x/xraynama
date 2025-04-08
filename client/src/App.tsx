@@ -36,7 +36,7 @@ function Router() {
     <Switch>
       <Route path="/" component={HomePage} />
       <Route path="/auth" component={AuthPage} />
-      <Route path="/content/:id" component={ContentPage} />
+      <Route path="/content/:slug" component={ContentPage} />
       <Route path="/category/:type" component={CategoryPage} />
       <Route path="/search" component={SearchPage} />
       <Route path="/top-imdb" component={TopIMDBPage} />
