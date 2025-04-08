@@ -30,7 +30,7 @@ export function MobileMenu({ isOpen, onClose, navItems }: MobileMenuProps) {
           leaveFrom="opacity-100"
           leaveTo="opacity-0"
         >
-          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm" />
+          <div className="fixed inset-0 bg-[#00142c]/70 backdrop-blur-md" />
         </Transition.Child>
 
         <Transition.Child
@@ -42,31 +42,32 @@ export function MobileMenu({ isOpen, onClose, navItems }: MobileMenuProps) {
           leaveFrom="translate-x-0"
           leaveTo="translate-x-full"
         >
-          <Dialog.Panel className="fixed inset-y-0 left-0 right-0 w-full max-w-md mr-auto glass-effect shadow-xl">
-            <div className="flex items-center justify-between px-4 py-3 border-b border-border">
-              <Dialog.Title className="text-xl font-semibold text-foreground">
-                منو
+          <Dialog.Panel className="fixed inset-y-0 left-0 right-0 w-full max-w-md mr-auto bg-[#00142c]/90 backdrop-blur-xl shadow-xl border-l border-[#00BFFF]/20">
+            <div className="flex items-center justify-between px-4 py-3 border-b border-[#00BFFF]/20">
+              <Dialog.Title className="text-xl font-semibold text-white flex items-center">
+                <span className="text-[#00BFFF] ml-2">X</span>
+                <span>منوی اصلی</span>
               </Dialog.Title>
-              <Button variant="ghost" size="icon" className="unified-icon-button" onClick={onClose}>
-                <X className="h-6 w-6" />
+              <Button variant="ghost" size="icon" className="glassmorphic-icon w-9 h-9 flex items-center justify-center" onClick={onClose}>
+                <X className="h-5 w-5 text-[#00BFFF]" />
               </Button>
             </div>
             
             <div className="px-4 py-6">
-              <nav className="space-y-4">
+              <nav className="space-y-1">
                 {navItems.map((item) => (
                   <Link
                     key={item.href}
                     href={item.href}
-                    className="flex items-center px-3 py-3 rounded-md hover:bg-black/40 transition-all duration-300 group"
+                    className="flex items-center px-3 py-3 rounded-md hover:bg-[#00BFFF]/10 transition-all duration-300 group"
                     onClick={onClose}
                   >
-                    <div className="ml-3 group-hover:text-orange-400 transition-colors duration-300">
+                    <div className="ml-3 text-[#00BFFF] group-hover:text-[#00BFFF] transition-colors duration-300">
                       {item.icon}
                     </div>
                     <div className="flex flex-col">
-                      <span className="text-base font-medium">{item.label}</span>
-                      <span className="text-xs text-slate-400 group-hover:text-orange-400 transition-colors duration-300">
+                      <span className="text-base font-medium text-white">{item.label}</span>
+                      <span className="text-xs text-gray-400 group-hover:text-white transition-colors duration-300">
                         {item.englishLabel}
                       </span>
                     </div>

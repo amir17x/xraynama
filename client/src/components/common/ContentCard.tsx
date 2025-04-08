@@ -4,17 +4,12 @@ import { ContentType, GenreType } from '@/types';
 import { Heart, Plus, Play, Download } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { apiRequest, queryClient } from '@/lib/queryClient';
-
-// تعریف ویژگی‌های اضافی برای ContentType
-interface ContentTypeExtended extends ContentType {
-  genres?: GenreType[] | string[];
-}
 import { useAuth } from '@/hooks/use-auth';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 
 interface ContentCardProps {
-  content: ContentTypeExtended;
+  content: ContentType;
   isInWatchlist?: boolean;
   isInFavorites?: boolean;
   className?: string;
@@ -341,11 +336,15 @@ export function ContentCard({
         <div className="p-4">
           <h3 className="content-title">{content.title}</h3>
           <p className="content-subtitle">{content.englishTitle}</p>
-          {content.genres && content.genres.length > 0 && (
+          {content.genres && (
             <div className="flex flex-wrap gap-1 mt-2">
-              {content.genres.slice(0, 2).map((genre, index) => (
+              {typeof content.genres === 'string' ? (
+                <span className="text-xs bg-muted px-2 py-0.5 rounded-full text-muted-foreground">
+                  {content.genres}
+                </span>
+              ) : Array.isArray(content.genres) && content.genres.slice(0, 2).map((genre: any, index: number) => (
                 <span key={index} className="text-xs bg-muted px-2 py-0.5 rounded-full text-muted-foreground">
-                  {typeof genre === 'string' ? genre : genre.name}
+                  {typeof genre === 'string' ? genre : genre.name || String(genre)}
                 </span>
               ))}
             </div>

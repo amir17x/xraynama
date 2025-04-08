@@ -64,215 +64,226 @@ export function Header() {
       label: 'خانه', 
       englishLabel: 'HOME',
       href: '/', 
-      icon: <Home className="h-5 w-5 mb-1" />
+      icon: <Home className="h-5 w-5" />
     },
     { 
       label: 'فیلم‌ها', 
       englishLabel: 'MOVIES',
       href: '/movies', 
-      icon: <Film className="h-5 w-5 mb-1" />
+      icon: <Film className="h-5 w-5" />
     },
     { 
       label: 'سریال‌ها', 
       englishLabel: 'SERIES',
       href: '/series', 
-      icon: <Video className="h-5 w-5 mb-1" />
+      icon: <Video className="h-5 w-5" />
     },
     { 
       label: 'انیمیشن‌ها', 
       englishLabel: 'ANIMATIONS',
       href: '/animations', 
-      icon: <FileVideo className="h-5 w-5 mb-1" />
+      icon: <FileVideo className="h-5 w-5" />
     },
     { 
       label: 'مستندها', 
       englishLabel: 'DOCUMENTARIES',
       href: '/documentaries', 
-      icon: <Theater className="h-5 w-5 mb-1" />
+      icon: <Theater className="h-5 w-5" />
     },
     { 
       label: 'هنرمندان', 
       englishLabel: 'ARTISTS',
       href: '/artists', 
-      icon: <Users className="h-5 w-5 mb-1" />
+      icon: <Users className="h-5 w-5" />
     },
     { 
       label: 'اپلیکیشن', 
       englishLabel: 'APP',
       href: '/app', 
-      icon: <Smartphone className="h-5 w-5 mb-1 text-green-400" />
+      icon: <Smartphone className="h-5 w-5" />
     },
   ];
 
   return (
     <>
-      <header className={`
+      <div className={`
         sticky z-50 
-        px-6 py-4 
         mx-4 my-2
-        flex items-center justify-between 
+        flex flex-col
         rounded-xl 
+        overflow-hidden
         glass-header
         ${isScrolled 
           ? 'header-shadow top-2 header-scroll-transition' 
           : 'top-3'
         }
       `}>
-        <div className="flex items-center">
-          <div className="mr-4">
-            <Link href="/" className="flex items-center">
-              <span className="text-primary text-2xl font-bold">X<span className="text-foreground">raynama</span></span>
-            </Link>
+        {/* بخش بالایی هدر - پروفایل، جستجو، اعلانات */}
+        <header className="px-6 py-3 flex items-center justify-between">
+          <div className="flex items-center">
+            <div className="mr-4">
+              <Link href="/" className="flex items-center">
+                <span className="text-[#00BFFF] text-2xl font-bold">X<span className="text-white">raynama</span></span>
+              </Link>
+            </div>
           </div>
-          
-          <nav className="hidden md:flex items-center space-x-2 rtl:space-x-reverse mr-6">
+
+          <div className="flex items-center">
+            {/* دکمه جستجوی پیشرفته */}
+            <div className="ml-3">
+              <AdvancedSearchButton />
+            </div>
+            
+            {/* دکمه اعلانات */}
+            <div className="ml-3">
+              <NotificationsButton />
+            </div>
+            
+            <SearchBar />
+
+            <div className="flex items-center mr-2">
+              {isLoading ? (
+                <Loader2 className="h-5 w-5 animate-spin text-[#00BFFF] ml-4" />
+              ) : !user ? (
+                // Not logged in
+                <div className="flex items-center">
+                  <Link href="/auth" className="unified-button">
+                    ورود
+                  </Link>
+                  <Link href="/auth" className="mx-2 px-4 py-2 rounded-md bg-[#00BFFF] hover:bg-[#00BFFF]/90 text-white border border-[#00BFFF]/70 transition-all duration-300">
+                    ثبت نام
+                  </Link>
+                </div>
+              ) : (
+                // Logged in
+                <div className="relative ml-1" style={{ position: 'relative' }}>
+                  <Button 
+                    ref={triggerRef}
+                    variant="ghost" 
+                    className="glassmorphic-icon flex items-center focus:outline-none px-2 py-1 rounded-full"
+                    onClick={() => setIsMenuOpen(!isMenuOpen)}
+                  >
+                    <Avatar className="w-8 h-8 border-2 border-[#00BFFF]/80">
+                      <AvatarImage src={user.avatar || undefined} />
+                      <AvatarFallback className="bg-[#00142c] text-[#00BFFF] font-semibold">
+                        {user.name?.charAt(0) || user.username.charAt(0)}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="mr-2 flex flex-col items-start hidden md:block">
+                      <span className="text-white text-sm font-medium">
+                        {user.name || user.username}
+                      </span>
+                      <span className="text-xs text-[#00BFFF]">
+                        {user?.role === 'admin' ? 'مدیر سیستم' : 'کاربر'}
+                      </span>
+                    </div>
+                    <ChevronDown className="mr-1 text-[#00BFFF] h-4 w-4 md:hidden" />
+                  </Button>
+                  
+                  {isMenuOpen && (
+                    <div style={{ right: '0', left: 'auto' }} className="profile-dropdown w-48 bg-[#00142c]/95 border border-[#00BFFF]/20 rounded-lg shadow-lg backdrop-blur-md p-2 text-white animate-fade-in z-50 absolute top-full mt-2">
+                      <Link 
+                        href="/profile"
+                        className="w-full flex items-center p-2 rounded-md text-sm hover:bg-[#00BFFF]/10 transition-colors duration-200"
+                        onClick={() => setIsMenuOpen(false)}
+                      >
+                        <User className="ml-2 h-4 w-4 text-[#00BFFF]" />
+                        <span>پروفایل</span>
+                      </Link>
+                      
+                      <Link 
+                        href="/profile?tab=favorites"
+                        className="w-full flex items-center p-2 rounded-md text-sm hover:bg-[#00BFFF]/10 transition-colors duration-200"
+                        onClick={() => setIsMenuOpen(false)}
+                      >
+                        <Heart className="ml-2 h-4 w-4 text-[#00BFFF]" />
+                        <span>علاقه‌مندی‌ها</span>
+                      </Link>
+                      
+                      <Link 
+                        href="/profile?tab=playlists"
+                        className="w-full flex items-center p-2 rounded-md text-sm hover:bg-[#00BFFF]/10 transition-colors duration-200"
+                        onClick={() => setIsMenuOpen(false)}
+                      >
+                        <ListVideo className="ml-2 h-4 w-4 text-[#00BFFF]" />
+                        <span>پلی‌لیست‌ها</span>
+                      </Link>
+                      
+                      <Link 
+                        href="/profile?tab=settings"
+                        className="w-full flex items-center p-2 rounded-md text-sm hover:bg-[#00BFFF]/10 transition-colors duration-200"
+                        onClick={() => setIsMenuOpen(false)}
+                      >
+                        <Settings className="ml-2 h-4 w-4 text-[#00BFFF]" />
+                        <span>تنظیمات</span>
+                      </Link>
+                      
+                      {/* نمایش گزینه مدیر سیستم فقط برای کاربران ادمین */}
+                      {user?.role === 'admin' && (
+                        <>
+                          <div className="h-px bg-[#00BFFF]/10 my-1"></div>
+                          <Link 
+                            href="/admin/dashboard"
+                            className="w-full flex items-center p-2 rounded-md bg-[#00BFFF]/10 text-[#00BFFF] hover:bg-[#00BFFF]/20 text-sm font-semibold transition-all duration-300"
+                            onClick={() => setIsMenuOpen(false)}
+                          >
+                            <ShieldAlert className="ml-2 h-4 w-4" />
+                            <span>مدیر سیستم</span>
+                          </Link>
+                        </>
+                      )}
+                      
+                      <div className="h-px bg-[#00BFFF]/10 my-1"></div>
+                      <button 
+                        className="w-full flex items-center p-2 rounded-md text-sm hover:bg-red-500/10 hover:text-red-400 transition-colors duration-200"
+                        onClick={() => { handleLogout(); setIsMenuOpen(false); }}
+                        disabled={logoutMutation.isPending}
+                      >
+                        <LogOut className="ml-2 h-4 w-4" />
+                        <span>خروج</span>
+                        {logoutMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+            
+            {/* Mobile menu button */}
+            <div className="md:hidden ml-4">
+              <Button 
+                variant="ghost" 
+                size="icon"
+                className="glassmorphic-icon w-9 h-9 flex items-center justify-center" 
+                onClick={() => setIsMobileMenuOpen(true)}
+              >
+                <Menu className="h-5 w-5 text-[#00BFFF]" />
+              </Button>
+            </div>
+          </div>
+        </header>
+        
+        {/* نوار ناوبری پایین - مخفی در حالت موبایل */}
+        <nav className="header-navigation hidden md:flex">
+          <div className="flex items-center justify-center gap-0 w-full">
             {navItems.map((item) => (
               <Link 
                 key={item.href} 
                 href={item.href}
-                className="flex flex-col items-center px-4 py-2 rounded-md hover:bg-black/40 transition-all duration-300 group"
+                className="nav-item"
               >
-                <div className="group-hover:text-orange-400 transition-colors duration-300">
+                <div className="nav-icon">
                   {item.icon}
                 </div>
-                <span className="text-sm font-medium mb-0.5">{item.label}</span>
-                <span className="text-xs text-slate-400 group-hover:text-orange-400 transition-colors duration-300">
+                <span className="nav-label">{item.label}</span>
+                <span className="nav-english-label">
                   {item.englishLabel}
                 </span>
               </Link>
             ))}
-          </nav>
-        </div>
-
-        <div className="flex items-center">
-          {/* قسمت قرمز - دکمه جستجوی پیشرفته */}
-          <div className="ml-4">
-            <AdvancedSearchButton />
           </div>
-          
-          {/* قسمت بنفش - دکمه اعلانات */}
-          <div className="ml-4">
-            <NotificationsButton />
-          </div>
-          
-          <SearchBar />
-
-          <div className="flex items-center mr-2">
-            {isLoading ? (
-              <Loader2 className="h-5 w-5 animate-spin text-muted-foreground ml-4" />
-            ) : !user ? (
-              // Not logged in
-              <div className="flex items-center">
-                <Link href="/auth" className="unified-button">
-                  ورود
-                </Link>
-                <Link href="/auth" className="unified-button mx-2 bg-[#006bd6] hover:bg-[#006bd6]/90 border-[#006bd6]/70 text-white">
-                  ثبت نام
-                </Link>
-              </div>
-            ) : (
-              // Logged in
-              <div className="relative" style={{ position: 'relative' }}>
-                <Button 
-                  ref={triggerRef}
-                  variant="ghost" 
-                  className="unified-icon-button flex items-center focus:outline-none"
-                  onClick={() => setIsMenuOpen(!isMenuOpen)}
-                >
-                  <Avatar className="w-8 h-8 border-2 border-primary">
-                    <AvatarImage src={user.avatar || undefined} />
-                    <AvatarFallback className="bg-muted text-primary font-semibold">
-                      {user.name?.charAt(0) || user.username.charAt(0)}
-                    </AvatarFallback>
-                  </Avatar>
-                  <span className="mr-2 text-foreground hidden md:block">
-                    {user.name || user.username}
-                  </span>
-                  <ChevronDown className="text-xs mr-1 text-muted-foreground h-4 w-4" />
-                </Button>
-                
-                {isMenuOpen && (
-                  <div style={{ right: '0', left: 'auto' }} className="profile-dropdown w-48 bg-popover border rounded-md shadow-md p-1 text-popover-foreground animate-fade-in z-50 absolute top-full mt-2">
-                    <Link 
-                      href="/profile"
-                      className="unified-button w-full flex items-center p-2 rounded text-sm"
-                      onClick={() => setIsMenuOpen(false)}
-                    >
-                      <User className="ml-2 h-4 w-4" />
-                      <span>پروفایل</span>
-                    </Link>
-                    
-                    <Link 
-                      href="/profile?tab=favorites"
-                      className="unified-button w-full flex items-center p-2 rounded text-sm"
-                      onClick={() => setIsMenuOpen(false)}
-                    >
-                      <Heart className="ml-2 h-4 w-4" />
-                      <span>علاقه‌مندی‌ها</span>
-                    </Link>
-                    
-                    <Link 
-                      href="/profile?tab=playlists"
-                      className="unified-button w-full flex items-center p-2 rounded text-sm"
-                      onClick={() => setIsMenuOpen(false)}
-                    >
-                      <ListVideo className="ml-2 h-4 w-4" />
-                      <span>پلی‌لیست‌ها</span>
-                    </Link>
-                    
-                    <Link 
-                      href="/profile?tab=settings"
-                      className="unified-button w-full flex items-center p-2 rounded text-sm"
-                      onClick={() => setIsMenuOpen(false)}
-                    >
-                      <Settings className="ml-2 h-4 w-4" />
-                      <span>تنظیمات</span>
-                    </Link>
-                    
-                    {/* نمایش گزینه مدیر سیستم فقط برای کاربران ادمین */}
-                    {user?.role === 'admin' && (
-                      <>
-                        <div className="h-px bg-muted my-1 -mx-1"></div>
-                        <Link 
-                          href="/admin/dashboard"
-                          className="w-full flex items-center p-2 rounded bg-[#006bd6]/10 text-[#006bd6] hover:bg-[#006bd6]/20 text-sm font-semibold transition-all duration-300"
-                          onClick={() => setIsMenuOpen(false)}
-                        >
-                          <ShieldAlert className="ml-2 h-4 w-4" />
-                          <span>مدیر سیستم</span>
-                        </Link>
-                      </>
-                    )}
-                    
-                    <div className="h-px bg-muted my-1 -mx-1"></div>
-                    <button 
-                      className="unified-button w-full flex items-center p-2 rounded text-sm"
-                      onClick={() => { handleLogout(); setIsMenuOpen(false); }}
-                      disabled={logoutMutation.isPending}
-                    >
-                      <LogOut className="ml-2 h-4 w-4" />
-                      <span>خروج</span>
-                      {logoutMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                    </button>
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
-          
-          {/* Mobile menu button */}
-          <div className="md:hidden ml-4">
-            <Button 
-              variant="ghost" 
-              size="icon"
-              className="unified-icon-button" 
-              onClick={() => setIsMobileMenuOpen(true)}
-            >
-              <Menu className="h-6 w-6" />
-            </Button>
-          </div>
-        </div>
-      </header>
+        </nav>
+      </div>
 
       {/* Mobile menu */}
       <MobileMenu 

@@ -1,0 +1,47 @@
+حتماً! این هم یک پرامپت حرفه‌ای، دقیق و پر از جزئیات برای ساخت یک رابط جست‌وجوی پیشرفته‌ی فیلم، با تم شیشه‌ای (glassmorphism) و رنگ غالب آبی، مخصوص یک سایت فیلم، الهام‌گرفته از تصویرت ولی با نوآوری و امکانات بیشتر:
+
+---
+
+**🎯 Prompt برای هوش مصنوعی طراحی UI (مثل Midjourney، DALL·E یا هر مدل مولد تصویر):**
+
+> Design a futuristic, glassmorphism-style advanced movie search interface for a streaming or movie database website.  
+>  
+> **Theme**: Sleek, elegant blue tones (royal blue, sky blue, neon blue accents), combined with transparent, frosted-glass panels.  
+>  
+> **Layout**:
+> - A responsive horizontal search panel with rounded corners and smooth shadows.
+> - Transparent floating cards for filters.
+> - Neon blue glowing edges and soft blur backgrounds for depth.
+>  
+> **Filters to include**:
+> - **Date Range Slider**: "Release Year", from 1888 to 2025 with glowing numeric indicators.
+> - **Rating Slider**: From 1.0 to 10.0, with animated handles and live preview.
+> - **Actor Name Input**: Modern input box with auto-suggestion dropdown.
+> - **Director Name Input**: Same as actor input with subtle icon.
+> - **Genre Dropdown**: Multi-select option with icons (sci-fi, drama, comedy etc.)
+> - **Age Rating Dropdown**: Stylized age badges (PG, R, etc).
+> - **Country Dropdown**: Flag icons beside country names.
+> - **Quality**: Buttons like 720p, 1080p, 4K with glowing borders.
+> - **Streaming Options**: Toggle switches for: "Dubbed", "Subtitled", "Censored", "Online Streaming".
+> - **Sort By Dropdown**: Newest, Oldest, Rating, Popularity.
+> - **Search Button**: Glowing neon blue magnifying glass icon, interactive hover effect.
+> - **Mode Switch**: Toggle between “Movies” and “Series”, clearly differentiated with visual cues.
+>  
+> **Style Notes**:
+> - Use glassmorphism effects (blurred background with transparency).
+> - Smooth animations on hover and focus.
+> - Font: sleek modern sans-serif (like "Poppins" or "Inter").
+> - Use icons for clarity (actor, director, rating, etc).
+> - Background: dark gradient (midnight blue to deep indigo).
+>  
+> **Add Creative Enhancements**:
+> - A futuristic scanning animation near the search icon.
+> - Interactive filter chips that "float" with soft motion.
+> - Hidden advanced filters that expand with smooth animation when clicked.
+>  
+> This should look like a next-gen user interface for a premium movie platform, perfect for a modern streaming website.
+
+---
+
+اگه دوست داری نسخه‌ی فارسی‌شو هم برات بنویسم که بدی به یه طراح ایرانی، بگو برات می‌نویسم.  
+یا اگه می‌خوای این طراحی رو به صورت HTML/CSS/React هم پیاده‌سازی کنم، فقط کافیه بگی.

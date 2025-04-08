@@ -386,43 +386,43 @@
     @apply text-muted-foreground text-xs;
   }
   
-  /* استایل یکپارچه برای همه دکمه‌ها و المان‌های هدر */
+  /* استایل یکپارچه برای همه دکمه‌ها و المان‌های هدر - با رنگ نئون آبی */
   .unified-button {
-    @apply px-4 py-2 rounded-md bg-background/80 hover:bg-[#006bd6]/20 hover:text-[#006bd6] font-medium border border-border hover:border-[#006bd6]/30 transition-all duration-300;
+    @apply px-4 py-2 rounded-md bg-background/80 hover:bg-[#00BFFF]/20 hover:text-[#00BFFF] font-medium border border-border hover:border-[#00BFFF]/30 transition-all duration-300;
   }
   
-  /* استایل برای دکمه‌های آیکون‌دار کوچکتر */
+  /* استایل برای دکمه‌های آیکون‌دار کوچکتر - با رنگ نئون آبی */
   .unified-icon-button {
-    @apply p-2 rounded-md bg-background/80 hover:bg-[#006bd6]/20 text-foreground hover:text-[#006bd6] border border-border hover:border-[#006bd6]/30 transition-all duration-300;
+    @apply p-2 rounded-md bg-background/80 hover:bg-[#00BFFF]/20 text-foreground hover:text-[#00BFFF] border border-border hover:border-[#00BFFF]/30 transition-all duration-300;
   }
   
-  /* طرح شیشه‌ای و شفاف برای هدر */
+  /* طرح شیشه‌ای و شفاف برای هدر - با گرادیان آبی-سیاه فوتوریستیک */
   .glass-header {
     @apply backdrop-blur-md shadow-sm border transition-all duration-500 ease-in-out;
-    background-color: rgba(13, 17, 23, 0.4);
+    background-color: rgba(10, 15, 35, 0.65);
     background-image: 
       linear-gradient(to bottom, 
-        rgba(255, 255, 255, 0.07) 0%, 
-        rgba(255, 255, 255, 0.02) 50%, 
-        rgba(0, 0, 0, 0.1) 100%);
+        rgba(0, 191, 255, 0.07) 0%, 
+        rgba(0, 80, 170, 0.04) 50%, 
+        rgba(0, 20, 60, 0.07) 100%);
     background-size: 200% 200%;
-    border-color: rgba(255, 255, 255, 0.08);
+    border-color: rgba(0, 191, 255, 0.12);
     box-shadow: 
-      0 10px 30px -10px rgba(0, 0, 0, 0.2),
-      0 1px 2px rgba(255, 255, 255, 0.05),
-      inset 0 1px 1px rgba(255, 255, 255, 0.03);
-    backdrop-filter: blur(10px);
+      0 10px 30px -10px rgba(0, 0, 0, 0.3),
+      0 1px 2px rgba(0, 191, 255, 0.1),
+      inset 0 1px 1px rgba(0, 191, 255, 0.05);
+    backdrop-filter: blur(12px);
   }
   
-  /* هدر در حالت اسکرول */
+  /* هدر در حالت اسکرول - با افکت درخشش بیشتر */
   .glass-header.header-shadow {
-    background-color: rgba(13, 17, 23, 0.75);
-    border-color: rgba(255, 255, 255, 0.12);
+    background-color: rgba(10, 15, 35, 0.85);
+    border-color: rgba(0, 191, 255, 0.18);
     box-shadow: 
-      0 10px 30px -5px rgba(0, 0, 0, 0.3),
-      0 4px 10px rgba(0, 0, 0, 0.1),
-      inset 0 1px 0 rgba(255, 255, 255, 0.05);
-    backdrop-filter: blur(12px);
+      0 10px 30px -5px rgba(0, 0, 0, 0.4),
+      0 4px 15px rgba(0, 191, 255, 0.1),
+      inset 0 1px 0 rgba(0, 191, 255, 0.08);
+    backdrop-filter: blur(15px);
   }
 
   /* انیمیشن نرم برای هدر */
@@ -455,17 +455,22 @@
   }
   
   .glassmorphic-icon {
-    @apply relative bg-blue-900/20 backdrop-blur-sm border border-blue-800/30 hover:bg-blue-800/40 transition-all duration-300 rounded-full shadow-lg;
+    @apply relative bg-[#00BFFF]/10 backdrop-blur-sm border border-[#00BFFF]/20 hover:bg-[#00BFFF]/20 transition-all duration-300 rounded-full shadow-md;
+    box-shadow: 0 4px 12px -2px rgba(0, 191, 255, 0.15);
   }
   
   .glassmorphic-icon::before {
     content: '';
-    @apply absolute inset-0 rounded-full bg-gradient-to-tr from-transparent via-blue-500/10 to-blue-300/20 opacity-0 transition-opacity duration-300;
+    @apply absolute inset-0 rounded-full bg-gradient-to-tr from-transparent via-[#00BFFF]/10 to-[#00BFFF]/20 opacity-0 transition-opacity duration-300;
     z-index: -1;
   }
   
   .glassmorphic-icon:hover::before {
     @apply opacity-100;
+  }
+  
+  .glassmorphic-icon:hover {
+    box-shadow: 0 4px 12px -1px rgba(0, 191, 255, 0.25);
   }
   
   /* استایل مشترک برای container صفحات */
@@ -764,4 +769,41 @@ html[dir='rtl'] [data-radix-popper-content-wrapper] {
 /* استایل‌های جانبی و مسکل */
 .divider {
   @apply h-px w-full bg-border my-4;
+}
+
+/* استایل برای نوار ناوبری پایین هدر */
+.header-navigation {
+  @apply bg-[#00142c]/90 backdrop-blur-md border-t border-[#00BFFF]/10 px-0 py-1.5 flex items-center justify-center rounded-b-xl shadow-md;
+  box-shadow: 0 4px 15px -2px rgba(0, 0, 0, 0.2), 0 2px 8px -2px rgba(0, 191, 255, 0.1);
+}
+
+/* استایل برای آیتم‌های منوی ناوبری */
+.nav-item {
+  @apply flex flex-col items-center justify-center px-1 py-1 rounded-md transition-all duration-300;
+  min-width: 60px;
+  margin: 0;
+}
+
+.nav-item:hover .nav-icon {
+  @apply text-[#00BFFF];
+  transform: translateY(-2px);
+}
+
+.nav-item:hover .nav-label {
+  @apply text-white;
+}
+
+.nav-icon {
+  @apply mb-1 transition-all duration-300;
+  font-size: 1.1rem;
+}
+
+.nav-label {
+  @apply text-xs font-medium text-gray-300 transition-colors duration-300;
+  margin-top: -2px;
+}
+
+.nav-english-label {
+  @apply text-[9px] text-gray-500 transition-colors duration-300;
+  margin-top: -2px;
 }

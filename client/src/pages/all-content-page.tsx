@@ -19,6 +19,7 @@ import {
   SelectTrigger, 
   SelectValue 
 } from '@/components/ui/select';
+import AdvancedSearchPanel from '@/components/search/AdvancedSearchPanel';
 import { ContentType } from '@/types';
 
 interface SearchFilters {
@@ -276,121 +277,27 @@ const AllContentPage: React.FC = () => {
           
           {/* Advanced Search Panel */}
           {showAdvancedSearch && (
-            <div className="glass-effect shadow rounded-lg p-6 mb-8">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <div>
-                  <Label className="block mb-2 text-white">نوع محتوا</Label>
-                  <Select
-                    value={filters.type || 'all'}
-                    onValueChange={(value) => handleFilterChange('type', value === 'all' ? undefined : value)}
-                  >
-                    <SelectTrigger className="bg-black/20 border-gray-700 text-white">
-                      <SelectValue placeholder="همه" />
-                    </SelectTrigger>
-                    <SelectContent className="bg-gray-800 border-gray-700 text-white">
-                      <SelectItem value="all">همه</SelectItem>
-                      <SelectItem value="movie">فیلم</SelectItem>
-                      <SelectItem value="series">سریال</SelectItem>
-                      <SelectItem value="animation">انیمیشن</SelectItem>
-                      <SelectItem value="documentary">مستند</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                
-                <div>
-                  <Label className="block mb-2 text-white">سال انتشار</Label>
-                  <div className="px-2 pt-4">
-                    <Slider
-                      value={[filters.year_from || 1900, filters.year_to || 2025]}
-                      min={1900}
-                      max={2025}
-                      step={1}
-                      onValueChange={handleYearRangeChange}
-                      className="mb-2"
-                    />
-                    <div className="flex justify-between mt-2 text-sm text-gray-400">
-                      <span>{filters.year_from || 1900}</span>
-                      <span>{filters.year_to || 2025}</span>
-                    </div>
-                  </div>
-                </div>
-                
-                <div>
-                  <Label className="block mb-2 text-white">حداقل امتیاز</Label>
-                  <Select
-                    value={filters.min_rating?.toString() || ''}
-                    onValueChange={(value) => handleFilterChange('min_rating', value === '' ? undefined : parseFloat(value))}
-                  >
-                    <SelectTrigger className="bg-black/20 border-gray-700 text-white">
-                      <SelectValue placeholder="بدون محدودیت" />
-                    </SelectTrigger>
-                    <SelectContent className="bg-gray-800 border-gray-700 text-white">
-                      <SelectItem value="">بدون محدودیت</SelectItem>
-                      <SelectItem value="5">بالای 5</SelectItem>
-                      <SelectItem value="6">بالای 6</SelectItem>
-                      <SelectItem value="7">بالای 7</SelectItem>
-                      <SelectItem value="8">بالای 8</SelectItem>
-                      <SelectItem value="9">بالای 9</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                
-                <div>
-                  <Label className="block mb-2 text-white">بازیگر</Label>
-                  <Input
-                    placeholder="نام بازیگر..."
-                    className="bg-black/20 border-gray-700 text-white placeholder:text-gray-400"
-                    value={filters.actor || ''}
-                    onChange={(e) => handleFilterChange('actor', e.target.value || undefined)}
-                  />
-                </div>
-                
-                <div>
-                  <Label className="block mb-2 text-white">کارگردان</Label>
-                  <Input
-                    placeholder="نام کارگردان..."
-                    className="bg-black/20 border-gray-700 text-white placeholder:text-gray-400"
-                    value={filters.director || ''}
-                    onChange={(e) => handleFilterChange('director', e.target.value || undefined)}
-                  />
-                </div>
-                
-                <div className="flex flex-col justify-end">
-                  <div className="flex flex-col space-y-2">
-                    <div className="flex items-center space-x-2 space-x-reverse">
-                      <Checkbox 
-                        id="dubbing" 
-                        checked={filters.has_dubbing}
-                        onCheckedChange={(checked) => handleFilterChange('has_dubbing', checked === true)}
-                      />
-                      <Label htmlFor="dubbing" className="text-white mr-2">دوبله فارسی</Label>
-                    </div>
-                    <div className="flex items-center space-x-2 space-x-reverse">
-                      <Checkbox 
-                        id="subtitle" 
-                        checked={filters.has_subtitle}
-                        onCheckedChange={(checked) => handleFilterChange('has_subtitle', checked === true)}
-                      />
-                      <Label htmlFor="subtitle" className="text-white mr-2">زیرنویس فارسی</Label>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="flex justify-end mt-6 gap-2">
-                <Button 
-                  variant="outline" 
-                  onClick={resetFilters}
-                  className="bg-gray-800 border-gray-700 text-white hover:bg-gray-700"
-                >
-                  <X className="h-4 w-4 ml-2" />
-                  پاک کردن فیلترها
-                </Button>
-                <Button onClick={applyFilters}>
-                  <Filter className="h-4 w-4 ml-2" />
-                  اعمال فیلتر
-                </Button>
-              </div>
+            <div className="mb-8">
+              <AdvancedSearchPanel 
+                onSearch={(searchParams) => {
+                  // نگاشت پارامترهای فیلتر از کامپوننت پیشرفته به حالت فیلتر صفحه
+                  const newFilters: SearchFilters = {
+                    type: searchParams.mode,
+                    year_from: searchParams.yearRange[0],
+                    year_to: searchParams.yearRange[1],
+                    min_rating: searchParams.ratingRange[0],
+                    has_dubbing: searchParams.options.isDubbed,
+                    has_subtitle: searchParams.options.hasSubtitle,
+                    actor: searchParams.actorName || undefined,
+                    director: searchParams.directorName || undefined,
+                    country: searchParams.selectedCountry || undefined
+                  };
+                  
+                  setFilters(newFilters);
+                  setSearchQuery(''); // پاک کردن متن جستجوی قبلی
+                  applyFilters(); // اعمال فیلترها
+                }}
+              />
             </div>
           )}
           

@@ -186,35 +186,35 @@ const AdvancedSearchPanel: React.FC<AdvancedSearchPanelProps> = ({ className, on
   return (
     <div 
       className={cn(
-        "relative overflow-hidden rounded-2xl bg-gradient-to-b from-[#0f172a]/80 to-[#1e293b]/80 backdrop-blur-md border border-[#1e293b]/50 shadow-glow",
+        "relative overflow-hidden rounded-2xl bg-[#00142c]/90 backdrop-blur-md border border-[#00BFFF]/10 shadow-lg",
         className
       )}
       dir="rtl"
     >
       {/* تزئینات پس‌زمینه - دایره‌های نورانی محو */}
-      <div className="absolute -top-20 -right-20 w-40 h-40 rounded-full bg-[#1d4ed8]/20 blur-3xl"></div>
-      <div className="absolute -bottom-20 -left-20 w-40 h-40 rounded-full bg-[#3b82f6]/20 blur-3xl"></div>
+      <div className="absolute -top-20 -right-20 w-40 h-40 rounded-full bg-[#00BFFF]/10 blur-3xl"></div>
+      <div className="absolute -bottom-20 -left-20 w-40 h-40 rounded-full bg-[#00BFFF]/10 blur-3xl"></div>
       
       <div className="p-5 md:p-6">
         {/* عنوان و جستجوی کلیدی */}
         <div className="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
           <div className="flex items-center">
-            <div className="h-10 w-10 ml-3 rounded-full bg-gradient-to-br from-blue-600 to-blue-400 flex items-center justify-center">
+            <div className="h-10 w-10 ml-3 rounded-full bg-gradient-to-br from-[#00BFFF] to-[#0077b6] flex items-center justify-center shadow-[0_0_15px_rgba(0,191,255,0.3)]">
               <Search className="h-5 w-5 text-white" />
             </div>
             <div>
               <h2 className="text-xl font-semibold text-white">جستجوی پیشرفته</h2>
-              <p className="text-sm text-blue-300">فیلم‌ها و سریال‌ها را با جزئیات دقیق پیدا کنید</p>
+              <p className="text-sm text-[#00BFFF]">فیلم‌ها و سریال‌ها را با جزئیات دقیق پیدا کنید</p>
             </div>
           </div>
           
           {/* انتخاب حالت: فیلم یا سریال */}
-          <div className="flex items-center p-1 bg-black/30 backdrop-blur-sm rounded-full">
+          <div className="flex items-center p-1 bg-black/30 backdrop-blur-sm rounded-full border border-[#00BFFF]/20">
             <button
               className={cn(
                 "px-5 py-2 rounded-full flex items-center gap-2 transition-all duration-300",
                 searchMode === 'movie' 
-                  ? "bg-gradient-to-r from-blue-600 to-blue-500 text-white shadow-lg" 
+                  ? "bg-gradient-to-r from-[#00BFFF] to-[#0077b6] text-white shadow-[0_0_10px_rgba(0,191,255,0.3)]" 
                   : "text-gray-400 hover:text-white"
               )}
               onClick={() => setSearchMode('movie')}
@@ -226,7 +226,7 @@ const AdvancedSearchPanel: React.FC<AdvancedSearchPanelProps> = ({ className, on
               className={cn(
                 "px-5 py-2 rounded-full flex items-center gap-2 transition-all duration-300",
                 searchMode === 'series' 
-                  ? "bg-gradient-to-r from-blue-600 to-blue-500 text-white shadow-lg" 
+                  ? "bg-gradient-to-r from-[#00BFFF] to-[#0077b6] text-white shadow-[0_0_10px_rgba(0,191,255,0.3)]" 
                   : "text-gray-400 hover:text-white"
               )}
               onClick={() => setSearchMode('series')}
@@ -240,10 +240,10 @@ const AdvancedSearchPanel: React.FC<AdvancedSearchPanelProps> = ({ className, on
         {/* فیلترهای اصلی */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
           {/* اسلایدر سال ساخت */}
-          <div className="bg-white/5 backdrop-blur-md rounded-xl p-4 border border-white/10 hover:border-blue-500/30 transition-all duration-300 group">
+          <div className="bg-[#00142c]/70 backdrop-blur-md rounded-xl p-4 border border-[#00BFFF]/10 hover:border-[#00BFFF]/30 transition-all duration-300 group">
             <div className="flex items-center justify-between mb-2">
-              <label className="text-sm font-medium text-gray-200">سال ساخت</label>
-              <span className="text-xs text-blue-400 font-bold">
+              <label className="text-sm font-medium text-white">سال ساخت</label>
+              <span className="text-xs text-[#00BFFF] font-bold bg-[#00142c]/80 px-2 py-1 rounded border border-[#00BFFF]/20">
                 {yearRange[0]} - {yearRange[1]}
               </span>
             </div>
@@ -263,12 +263,12 @@ const AdvancedSearchPanel: React.FC<AdvancedSearchPanelProps> = ({ className, on
           </div>
           
           {/* اسلایدر امتیاز */}
-          <div className="bg-white/5 backdrop-blur-md rounded-xl p-4 border border-white/10 hover:border-blue-500/30 transition-all duration-300 group">
+          <div className="bg-[#00142c]/70 backdrop-blur-md rounded-xl p-4 border border-[#00BFFF]/10 hover:border-[#00BFFF]/30 transition-all duration-300 group">
             <div className="flex items-center justify-between mb-2">
-              <label className="text-sm font-medium text-gray-200">امتیاز</label>
-              <div className="flex items-center text-xs">
-                <Star className="h-3 w-3 text-yellow-400 ml-1 fill-yellow-400" />
-                <span className="text-yellow-400 font-bold">
+              <label className="text-sm font-medium text-white">امتیاز</label>
+              <div className="flex items-center text-xs bg-[#00142c]/80 px-2 py-1 rounded border border-[#00BFFF]/20">
+                <Star className="h-3 w-3 text-[#00BFFF] ml-1 fill-[#00BFFF]" />
+                <span className="text-[#00BFFF] font-bold">
                   {ratingRange[0]} - {ratingRange[1]}
                 </span>
               </div>
@@ -289,19 +289,19 @@ const AdvancedSearchPanel: React.FC<AdvancedSearchPanelProps> = ({ className, on
           </div>
           
           {/* انتخاب ژانر */}
-          <div className="bg-white/5 backdrop-blur-md rounded-xl p-4 border border-white/10 hover:border-blue-500/30 transition-all duration-300">
-            <label className="text-sm font-medium text-gray-200 block mb-2">ژانر</label>
+          <div className="bg-[#00142c]/70 backdrop-blur-md rounded-xl p-4 border border-[#00BFFF]/10 hover:border-[#00BFFF]/30 transition-all duration-300">
+            <label className="text-sm font-medium text-white block mb-2">ژانر</label>
             <Popover>
               <PopoverTrigger asChild>
                 <Button 
                   variant="outline" 
-                  className="w-full justify-between border-white/10 bg-black/20 text-gray-200 hover:bg-black/30"
+                  className="w-full justify-between border-[#00BFFF]/20 bg-[#00142c]/80 text-white hover:bg-[#00142c]"
                 >
                   <span>{selectedGenresDisplay()}</span>
-                  <Filter className="h-4 w-4 mr-2 opacity-50" />
+                  <Filter className="h-4 w-4 mr-2 text-[#00BFFF]/70" />
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="w-full bg-[#1e293b]/95 backdrop-blur-xl border-white/10 text-white p-0 max-h-[320px] overflow-y-auto">
+              <PopoverContent className="w-full bg-[#00142c]/95 backdrop-blur-xl border-[#00BFFF]/20 text-white p-0 max-h-[320px] overflow-y-auto">
                 <div className="grid grid-cols-2 p-2 gap-1">
                   {genres.map((genre) => (
                     <button
@@ -309,15 +309,15 @@ const AdvancedSearchPanel: React.FC<AdvancedSearchPanelProps> = ({ className, on
                       className={cn(
                         "flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-all",
                         selectedGenres.includes(genre.id)
-                          ? "bg-blue-600/30 text-blue-300"
-                          : "hover:bg-white/5 text-gray-300"
+                          ? "bg-[#00BFFF]/20 text-[#00BFFF]"
+                          : "hover:bg-[#00142c]/80 text-gray-300"
                       )}
                       onClick={() => toggleGenre(genre.id)}
                     >
                       <span className="text-lg">{genre.icon}</span>
                       <span>{genre.name}</span>
                       {selectedGenres.includes(genre.id) && (
-                        <Check className="h-3 w-3 mr-auto text-blue-400" />
+                        <Check className="h-3 w-3 mr-auto text-[#00BFFF]" />
                       )}
                     </button>
                   ))}
@@ -327,17 +327,17 @@ const AdvancedSearchPanel: React.FC<AdvancedSearchPanelProps> = ({ className, on
           </div>
           
           {/* کشور سازنده */}
-          <div className="bg-white/5 backdrop-blur-md rounded-xl p-4 border border-white/10 hover:border-blue-500/30 transition-all duration-300">
-            <label className="text-sm font-medium text-gray-200 block mb-2">کشور</label>
+          <div className="bg-[#00142c]/70 backdrop-blur-md rounded-xl p-4 border border-[#00BFFF]/10 hover:border-[#00BFFF]/30 transition-all duration-300">
+            <label className="text-sm font-medium text-white block mb-2">کشور</label>
             <Select value={selectedCountry || ""} onValueChange={setSelectedCountry}>
-              <SelectTrigger className="border-white/10 bg-black/20 text-gray-200 hover:bg-black/30">
+              <SelectTrigger className="border-[#00BFFF]/20 bg-[#00142c]/80 text-white hover:bg-[#00142c]">
                 <SelectValue placeholder="کشور سازنده" />
               </SelectTrigger>
-              <SelectContent className="bg-[#1e293b]/95 backdrop-blur-xl border-white/10 text-white">
+              <SelectContent className="bg-[#00142c]/95 backdrop-blur-xl border-[#00BFFF]/20 text-white">
                 <SelectGroup>
-                  <SelectLabel className="text-blue-400">کشورها</SelectLabel>
+                  <SelectLabel className="text-[#00BFFF]">کشورها</SelectLabel>
                   {countries.map((country) => (
-                    <SelectItem key={country.id} value={country.id} className="hover:bg-white/5">
+                    <SelectItem key={country.id} value={country.id} className="hover:bg-[#00BFFF]/10">
                       <div className="flex items-center gap-2">
                         <span className="text-lg">{country.flag}</span>
                         <span>{country.name}</span>
@@ -352,58 +352,58 @@ const AdvancedSearchPanel: React.FC<AdvancedSearchPanelProps> = ({ className, on
         
         {/* گزینه‌های پخش - سوئیچ‌ها */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
-          <div className="bg-white/5 backdrop-blur-md rounded-xl p-3 border border-white/10 hover:border-blue-500/30 transition-all">
+          <div className="bg-[#00142c]/70 backdrop-blur-md rounded-xl p-3 border border-[#00BFFF]/10 hover:border-[#00BFFF]/30 transition-all">
             <div className="flex items-center justify-between">
               <div className="flex items-center">
-                <Mic className="h-4 w-4 text-gray-400 ml-2" />
-                <label className="text-sm text-gray-200">دوبله فارسی</label>
+                <Mic className="h-4 w-4 text-[#00BFFF] ml-2" />
+                <label className="text-sm text-white">دوبله فارسی</label>
               </div>
               <Switch
                 checked={isDubbed}
                 onCheckedChange={setIsDubbed}
-                className="data-[state=checked]:bg-blue-600"
+                className="data-[state=checked]:bg-[#00BFFF]"
               />
             </div>
           </div>
           
-          <div className="bg-white/5 backdrop-blur-md rounded-xl p-3 border border-white/10 hover:border-blue-500/30 transition-all">
+          <div className="bg-[#00142c]/70 backdrop-blur-md rounded-xl p-3 border border-[#00BFFF]/10 hover:border-[#00BFFF]/30 transition-all">
             <div className="flex items-center justify-between">
               <div className="flex items-center">
-                <Globe className="h-4 w-4 text-gray-400 ml-2" />
-                <label className="text-sm text-gray-200">زیرنویس</label>
+                <Globe className="h-4 w-4 text-[#00BFFF] ml-2" />
+                <label className="text-sm text-white">زیرنویس</label>
               </div>
               <Switch
                 checked={hasSubtitle}
                 onCheckedChange={setHasSubtitle}
-                className="data-[state=checked]:bg-blue-600"
+                className="data-[state=checked]:bg-[#00BFFF]"
               />
             </div>
           </div>
           
-          <div className="bg-white/5 backdrop-blur-md rounded-xl p-3 border border-white/10 hover:border-blue-500/30 transition-all">
+          <div className="bg-[#00142c]/70 backdrop-blur-md rounded-xl p-3 border border-[#00BFFF]/10 hover:border-[#00BFFF]/30 transition-all">
             <div className="flex items-center justify-between">
               <div className="flex items-center">
-                <Filter className="h-4 w-4 text-gray-400 ml-2" />
-                <label className="text-sm text-gray-200">سانسور شده</label>
+                <Filter className="h-4 w-4 text-[#00BFFF] ml-2" />
+                <label className="text-sm text-white">سانسور شده</label>
               </div>
               <Switch
                 checked={isCensored}
                 onCheckedChange={setIsCensored}
-                className="data-[state=checked]:bg-blue-600"
+                className="data-[state=checked]:bg-[#00BFFF]"
               />
             </div>
           </div>
           
-          <div className="bg-white/5 backdrop-blur-md rounded-xl p-3 border border-white/10 hover:border-blue-500/30 transition-all">
+          <div className="bg-[#00142c]/70 backdrop-blur-md rounded-xl p-3 border border-[#00BFFF]/10 hover:border-[#00BFFF]/30 transition-all">
             <div className="flex items-center justify-between">
               <div className="flex items-center">
-                <Video className="h-4 w-4 text-gray-400 ml-2" />
-                <label className="text-sm text-gray-200">پخش آنلاین</label>
+                <Video className="h-4 w-4 text-[#00BFFF] ml-2" />
+                <label className="text-sm text-white">پخش آنلاین</label>
               </div>
               <Switch
                 checked={hasOnlineStream}
                 onCheckedChange={setHasOnlineStream}
-                className="data-[state=checked]:bg-blue-600"
+                className="data-[state=checked]:bg-[#00BFFF]"
               />
             </div>
           </div>
@@ -413,18 +413,18 @@ const AdvancedSearchPanel: React.FC<AdvancedSearchPanelProps> = ({ className, on
         <div className="flex flex-col md:flex-row gap-4 mb-4">
           <div className="relative flex-1">
             <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-              <Search className="h-4 w-4 text-gray-400" />
+              <Search className="h-4 w-4 text-[#00BFFF]" />
             </div>
             <Input
               type="text"
               placeholder="جستجوی عنوان فیلم، سریال یا کلیدواژه..."
-              className="w-full pr-10 border-white/10 bg-black/20 text-white placeholder:text-gray-500 focus:border-blue-500"
+              className="w-full pr-10 border-[#00BFFF]/20 bg-[#00142c]/80 text-white placeholder:text-gray-400 focus:border-[#00BFFF]/50 focus:ring-[#00BFFF]/30"
             />
             
             {/* انیمیشن اسکن در زمان جستجو */}
             {isScanning && (
               <div className="absolute inset-0 overflow-hidden pointer-events-none">
-                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-blue-500/20 to-transparent animate-scan"></div>
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[#00BFFF]/20 to-transparent animate-scan"></div>
               </div>
             )}
           </div>
@@ -432,15 +432,15 @@ const AdvancedSearchPanel: React.FC<AdvancedSearchPanelProps> = ({ className, on
           <div className="flex gap-3">
             <Button 
               variant="outline"
-              className="border-white/10 bg-black/20 text-gray-200 hover:bg-black/30 hover:text-white"
+              className="border-[#00BFFF]/20 bg-[#00142c]/80 text-white hover:bg-[#00142c] hover:border-[#00BFFF]/30"
               onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
             >
-              <Filter className="h-4 w-4 ml-2" />
+              <Filter className="h-4 w-4 ml-2 text-[#00BFFF]" />
               فیلترهای پیشرفته
             </Button>
             
             <Button 
-              className="bg-gradient-to-r from-blue-600 to-blue-500 text-white hover:shadow-lg transition-all duration-300 relative overflow-hidden group"
+              className="bg-gradient-to-r from-[#00BFFF] to-[#0077b6] text-white hover:shadow-[0_0_15px_rgba(0,191,255,0.3)] transition-all duration-300 relative overflow-hidden group"
               onClick={handleSearch}
               disabled={isScanning}
             >
@@ -450,8 +450,8 @@ const AdvancedSearchPanel: React.FC<AdvancedSearchPanelProps> = ({ className, on
               </span>
               
               {/* افکت هاله نورانی دکمه */}
-              <span className="absolute inset-0 bg-blue-400/20 blur-md group-hover:opacity-100 opacity-0 transition-opacity"></span>
-              <span className="absolute -inset-x-1 bottom-0 h-px bg-gradient-to-r from-transparent via-blue-300 to-transparent"></span>
+              <span className="absolute inset-0 bg-[#00BFFF]/20 blur-md group-hover:opacity-100 opacity-0 transition-opacity"></span>
+              <span className="absolute -inset-x-1 bottom-0 h-px bg-gradient-to-r from-transparent via-[#00BFFF]/50 to-transparent"></span>
             </Button>
           </div>
         </div>
@@ -466,8 +466,8 @@ const AdvancedSearchPanel: React.FC<AdvancedSearchPanelProps> = ({ className, on
           )}
         >
           <div className="min-h-0">
-            <div className="pt-4 border-t border-white/10">
-              <h3 className="text-sm font-semibold text-blue-400 mb-4 flex items-center">
+            <div className="pt-4 border-t border-[#00BFFF]/10">
+              <h3 className="text-sm font-semibold text-[#00BFFF] mb-4 flex items-center">
                 <Filter className="h-4 w-4 ml-2" />
                 فیلترهای پیشرفته
               </h3>
@@ -475,52 +475,52 @@ const AdvancedSearchPanel: React.FC<AdvancedSearchPanelProps> = ({ className, on
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 {/* جستجوی نام بازیگر */}
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-gray-200 block">بازیگر</label>
+                  <label className="text-sm font-medium text-white block">بازیگر</label>
                   <div className="relative">
                     <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                      <Users className="h-4 w-4 text-gray-400" />
+                      <Users className="h-4 w-4 text-[#00BFFF]" />
                     </div>
                     <Input
                       type="text"
                       placeholder="نام بازیگر..."
                       value={actorName}
                       onChange={(e) => setActorName(e.target.value)}
-                      className="w-full pr-10 border-white/10 bg-black/20 text-white placeholder:text-gray-500 focus:border-blue-500"
+                      className="w-full pr-10 border-[#00BFFF]/20 bg-[#00142c]/80 text-white placeholder:text-gray-400 focus:border-[#00BFFF]/50 focus:ring-[#00BFFF]/30"
                     />
                   </div>
                 </div>
                 
                 {/* جستجوی نام کارگردان */}
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-gray-200 block">کارگردان</label>
+                  <label className="text-sm font-medium text-white block">کارگردان</label>
                   <div className="relative">
                     <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                      <Video className="h-4 w-4 text-gray-400" />
+                      <Video className="h-4 w-4 text-[#00BFFF]" />
                     </div>
                     <Input
                       type="text"
                       placeholder="نام کارگردان..."
                       value={directorName}
                       onChange={(e) => setDirectorName(e.target.value)}
-                      className="w-full pr-10 border-white/10 bg-black/20 text-white placeholder:text-gray-500 focus:border-blue-500"
+                      className="w-full pr-10 border-[#00BFFF]/20 bg-[#00142c]/80 text-white placeholder:text-gray-400 focus:border-[#00BFFF]/50 focus:ring-[#00BFFF]/30"
                     />
                   </div>
                 </div>
                 
                 {/* رده سنی */}
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-gray-200 block">رده سنی</label>
+                  <label className="text-sm font-medium text-white block">رده سنی</label>
                   <Select value={selectedAgeRating || ""} onValueChange={setSelectedAgeRating}>
-                    <SelectTrigger className="border-white/10 bg-black/20 text-gray-200 hover:bg-black/30">
+                    <SelectTrigger className="border-[#00BFFF]/20 bg-[#00142c]/80 text-white hover:bg-[#00142c]">
                       <SelectValue placeholder="انتخاب رده سنی" />
                     </SelectTrigger>
-                    <SelectContent className="bg-[#1e293b]/95 backdrop-blur-xl border-white/10 text-white">
+                    <SelectContent className="bg-[#00142c]/95 backdrop-blur-xl border-[#00BFFF]/20 text-white">
                       <SelectGroup>
-                        <SelectLabel className="text-blue-400">رده‌های سنی</SelectLabel>
+                        <SelectLabel className="text-[#00BFFF]">رده‌های سنی</SelectLabel>
                         {ageRatings.map((rating) => (
-                          <SelectItem key={rating.id} value={rating.id} className="hover:bg-white/5">
+                          <SelectItem key={rating.id} value={rating.id} className="hover:bg-[#00BFFF]/10">
                             <div className="flex items-center gap-2">
-                              <Badge className="bg-yellow-600 text-white text-xs py-0 px-1.5">
+                              <Badge className="bg-[#00142c] border border-[#00BFFF]/30 text-[#00BFFF] text-xs py-0 px-1.5">
                                 {rating.badge}
                               </Badge>
                               <span>{rating.name}</span>
@@ -535,8 +535,8 @@ const AdvancedSearchPanel: React.FC<AdvancedSearchPanelProps> = ({ className, on
               
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
                 {/* کیفیت */}
-                <div className="bg-white/5 backdrop-blur-md rounded-xl p-4 border border-white/10">
-                  <label className="text-sm font-medium text-gray-200 block mb-3">کیفیت</label>
+                <div className="bg-[#00142c]/70 backdrop-blur-md rounded-xl p-4 border border-[#00BFFF]/10 hover:border-[#00BFFF]/30 transition-all">
+                  <label className="text-sm font-medium text-white block mb-3">کیفیت</label>
                   <div className="flex flex-wrap gap-2">
                     {qualities.map((quality) => (
                       <button
@@ -544,8 +544,8 @@ const AdvancedSearchPanel: React.FC<AdvancedSearchPanelProps> = ({ className, on
                         className={cn(
                           "px-3 py-1.5 rounded-lg text-sm transition-all",
                           selectedQuality === quality.id
-                            ? "bg-gradient-to-r from-blue-600 to-blue-500 text-white shadow-lg" 
-                            : "bg-black/30 text-gray-300 hover:bg-black/50"
+                            ? "bg-gradient-to-r from-[#00BFFF] to-[#0077b6] text-white shadow-[0_0_10px_rgba(0,191,255,0.3)]" 
+                            : "bg-[#00142c]/90 text-gray-300 hover:bg-[#00142c] border border-[#00BFFF]/20"
                         )}
                         onClick={() => setSelectedQuality(quality.id)}
                       >
@@ -556,19 +556,19 @@ const AdvancedSearchPanel: React.FC<AdvancedSearchPanelProps> = ({ className, on
                 </div>
                 
                 {/* مرتب‌سازی */}
-                <div className="bg-white/5 backdrop-blur-md rounded-xl p-4 border border-white/10">
-                  <label className="text-sm font-medium text-gray-200 block mb-3">ترتیب نمایش</label>
+                <div className="bg-[#00142c]/70 backdrop-blur-md rounded-xl p-4 border border-[#00BFFF]/10 hover:border-[#00BFFF]/30 transition-all">
+                  <label className="text-sm font-medium text-white block mb-3">ترتیب نمایش</label>
                   <Select value={sortBy} onValueChange={setSortBy}>
-                    <SelectTrigger className="border-white/10 bg-black/20 text-gray-200 hover:bg-black/30">
+                    <SelectTrigger className="border-[#00BFFF]/20 bg-[#00142c]/80 text-white hover:bg-[#00142c]">
                       <SelectValue placeholder="ترتیب نمایش" />
                     </SelectTrigger>
-                    <SelectContent className="bg-[#1e293b]/95 backdrop-blur-xl border-white/10 text-white">
+                    <SelectContent className="bg-[#00142c]/95 backdrop-blur-xl border-[#00BFFF]/20 text-white">
                       <SelectGroup>
-                        <SelectLabel className="text-blue-400">ترتیب</SelectLabel>
+                        <SelectLabel className="text-[#00BFFF]">ترتیب</SelectLabel>
                         {sortOptions.map((option) => (
-                          <SelectItem key={option.id} value={option.id} className="hover:bg-white/5">
+                          <SelectItem key={option.id} value={option.id} className="hover:bg-[#00BFFF]/10">
                             <div className="flex items-center gap-2">
-                              <SortDesc className="h-3.5 w-3.5 text-gray-400" />
+                              <SortDesc className="h-3.5 w-3.5 text-[#00BFFF]" />
                               <span>{option.name}</span>
                             </div>
                           </SelectItem>
@@ -582,7 +582,7 @@ const AdvancedSearchPanel: React.FC<AdvancedSearchPanelProps> = ({ className, on
                 <div className="flex items-end">
                   <Button 
                     variant="outline"
-                    className="border-white/10 bg-black/20 text-gray-200 hover:bg-red-500/20 hover:text-red-300 hover:border-red-500/30 transition-all"
+                    className="border-[#00BFFF]/20 bg-[#00142c]/80 text-white hover:bg-red-500/20 hover:text-red-300 hover:border-red-500/30 transition-all"
                     onClick={() => {
                       // بازنشانی فیلترها
                       setYearRange([1980, 2025]);
@@ -613,12 +613,12 @@ const AdvancedSearchPanel: React.FC<AdvancedSearchPanelProps> = ({ className, on
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
-                <button className="text-xs text-gray-500 hover:text-blue-400 transition-colors">
+                <button className="text-xs text-gray-500 hover:text-[#00BFFF] transition-colors">
                   درباره جستجوی پیشرفته
                 </button>
               </TooltipTrigger>
-              <TooltipContent className="bg-[#1e293b]/95 backdrop-blur-xl border-white/10 text-gray-200 max-w-xs">
-                <p>با استفاده از این ابزار می‌توانید دقیق‌ترین جستجوی ممکن را در محتواهای ایران‌نما انجام دهید.</p>
+              <TooltipContent className="bg-[#00142c]/95 backdrop-blur-xl border-[#00BFFF]/20 text-white max-w-xs">
+                <p>با استفاده از این ابزار می‌توانید دقیق‌ترین جستجوی ممکن را در محتواهای سایت انجام دهید.</p>
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
