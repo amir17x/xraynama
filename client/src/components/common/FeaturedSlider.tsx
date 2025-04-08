@@ -1,12 +1,13 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link } from 'wouter';
 import { ContentType } from '@/types';
-import { Play, Download, Heart, Share2, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Play, Download, Heart, Share2, ChevronLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { apiRequest, queryClient } from '@/lib/queryClient';
 import { useAuth } from '@/hooks/use-auth';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
+import { CarouselButton } from './CarouselButton';
 
 interface FeaturedSliderProps {
   content: ContentType[];
@@ -267,23 +268,19 @@ export function FeaturedSlider({ content, isLoading = false }: FeaturedSliderPro
           </div>
         </div>
         
-        {/* Navigation arrows */}
-        <Button
-          variant="ghost"
-          size="icon"
-          className="absolute top-1/2 right-4 -translate-y-1/2 bg-card/50 hover:bg-card text-white p-2 rounded-full transition duration-300 z-10"
+        {/* Navigation arrows - استفاده از کامپوننت استاندارد CarouselButton */}
+        <CarouselButton
+          direction="right"
           onClick={handlePrevious}
-        >
-          <ChevronRight className="h-5 w-5" />
-        </Button>
-        <Button
           variant="ghost"
-          size="icon"
-          className="absolute top-1/2 left-4 -translate-y-1/2 bg-card/50 hover:bg-card text-white p-2 rounded-full transition duration-300 z-10"
+          className="hidden md:flex scale-110"
+        />
+        <CarouselButton
+          direction="left"
           onClick={handleNext}
-        >
-          <ChevronLeft className="h-5 w-5" />
-        </Button>
+          variant="ghost"
+          className="hidden md:flex scale-110"
+        />
         
         {/* Indicators */}
         <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2 z-10">

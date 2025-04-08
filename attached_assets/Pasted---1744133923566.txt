@@ -1,0 +1,124 @@
+برای بهینه‌سازی بخش جستجوی حرفه‌ای سایت و اصلاح مشکلات طراحی که ذکر کردید، می‌توانید از پرامپت زیر استفاده کنید تا هوش مصنوعی یا توسعه‌دهنده بتواند به بهترین شکل این بخش را بهبود دهد و مشکلات ذکر شده را برطرف کند.
+
+---
+
+### **Prompt برای بهینه‌سازی بخش جستجو و نمودار تاریخ و زمان:**
+
+> I need you to **optimize and redesign the search section** in the website where there are currently two search fields. The search fields should be unified and **user-friendly**, and the design should be consistent. Additionally, the following issues need to be fixed:
+> 
+> 1. **Fix the Toggle Button (ON/OFF)**:
+>   - When clicking the toggle button (ON/OFF) that moves left and right, the position is **reversed** or not properly aligned. The button should move smoothly between the left and right positions without flipping or misaligning.
+>   - Ensure the button has a **clear visual transition** when clicked and the icon or label correctly reflects the action.
+>   - The button should also have a **hover effect** or an animation to indicate interactivity.
+
+> 2. **Unifying the Search Fields**:
+>   - There are currently **two separate search fields**. I need you to combine them into **one unified, advanced search field** that allows users to search for different categories (movies, series, genres) using **filters** or dropdowns.
+>   - The search should allow for **multiple criteria** to be applied (e.g., title, genre, release year, rating) and should return **relevant results** without cluttering the UI.
+> 
+> 3. **Optimizing the Date and Time Filters**:
+>   - The date and time range filters should be **interactive and intuitive**. Instead of just showing a single static graph, there should be a **date-range slider** or a **date-time picker** that allows users to select a **specific time range** and see results accordingly.
+>   - The graph should update dynamically based on the selected **start date and end date**. It should show a **clear and smooth transition** between the selected time range and the data points.
+> 
+> 4. **Displaying Rating and Other Information**:
+>   - For the **ratings and other criteria** (like release year, genre), the data should be displayed in a **graphical format** (e.g., bar charts, pie charts, or other visual indicators) that’s easy to interpret. Ensure the charts are responsive and allow the user to see the data clearly.
+>   - Ensure the chart for ratings allows **zooming in or out** on the data points to see more granular information.
+
+> 5. **UI/UX Enhancements**:
+>   - The overall search section should be **visually appealing** and align with the website's theme. Use a **clean, modern design** that doesn’t overwhelm the user.
+>   - The sections for the **filters**, **search results**, and **graphs** should be clearly separated and **easy to navigate**. Group related features and give clear indications of what each section does.
+> 
+> 6. **Mobile Responsiveness**:
+>   - The entire search section should be **fully responsive** on mobile devices. On small screens, the search bar should still be easily accessible, and the filters should be either collapsible or available as a **dropdown menu**.
+>   - The date/time picker and the graphs should scale down appropriately, ensuring users can still interact with them easily on mobile.
+
+> 7. **Smooth Transition Effects**:
+>   - The interaction between filters, search results, and graphs should have **smooth transitions**. For example, when a user applies a filter or changes the date range, the search results and graphs should **update smoothly** without any lag or jump.
+>   - Add subtle animation effects when filters are applied to give a **visual cue** to the user that the page has been updated.
+
+> **CSS Example**:
+> ```css
+> .search-container {
+>   display: flex;
+>   flex-direction: column;
+>   gap: 15px;
+>   padding: 20px;
+>   background-color: rgba(255, 255, 255, 0.8); /* light background */
+>   border-radius: 10px;
+>   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+> }
+> 
+> .search-input {
+>   width: 100%;
+>   padding: 12px;
+>   border-radius: 8px;
+>   border: 1px solid #ccc;
+>   font-size: 16px;
+> }
+> 
+> .toggle-button {
+>   display: flex;
+>   align-items: center;
+>   justify-content: space-between;
+>   background-color: #f4f4f4;
+>   border-radius: 20px;
+>   padding: 5px 10px;
+>   cursor: pointer;
+>   transition: all 0.3s ease;
+> }
+> 
+> .toggle-button.active {
+>   background-color: #4caf50; /* Active state background */
+> }
+> 
+> .date-time-range {
+>   width: 100%;
+>   display: flex;
+>   justify-content: space-between;
+> }
+> 
+> .graph-container {
+>   width: 100%;
+>   height: 300px;
+>   margin-top: 20px;
+> }
+> ```
+> 
+> **JavaScript for Smooth Transition and Filter Handling**:
+> ```javascript
+> // Handling the toggle button
+> const toggleButton = document.querySelector('.toggle-button');
+> toggleButton.addEventListener('click', function() {
+>   toggleButton.classList.toggle('active');
+>   // Add additional logic to switch between ON/OFF state
+> });
+> 
+> // Handle the date-time range picker
+> const dateRange = document.querySelector('.date-time-range');
+> dateRange.addEventListener('input', function() {
+>   updateGraph(dateRange.value); // Function to update graph based on date range
+> });
+> 
+> // Smooth transition for search results
+> const updateGraph = (range) => {
+>   // Example function to update the graph with smooth transition
+>   const graph = document.querySelector('.graph-container');
+>   graph.classList.add('updating');
+>   setTimeout(() => {
+>     graph.classList.remove('updating');
+>     // Update graph with new data based on date range
+>   }, 500);
+> };
+> ```
+
+---
+
+### **شرح عملکرد پرامپت:**
+
+1. **دکمه Toggle ON/OFF**: دکمه باید با یک انیمیشن صاف بین دو وضعیت جا به جا شود، همچنین متن یا آیکن آن باید مطابق با وضعیت تغییر کند.
+2. **یادآوری فیلترها و جستجوی پیشرفته**: فیلترهای جستجو باید در یک فیلد یکپارچه باشند و امکان جستجو با چندین معیار مختلف فراهم شود.
+3. **نمایش تاریخ و زمان**: فیلتر تاریخ و زمان باید به صورت **داینامیک و قابل تعامل** باشد، به طوری که کاربر بتواند بازه زمانی مشخصی را برای جستجو انتخاب کند.
+4. **طراحی گراف‌ها**: گراف‌ها باید با **انیمیشن‌های نرم** به‌روزرسانی شوند و نتایج را به صورت بصری نمایش دهند. داده‌ها باید به صورت **نمودارهای قابل درک** و قابل تعامل نمایش داده شوند.
+5. **واکنش‌گرایی**: طراحی به‌گونه‌ای باشد که در تمام دستگاه‌ها، از جمله موبایل، به راحتی استفاده شود.
+6. **انیمیشن و انتقال نرم**: تمام تعاملات (فیلترها، جستجوها و گراف‌ها) باید با انتقال‌های نرم انجام شود تا تجربه کاربری بهبود یابد.
+
+این پرامپت به توسعه‌دهنده کمک می‌کند تا بخش جستجو و نمودارهای تاریخ و زمان را به شکلی یکپارچه و حرفه‌ای طراحی کرده و عملکرد آن‌ها را بهینه‌سازی کند.

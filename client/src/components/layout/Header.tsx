@@ -180,21 +180,24 @@ export function Header() {
                     <ChevronDown className={`mr-1 text-[#00BFFF] h-4 w-4 md:hidden transition-transform duration-200 ${isMenuOpen ? 'transform rotate-180' : ''}`} />
                   </Button>
                   
-                  {/* استفاده از PortalOverride اصلاح شده برای منوی پروفایل */}
+                  {/* استفاده از PortalOverride بهبود یافته برای منوی پروفایل */}
                   <PortalOverride 
                     triggerRef={triggerRef} 
                     isOpen={isMenuOpen} 
                     onClose={() => setIsMenuOpen(false)}
                     alignRight={true}
-                  >
-                    <div className="profile-dropdown w-60 bg-[#00142c]/95 border border-[#00BFFF]/20 rounded-lg shadow-lg backdrop-blur-md p-2 text-white">
-                      <div className="py-2 px-3 mb-1 border-b border-[#00BFFF]/10">
+                    maxHeight={400}
+                    minWidth={240}
+                    stickyHeader={
+                      <div className="py-2 px-3 border-b border-[#00BFFF]/10 bg-[#00142c]/95">
                         <div className="text-sm font-medium text-white truncate">{user.name || user.username}</div>
                         <div className="text-xs text-[#00BFFF]/80 truncate">
                           {user?.role === 'admin' ? 'مدیر سیستم' : 'کاربر معمولی'}
                         </div>
                       </div>
-                      
+                    }
+                  >
+                    <div className="dropdown-glass text-white p-2">
                       <Link 
                         href="/profile"
                         className="w-full flex items-center p-2 rounded-md text-sm hover:bg-[#00BFFF]/10 transition-colors duration-200"

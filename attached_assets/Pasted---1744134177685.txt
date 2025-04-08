@@ -1,0 +1,113 @@
+حتماً! در اینجا پرامپت بروزرسانی‌شده با اضافه کردن ویژگی جدیدی که خواستید برای موقعیت منوهای انتخابی مانند **ژانر** و **کشور سازنده** است، آورده شده است. به این ترتیب منوهای بازشونده باید نزدیک‌تر به بخش مربوطه قرار گیرند تا تجربه کاربری بهبود یابد.
+
+---
+
+### **Prompt برای بهینه‌سازی بخش جستجو و منوهای بازشونده نزدیک به قسمت‌های مربوطه:**
+
+> I need you to **optimize and redesign the search section** in the website, where there are currently two search fields. The search fields should be unified and **user-friendly**, and the design should be consistent. Additionally, the following issues need to be fixed:
+> 
+> 1. **Fix the Toggle Button (ON/OFF)**:
+>   - When clicking the toggle button (ON/OFF) that moves left and right, the position is **reversed** or not properly aligned. The button should move smoothly between the left and right positions without flipping or misaligning.
+>   - Ensure the button has a **clear visual transition** when clicked and the icon or label correctly reflects the action.
+>   - The button should also have a **hover effect** or an animation to indicate interactivity.
+
+> 2. **Unifying the Search Fields**:
+>   - There are currently **two separate search fields**. I need you to combine them into **one unified, advanced search field** that allows users to search for different categories (movies, series, genres) using **filters** or dropdowns.
+>   - The search should allow for **multiple criteria** to be applied (e.g., title, genre, release year, rating) and should return **relevant results** without cluttering the UI.
+> 
+> 3. **Optimizing the Date and Time Filters**:
+>   - The date and time range filters should be **interactive and intuitive**. Instead of just showing a single static graph, there should be a **date-range slider** or a **date-time picker** that allows users to select a **specific time range** and see results accordingly.
+>   - The graph should update dynamically based on the selected **start date and end date**. It should show a **clear and smooth transition** between the selected time range and the data points.
+> 
+> 4. **Displaying Rating and Other Information**:
+>   - For the **ratings and other criteria** (like release year, genre), the data should be displayed in a **graphical format** (e.g., bar charts, pie charts, or other visual indicators) that’s easy to interpret. Ensure the charts are responsive and allow the user to see the data clearly.
+>   - Ensure the chart for ratings allows **zooming in or out** on the data points to see more granular information.
+
+> 5. **UI/UX Enhancements**:
+>   - The overall search section should be **visually appealing** and align with the website's theme. Use a **clean, modern design** that doesn’t overwhelm the user.
+>   - The sections for the **filters**, **search results**, and **graphs** should be clearly separated and **easy to navigate**. Group related features and give clear indications of what each section does.
+> 
+> 6. **Mobile Responsiveness**:
+>   - The entire search section should be **fully responsive** on mobile devices. On small screens, the search bar should still be easily accessible, and the filters should be either collapsible or available as a **dropdown menu**.
+>   - The date/time picker and the graphs should scale down appropriately, ensuring users can still interact with them easily on mobile.
+
+> 7. **Smooth Transition Effects**:
+>   - The interaction between filters, search results, and graphs should have **smooth transitions**. For example, when a user applies a filter or changes the date range, the search results and graphs should **update smoothly** without any lag or jump.
+>   - Add subtle animation effects when filters are applied to give a **visual cue** to the user that the page has been updated.
+
+> 8. **Fix Dropdown Menu Placement for Genre and Country Selection**:
+>   - When users click to select **genre** or **country**, the dropdown menu should **open directly below** or **near the corresponding selection box** (e.g., the Genre or Country field). Right now, the dropdown is **too far from the clicked section**, which creates confusion and a poor user experience.
+>   - The dropdown should be **aligned correctly** with the input field and should not open far away. Ensure that the **dropdown is responsive** and stays **close to** the area it’s associated with, whether on desktop or mobile.
+>   - The dropdowns should have **smooth animations** when opening and closing, giving a polished experience.
+
+> **CSS Example for Dropdown Fix**:
+> ```css
+> .dropdown-container {
+>   position: absolute;
+>   z-index: 999;
+>   background-color: white;
+>   border-radius: 5px;
+>   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+>   transition: all 0.3s ease-in-out;
+> }
+> 
+> .dropdown-menu {
+>   padding: 10px;
+>   max-height: 250px;
+>   overflow-y: auto;
+>   display: block;
+>   width: 100%;
+> }
+> 
+> .dropdown-menu.open {
+>   opacity: 1;
+>   transform: translateY(0);
+> }
+> 
+> .dropdown-menu.closed {
+>   opacity: 0;
+>   transform: translateY(-10px);
+> }
+> ```
+> 
+> **JavaScript for Dropdown Alignment**:
+> ```javascript
+> const genreField = document.querySelector('.genre-field');
+> const countryField = document.querySelector('.country-field');
+> 
+> genreField.addEventListener('click', function() {
+>   const dropdown = document.querySelector('.genre-dropdown');
+>   const position = genreField.getBoundingClientRect();
+>   dropdown.style.top = position.bottom + 'px'; // Position dropdown directly below the field
+>   dropdown.classList.add('open');
+> });
+> 
+> countryField.addEventListener('click', function() {
+>   const dropdown = document.querySelector('.country-dropdown');
+>   const position = countryField.getBoundingClientRect();
+>   dropdown.style.top = position.bottom + 'px'; // Position dropdown directly below the field
+>   dropdown.classList.add('open');
+> });
+> 
+> document.addEventListener('click', function(event) {
+>   if (!genreField.contains(event.target) && !countryField.contains(event.target)) {
+>     document.querySelector('.genre-dropdown').classList.remove('open');
+>     document.querySelector('.country-dropdown').classList.remove('open');
+>   }
+> });
+> ```
+
+---
+
+### **شرح عملکرد پرامپت:**
+
+1. **دکمه Toggle ON/OFF**: دکمه باید با یک انیمیشن صاف بین دو وضعیت جا به جا شود، همچنین متن یا آیکن آن باید مطابق با وضعیت تغییر کند.
+2. **یادآوری فیلترها و جستجوی پیشرفته**: فیلترهای جستجو باید در یک فیلد یکپارچه باشند و امکان جستجو با چندین معیار مختلف فراهم شود.
+3. **نمایش تاریخ و زمان**: فیلتر تاریخ و زمان باید به صورت **داینامیک و قابل تعامل** باشد، به طوری که کاربر بتواند بازه زمانی مشخصی را برای جستجو انتخاب کند.
+4. **طراحی گراف‌ها**: گراف‌ها باید با **انیمیشن‌های نرم** به‌روزرسانی شوند و نتایج را به صورت بصری نمایش دهند. داده‌ها باید به صورت **نمودارهای قابل درک** و قابل تعامل نمایش داده شوند.
+5. **واکنش‌گرایی**: طراحی به‌گونه‌ای باشد که در تمام دستگاه‌ها، از جمله موبایل، به راحتی استفاده شود.
+6. **انیمیشن و انتقال نرم**: تمام تعاملات (فیلترها، جستجوها و گراف‌ها) باید با انتقال‌های نرم انجام شود تا تجربه کاربری بهبود یابد.
+7. **موقعیت منوها**: منوهای بازشونده مانند **ژانر** و **کشور سازنده** باید به‌درستی نزدیک به فیلد خود قرار گیرند و از لحاظ بصری و فاصله با بخش مربوطه کاملاً هماهنگ شوند.
+8. **سازگاری با موبایل**: منوهای کشویی و فیلترها باید در دستگاه‌های مختلف به‌درستی نمایش داده شوند و واکنش‌گرایی کامل داشته باشند.
+
+این پرامپت به توسعه‌دهنده کمک می‌کند تا مشکلات طراحی منوهای جستجو و فیلترها را رفع کند و منوها و فیلترها را به‌طور مؤثری نزدیک به محل خود نمایش دهد تا تجربه کاربری بهبود یابد.

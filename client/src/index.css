@@ -12,6 +12,22 @@
     box-shadow: 0 0 15px -3px rgba(29, 78, 216, 0.2), 0 0 6px -2px rgba(59, 130, 246, 0.1);
   }
   
+  /* انیمیشن‌های مربوط به toast notification */
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  .animate-fade-in-up {
+    animation: fadeInUp 0.3s ease-out forwards;
+  }
+  
   /* انیمیشن اسکن برای جستجو */
   @keyframes scan {
     0% {
@@ -36,6 +52,27 @@
       opacity: 1;
       transform: translateY(0);
     }
+  }
+  
+  /* انیمیشن‌ها و استایل‌های منوهای کشویی بهبود یافته */
+  @keyframes panel-scale-in {
+    from {
+      opacity: 0;
+      transform: scale(0.95);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+  
+  /* استایل برای منوهای کشویی */
+  .dropdown-glass {
+    background-color: rgba(0, 20, 44, 0.95);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(0, 191, 255, 0.2);
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5), 0 0 5px rgba(0, 191, 255, 0.1);
+    border-radius: 0.5rem;
   }
   
   /* اسکرول‌بار نازک */

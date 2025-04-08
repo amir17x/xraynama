@@ -1,0 +1,135 @@
+برای این که خطاها به شکلی زیبا و جذاب نمایش داده شوند و در صورت عدم وجود خطا، بخش‌ها به صورت طبیعی عمل کنند، می‌توانید از پرامپت زیر استفاده کنید. این پرامپت به هوش مصنوعی یا توسعه‌دهنده کمک می‌کند که پیام‌های خطا را به صورت بصری زیبا و در یک مکان مشخص نمایش دهد:
+
+---
+
+### **Prompt برای طراحی و بهبود نمایش پیام‌های خطا در سایت:**
+
+> I need you to improve the **error handling system** on my website to make error messages appear in a more **visually appealing**, **consistent**, and **user-friendly** way. When an error occurs (e.g., when an invalid username/password is entered or a required field is left blank), the error message should appear **smoothly** and should be easy for users to understand. If no error occurs, the fields should function as expected without any visual disruptions.
+> 
+> Here's how you should proceed:
+> 
+> 1. **Error Display**:
+>   - The error message should appear in the **bottom-right corner** of the screen (or another location that is unobtrusive but noticeable).
+>   - The error message should have a **frosted glass effect** (using **Glassmorphism**) so that it stands out but also fits in with the website’s aesthetic.
+>   - The message should be **rounded** and have **soft shadows** to give it a sleek, modern look. It should fade in and fade out smoothly when it appears and disappears.
+>   - The background color of the error message should be a **light red or soft orange** for visibility, with **white text** for clarity.
+>   - The font used should be **bold** for the error title (e.g., "Error") and **regular** for the description (e.g., "The username or password you entered is incorrect").
+> 
+> 2. **Success Message (No Errors)**:
+>   - When a field is entered correctly and there is **no error**, the input field should display a **green check mark** or **subtle success message**. This message should be displayed **underneath the field** or as a tooltip.
+>   - If the form or field is filled out correctly, show a **soft green background** on the input field for a few seconds to indicate success.
+> 
+> 3. **Animation and Transition**:
+>   - When an error occurs, the error message should **slide in smoothly** from the bottom-right and **fade out** when the user clears the input or corrects the mistake.
+>   - Use **subtle animations** like **fade-in** and **slide-up** for error messages, making them feel more fluid and natural.
+>   - The error message should remain visible for around **3-5 seconds** before it automatically fades out. However, users should also be able to close the message manually by clicking a small **close (X)** icon in the corner.
+> 
+> 4. **Placement and Design**:
+>   - Error messages should **not obstruct** other elements on the page. They should appear in a small, well-defined box, without taking up too much space. Ensure they do not cover any important content or elements.
+>   - For **username/password input fields**, when the error occurs, show the error message **directly below the input field**, with a small gap to ensure it does not overlap with the field.
+> 
+> 5. **Examples of Error Messages**:
+>   - For **invalid username/password**:
+>     - Background Color: **Soft red with a slight transparent blur**.
+>     - Text: "Invalid username or password. Please try again."
+>     - Example HTML:
+>     ```html
+>     <div class="error-message" id="error-username">
+>       <span class="error-title">Error</span>
+>       <span class="error-description">The username or password you entered is incorrect.</span>
+>     </div>
+>     ```
+>   - For **missing required fields**:
+>     - Background Color: **Light red with some transparency**.
+>     - Text: "Please fill out this field."
+> 
+> 6. **CSS and JavaScript Example for Error Display**:
+> 
+> **CSS**:
+> ```css
+> .error-message {
+>   position: fixed;
+>   bottom: 20px;
+>   right: 20px;
+>   background: rgba(255, 0, 0, 0.8); /* Light red background */
+>   color: white;
+>   padding: 15px;
+>   border-radius: 10px;
+>   font-size: 14px;
+>   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+>   z-index: 9999;
+>   opacity: 0;
+>   transition: opacity 0.5s ease, transform 0.5s ease;
+> }
+> 
+> .error-message.show {
+>   opacity: 1;
+>   transform: translateY(0);
+> }
+> 
+> .error-title {
+>   font-weight: bold;
+>   font-size: 16px;
+>   margin-bottom: 5px;
+> }
+> 
+> .error-description {
+>   font-size: 14px;
+> }
+> 
+> .error-message .close-btn {
+>   position: absolute;
+>   top: 5px;
+>   right: 10px;
+>   cursor: pointer;
+>   font-weight: bold;
+>   font-size: 16px;
+> }
+> ```
+> 
+> **JavaScript**:
+> ```javascript
+> function showError(message) {
+>   const errorDiv = document.createElement('div');
+>   errorDiv.classList.add('error-message');
+>   errorDiv.innerHTML = `
+>     <span class="error-title">Error</span>
+>     <span class="error-description">${message}</span>
+>     <span class="close-btn">X</span>
+>   `;
+>   document.body.appendChild(errorDiv);
+>   setTimeout(() => {
+>     errorDiv.classList.add('show');
+>   }, 10);
+> 
+>   // Close button functionality
+>   const closeBtn = errorDiv.querySelector('.close-btn');
+>   closeBtn.addEventListener('click', () => {
+>     errorDiv.classList.remove('show');
+>     setTimeout(() => {
+>       errorDiv.remove();
+>     }, 500);
+>   });
+> 
+>   setTimeout(() => {
+>     errorDiv.classList.remove('show');
+>     setTimeout(() => {
+>       errorDiv.remove();
+>     }, 500);
+>   }, 5000);
+> }
+> 
+> // Example usage
+> // showError('The username or password you entered is incorrect.');
+> ```
+
+---
+
+### **شرح عملکرد پرامپت:**
+- **پیام‌های خطا** به شکلی زیبا و جذاب نمایش داده می‌شوند.
+- از **افکت‌های انیمیشن** مانند **fade-in** و **slide-up** برای نمایش و پنهان شدن پیام‌های خطا استفاده می‌شود.
+- در صورت صحیح بودن ورودی‌ها، **پیام موفقیت** به صورت سبز نمایش داده می‌شود.
+- طراحی با **Glassmorphism** و **رنگ‌های ملایم** برای پیام‌های خطا باعث می‌شود که نمایش خطاها کاملاً هماهنگ و بدون ایجاد اختلال در تجربه کاربری باشد.
+- **مدیریت خطاها** به شکل راحت و زیبا انجام می‌شود و کاربران می‌توانند به راحتی پیام‌ها را ببندند.
+
+این پرامپت به هوش مصنوعی یا توسعه‌دهنده کمک می‌کند که پیام‌های خطا را به شکلی حرفه‌ای، جذاب و کاربرپسند نمایش دهد.

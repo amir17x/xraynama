@@ -127,39 +127,47 @@ export function NotificationsButton() {
         )}
       </Button>
       
-      {/* استفاده از PortalOverride برای منوی اعلان‌ها */}
+      {/* استفاده از PortalOverride بهبود یافته برای منوی اعلان‌ها */}
       <PortalOverride 
         triggerRef={buttonRef} 
         isOpen={isOpen} 
         onClose={() => setIsOpen(false)}
         alignRight={false}
-      >
-        <div className="w-72 md:w-80 bg-[#00142c]/95 border border-[#00BFFF]/20 rounded-lg shadow-lg backdrop-blur-md p-3 text-white overflow-hidden">
-          <div className="font-bold text-lg border-b border-[#00BFFF]/10 pb-2 mb-2 flex items-center sticky top-0 bg-[#00142c]/95 backdrop-blur-md">
+        maxHeight={450}
+        minWidth={300}
+        forceMaxHeight={true}
+        stickyHeader={
+          <div className="font-bold text-lg border-b border-[#00BFFF]/10 p-3 flex items-center bg-[#00142c]/95">
             <BellRing className="h-5 w-5 ml-2 text-[#00BFFF]" />
             <span>اعلانات</span>
           </div>
-          
-          <div className="space-y-3 max-h-[calc(70vh-120px)] overflow-y-auto scrollbar-thin pr-1">
+        }
+        stickyFooter={
+          <div className="text-center border-t border-[#00BFFF]/10 p-2 bg-[#00142c]/95">
+            <Button variant="link" size="sm" className="text-[#00BFFF] text-xs hover:text-[#00BFFF]/80">
+              مشاهده همه اعلانات
+            </Button>
+          </div>
+        }
+      >
+        <div className="dropdown-glass text-white">
+          <div className="space-y-1 p-2">
             {notifications.map(notification => (
-              <div key={notification.id} className="border-b border-[#00BFFF]/10 pb-3 hover:bg-[#00BFFF]/5 p-2 rounded-md transition-colors duration-200">
+              <div 
+                key={notification.id} 
+                className="border-b border-[#00BFFF]/10 pb-3 hover:bg-[#00BFFF]/5 p-2 rounded-md transition-colors duration-200"
+              >
                 <div className="font-bold text-sm">{notification.title}</div>
                 <p className="text-xs text-gray-300 mt-1">{notification.text}</p>
                 <div className="text-[10px] text-gray-400 mt-1">{notification.date}</div>
               </div>
             ))}
-          </div>
-          
-          {notifications.length === 0 && (
-            <div className="py-8 text-center text-gray-400">
-              هیچ اعلانی وجود ندارد
-            </div>
-          )}
-          
-          <div className="mt-2 text-center border-t border-[#00BFFF]/10 pt-2 sticky bottom-0 bg-[#00142c]/95 backdrop-blur-md">
-            <Button variant="link" size="sm" className="text-[#00BFFF] text-xs hover:text-[#00BFFF]/80">
-              مشاهده همه اعلانات
-            </Button>
+            
+            {notifications.length === 0 && (
+              <div className="py-8 text-center text-gray-400">
+                هیچ اعلانی وجود ندارد
+              </div>
+            )}
           </div>
         </div>
       </PortalOverride>

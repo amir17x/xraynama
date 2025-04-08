@@ -1,0 +1,107 @@
+برای حل این مشکل، می‌توانید از پرامپت زیر استفاده کنید تا هوش مصنوعی یا توسعه‌دهنده به دکمه‌های «اعلانات» و «پروفایل» طراحی مناسب بدهد و مطمئن شود که منوها به درستی در مکان مناسب ظاهر شوند، بدون آنکه پشت هدر قرار بگیرند یا رفتار نامناسبی داشته باشند.
+
+---
+
+### **Prompt برای طراحی و اصلاح عملکرد منوهای «اعلانات» و «پروفایل»:**
+
+> I need you to implement a proper design for the **Notifications** and **Profile** dropdown menus in the header. When the user clicks on the respective button, the menu should **appear directly beneath** the button and not to the side or hidden behind the header. Additionally, when the user scrolls down, the menu should **remain in place** and not slide back under the header or move incorrectly.
+> 
+> Here’s how you should proceed:
+> 
+> 1. **Dropdown Placement**:
+>   - When the user clicks the **Notifications** or **Profile** button in the header, the menu should appear **directly below** the button. The menu should be **aligned** properly with the button and should be **centered horizontally** in relation to the button.
+>   - The menu should be **absolutely positioned** relative to the button, with a **z-index** high enough to ensure it stays on top of other content (especially the header).
+> 
+> 2. **Scrolling Behavior**:
+>   - When the user scrolls down the page, the menu should **remain fixed in position** relative to the top of the screen. It should not move behind the header or disappear when scrolling down. The menu should **stay visible** at all times.
+>   - If the user scrolls back to the top, the menu should **remain below the button**, but its position should be adjusted so it doesn't overlap or get hidden by the header.
+> 
+> 3. **Design Adjustments**:
+>   - The dropdown menu should have a **smooth transition effect** for appearing and disappearing. It should fade in smoothly when the user clicks the button and should fade out when the user clicks elsewhere on the page or closes the menu.
+>   - Ensure that the dropdown menu has a **slightly blurred background** (Glassmorphism effect), so it fits the overall design and theme of the website.
+> 
+> 4. **CSS and JavaScript Implementation**:
+>   - The menu should be dynamically **positioned based on the button's location** using JavaScript. If the button is near the top of the screen, the menu should appear just below it. If the button is near the bottom, the menu should not overlap with the footer or get pushed out of view.
+>   - When scrolling, the menu should have a **sticky position** that keeps it **below the button** but does not hide behind the header.
+
+> **CSS**:
+> ```css
+> .dropdown-menu {
+>   position: absolute;
+>   top: 100%; /* position it right below the button */
+>   left: 50%;
+>   transform: translateX(-50%); /* center the dropdown horizontally */
+>   background: rgba(255, 255, 255, 0.8); /* light background for visibility */
+>   border-radius: 8px;
+>   box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.2);
+>   display: none; /* hidden by default */
+>   z-index: 9999;
+>   transition: opacity 0.3s ease;
+> }
+> 
+> .dropdown-menu.show {
+>   display: block; /* show the menu */
+>   opacity: 1;
+> }
+> 
+> .header .notifications-button,
+> .header .profile-button {
+>   position: relative;
+>   z-index: 10000;
+> }
+> 
+> /* Position the dropdown when scrolled */
+> .dropdown-menu.fixed {
+>   position: fixed;
+>   top: 10px; /* distance from the top of the viewport */
+> }
+> ```
+> 
+> **JavaScript**:
+> ```javascript
+> // Show and hide the dropdown menu when the user clicks the respective button
+> const notificationButton = document.querySelector('.notifications-button');
+> const profileButton = document.querySelector('.profile-button');
+> const notificationMenu = document.querySelector('.notification-menu');
+> const profileMenu = document.querySelector('.profile-menu');
+> 
+> notificationButton.addEventListener('click', function() {
+>   notificationMenu.classList.toggle('show');
+>   profileMenu.classList.remove('show'); // Close profile menu if open
+> });
+> 
+> profileButton.addEventListener('click', function() {
+>   profileMenu.classList.toggle('show');
+>   notificationMenu.classList.remove('show'); // Close notification menu if open
+> });
+> 
+> // Keep the dropdown menu in place while scrolling
+> window.addEventListener('scroll', function() {
+>   const rect = notificationButton.getBoundingClientRect();
+>   if (rect.top <= 0) {  // If button is near top of viewport
+>     notificationMenu.classList.add('fixed');
+>     profileMenu.classList.add('fixed');
+>   } else {
+>     notificationMenu.classList.remove('fixed');
+>     profileMenu.classList.remove('fixed');
+>   }
+> });
+> 
+> // Hide the dropdown when clicking outside of the menu
+> window.addEventListener('click', function(event) {
+>   if (!event.target.closest('.notifications-button') && !event.target.closest('.profile-button')) {
+>     notificationMenu.classList.remove('show');
+>     profileMenu.classList.remove('show');
+>   }
+> });
+> ```
+
+---
+
+### **شرح عملکرد پرامپت:**
+1. **موقعیت منو**: منوهای اعلانات و پروفایل دقیقا زیر دکمه‌ها ظاهر می‌شوند، با استفاده از موقعیت‌دهی مطمئن می‌شویم که منوها پشت هدر یا خارج از صفحه قرار نمی‌گیرند.
+2. **رفتار هنگام اسکرول**: منوها در هنگام اسکرول ثابت می‌مانند و در صورت حرکت صفحه، به درستی در زیر دکمه‌ها باقی می‌مانند.
+3. **طراحی و انیمیشن**: منوها با افکت‌های انیمیشن نرم ظاهر و ناپدید می‌شوند و پس‌زمینه‌ای شفاف برای تناسب با طراحی سایت اعمال می‌شود.
+4. **کد جاوا اسکریپت**: این کد تضمین می‌کند که منو به درستی باز و بسته شود، در حین اسکرول در موقعیت مناسب قرار بگیرد و وقتی خارج از منو کلیک می‌شود، بسته شود.
+
+این پرامپت به شما کمک می‌کند تا منوهای اعلانات و پروفایل را به شکلی طبیعی، روان و در هماهنگی با طراحی سایت پیاده‌سازی کنید.

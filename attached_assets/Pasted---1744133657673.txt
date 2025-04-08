@@ -1,0 +1,104 @@
+برای بازطراحی دکمه‌های «فلش راست و چپ» که کارت‌های فیلم را در صفحه جابجا می‌کنند و اطمینان از این که این دکمه‌ها در تمام بخش‌های سایت به‌صورت یکپارچه و سازگار عمل کنند، می‌توانید از پرامپت زیر استفاده کنید. این پرامپت به هوش مصنوعی یا توسعه‌دهنده کمک می‌کند که تمامی دکمه‌ها و بخش‌های مورد نظر را بررسی و بازطراحی کند.
+
+---
+
+### **Prompt برای بازطراحی دکمه‌های جابجایی کارت فیلم‌ها در سایت:**
+
+> I need you to **redesign the left and right arrow buttons** (for scrolling through movie cards) to make them **consistent** and **user-friendly** across all sections of the website. The buttons should have a unified design that ensures they are properly aligned, not overlapping with other elements, and easy to use.
+> 
+> The following issues should be addressed:
+> 
+> 1. **Consistent Positioning**:
+>   - The left and right arrow buttons should always be placed at **the same position relative to the movie card section**. They should not overlap with the movie cards or any other content. The buttons should be positioned **outside** of the cards but **close enough** to the section for easy access.
+>   - Ensure that the buttons are **aligned perfectly** across all sections where they appear (no offset positioning or flipped buttons).
+> 
+> 2. **Button Alignment and Spacing**:
+>   - The buttons should have equal **padding** and **spacing** around them, ensuring they do not touch the edges of the screen or cards. Make sure there is enough room for users to click the buttons easily without interference from the cards or other elements.
+> 
+> 3. **Design Consistency**:
+>   - The buttons should have a **consistent design** across all sections, including size, color, and style. They should match the overall **design theme** of the website (e.g., modern, minimal, or glassmorphism).
+>   - If the buttons are currently blurry in some sections or have a different design, make sure they have the same **sharpness** and style across all pages.
+> 
+> 4. **Interactivity and Accessibility**:
+>   - The buttons should have a **clear hover effect** to indicate they are clickable (e.g., subtle color change, scale-up effect, or shadow). Also, ensure that the buttons are **accessible** for all users by providing a **clear focus state** (e.g., outline or glow effect).
+>   - Make sure that the buttons are **clickable** and **not obstructed by the movie card image** or any other content. The buttons should be on **top of the content** with a higher **z-index** so that they are always clickable.
+> 
+> 5. **Fix Overlapping Issues**:
+>   - For sections where the left or right buttons overlap with the images or cards, move the buttons outside the card’s bounds and ensure that the cards are not being pushed by the buttons. Ensure that the buttons are always clickable even when the card images are large.
+>   - The buttons should not overlap with the content, such as the images of the movie cards. They should be **separate** from the cards and positioned on a **fixed layer** so they don’t interfere with the image display.
+> 
+> 6. **Mobile Responsiveness**:
+>   - Ensure the buttons are also properly designed for **mobile screens**. On smaller screens, the buttons should be **visible** and accessible without obstructing the content. Consider making the buttons **larger** or more prominent on mobile devices for easier tapping.
+> 
+> 7. **Smooth Transition for Scrolling**:
+>   - When the user clicks the arrows to scroll the movie cards, make sure the transition between cards is **smooth**. Add **ease-in-out transitions** to the card movement for a seamless experience.
+> 
+> **CSS Example**:
+> ```css
+> .scroll-button {
+>   position: absolute;
+>   top: 50%;
+>   transform: translateY(-50%);
+>   background: rgba(255, 255, 255, 0.7); /* light, transparent background */
+>   padding: 10px;
+>   border-radius: 50%;
+>   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+>   z-index: 9999; /* Ensure the button is above other content */
+>   transition: transform 0.3s ease, box-shadow 0.3s ease;
+> }
+> 
+> .scroll-button:hover {
+>   transform: translateY(-50%) scale(1.1); /* Slight zoom effect on hover */
+>   box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+> }
+> 
+> .scroll-button.left {
+>   left: 10px;
+> }
+> 
+> .scroll-button.right {
+>   right: 10px;
+> }
+> 
+> .movie-section {
+>   position: relative;
+> }
+> 
+> .movie-cards-container {
+>   display: flex;
+>   overflow-x: scroll;
+> }
+> ```
+> 
+> **JavaScript for Smooth Scroll Effect**:
+> ```javascript
+> const leftButton = document.querySelector('.scroll-button.left');
+> const rightButton = document.querySelector('.scroll-button.right');
+> const movieCardsContainer = document.querySelector('.movie-cards-container');
+> 
+> leftButton.addEventListener('click', function() {
+>   movieCardsContainer.scrollBy({
+>     left: -300, /* Adjust based on your card width */
+>     behavior: 'smooth'
+>   });
+> });
+> 
+> rightButton.addEventListener('click', function() {
+>   movieCardsContainer.scrollBy({
+>     left: 300, /* Adjust based on your card width */
+>     behavior: 'smooth'
+>   });
+> });
+> ```
+
+---
+
+### **شرح عملکرد پرامپت:**
+
+1. **موقعیت‌گذاری دکمه‌ها**: دکمه‌های چپ و راست به‌صورت یکپارچه و منظم در تمام بخش‌های سایت قرار می‌گیرند و هیچگونه تداخلی با تصاویر و دیگر بخش‌ها ندارند.
+2. **یکپارچگی طراحی**: دکمه‌ها در تمام بخش‌ها با طراحی مشابه و هماهنگ به نمایش درمی‌آیند.
+3. **اصلاح مشکلات تداخل**: در بخش‌هایی که دکمه‌ها با تصاویر یا کارت‌ها تداخل دارند، دکمه‌ها به موقعیت‌های صحیح منتقل می‌شوند.
+4. **واکنش‌گرایی موبایل**: طراحی به گونه‌ای است که دکمه‌ها در نمایشگرهای موبایل به‌راحتی قابل دسترسی و قابل کلیک باشند.
+5. **حرکت روان کارت‌ها**: دکمه‌ها برای پیمایش روان و بدون وقفه طراحی شده‌اند، به طوری که هنگام جابجایی کارت‌ها، حرکت آن‌ها به صورت نرم و راحت است.
+
+این پرامپت به هوش مصنوعی یا توسعه‌دهنده کمک می‌کند که دکمه‌های جابجایی کارت‌ها را به‌صورت منسجم و با طراحی حرفه‌ای بازطراحی کند و اطمینان حاصل کند که در تمامی بخش‌ها به‌درستی عمل می‌کنند.

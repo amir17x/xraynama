@@ -2,8 +2,8 @@ import { useRef } from 'react';
 import { Link } from 'wouter';
 import { ContentType } from '@/types';
 import { ContentCard } from './ContentCard';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { ChevronLeft } from 'lucide-react';
+import { CarouselButton } from './CarouselButton';
 
 interface ContentRowProps {
   title: string;
@@ -57,7 +57,7 @@ export function ContentRow({ title, moreLink, content, isLoading = false }: Cont
         )}
       </div>
       
-      <div className="relative">
+      <div className="relative group">
         <div ref={scrollContainerRef} className="overflow-x-auto scrollbar-hide">
           <div className="flex space-x-4 rtl:space-x-reverse pb-4">
             {isLoading ? renderSkeletons() : (
@@ -68,23 +68,18 @@ export function ContentRow({ title, moreLink, content, isLoading = false }: Cont
           </div>
         </div>
         
-        {/* Scroll buttons */}
-        <Button
-          variant="secondary"
-          size="icon"
-          className="hidden md:flex absolute top-1/2 -translate-y-1/2 right-0 -mr-6 bg-card hover:bg-muted text-foreground p-3 rounded-full shadow-lg transform transition-transform duration-300 hover:scale-110 z-10"
-          onClick={handleScrollRight}
-        >
-          <ChevronRight className="h-4 w-4" />
-        </Button>
-        <Button
-          variant="secondary"
-          size="icon"
-          className="hidden md:flex absolute top-1/2 -translate-y-1/2 left-0 -ml-6 bg-card hover:bg-muted text-foreground p-3 rounded-full shadow-lg transform transition-transform duration-300 hover:scale-110 z-10"
-          onClick={handleScrollLeft}
-        >
-          <ChevronLeft className="h-4 w-4" />
-        </Button>
+        {/* استفاده از کامپوننت استاندارد برای دکمه‌های پیمایش */}
+        <CarouselButton 
+          direction="right" 
+          onClick={handleScrollRight} 
+          className="opacity-0 group-hover:opacity-100 md:flex hidden"
+        />
+        
+        <CarouselButton 
+          direction="left" 
+          onClick={handleScrollLeft} 
+          className="opacity-0 group-hover:opacity-100 md:flex hidden"
+        />
       </div>
     </section>
   );
