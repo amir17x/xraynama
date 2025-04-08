@@ -19,6 +19,12 @@ export default function HomePage() {
     staleTime: 1000 * 60 * 5, // 5 minutes
   });
 
+  // Get AI recommended content
+  const { data: recommendedContent, isLoading: isRecommendedLoading } = useQuery<ContentType[]>({
+    queryKey: ['/api/content/recommended', 5],
+    staleTime: 1000 * 60 * 5, // 5 minutes
+  });
+
   // Get latest movies
   const { data: latestMovies, isLoading: isMoviesLoading } = useQuery<ContentType[]>({
     queryKey: ['/api/content/type/movie'],
@@ -81,6 +87,17 @@ export default function HomePage() {
             isLoading={isFeaturedLoading} 
           />
         </div>
+        
+        {/* AI Recommended Content - Personal Recommendations */}
+        <FeaturedContentSection
+          title="پیشنهادهای ویژه برای شما"
+          subtitle="انتخاب‌های هوشمند با استفاده از هوش مصنوعی"
+          content={recommendedContent || []}
+          isLoading={isRecommendedLoading}
+          icon="sparkles"
+          moreLink="/recommended"
+          className="bg-blue-900/30 backdrop-blur-md"
+        />
         
         {/* Top Rated Content with new icon-rich component */}
         <FeaturedContentSection

@@ -231,6 +231,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
       next(error);
     }
   });
+  
+  // Get content by genre
+  app.get("/api/content/genre/:genre", async (req, res, next) => {
+    try {
+      const genre = req.params.genre;
+      const limit = req.query.limit ? parseInt(req.query.limit as string) : 10;
+      const offset = req.query.offset ? parseInt(req.query.offset as string) : 0;
+      
+      const content = await storage.getContentByGenre(genre, limit, offset);
+      res.json(content);
+    } catch (error) {
+      next(error);
+    }
+  });
 
   // Search route
   app.get("/api/search", async (req, res, next) => {

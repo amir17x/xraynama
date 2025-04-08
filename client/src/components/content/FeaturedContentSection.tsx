@@ -6,7 +6,8 @@ import {
   StarIcon, 
   CalendarIcon, 
   ChevronLeftIcon, 
-  ChevronRightIcon 
+  ChevronRightIcon,
+  SparklesIcon
 } from "@/components/icons/RoundedIcons";
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
@@ -17,8 +18,9 @@ interface FeaturedContentSectionProps {
   subtitle?: string;
   content: ContentType[];
   isLoading?: boolean;
-  icon?: "award" | "star" | "calendar" | null;
+  icon?: "award" | "star" | "calendar" | "sparkles" | null;
   moreLink?: string;
+  className?: string;
 }
 
 const FeaturedContentSection: React.FC<FeaturedContentSectionProps> = ({
@@ -28,6 +30,7 @@ const FeaturedContentSection: React.FC<FeaturedContentSectionProps> = ({
   isLoading = false,
   icon = null,
   moreLink,
+  className,
 }) => {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -131,13 +134,15 @@ const FeaturedContentSection: React.FC<FeaturedContentSectionProps> = ({
         return <StarIcon className="h-4 w-4" />;
       case "calendar":
         return <CalendarIcon className="h-4 w-4" />;
+      case "sparkles":
+        return <SparklesIcon className="h-4 w-4" />;
       default:
         return null;
     }
   };
 
   return (
-    <div className="py-8 mb-6">
+    <div className={`py-8 mb-6 ${className || ''}`}>
       <div className="container mx-auto px-4">
         <div className="content-section-glass mb-6">
           <div className="flex justify-between items-center mb-4">

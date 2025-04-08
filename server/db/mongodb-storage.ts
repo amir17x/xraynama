@@ -290,6 +290,53 @@ export class MongoDBStorage implements IStorage {
     }
   }
 
+  async getContentByGenre(genre: string, limit: number = 10, offset: number = 0): Promise<Content[]> {
+    try {
+      // Generate a cache key based on parameters
+      const cacheKey = `getContentByGenre:${genre}:${limit}:${offset}`;
+      
+      // Try to get from cache first
+      const cachedContent = this.contentCache.get(cacheKey);
+      if (cachedContent) {
+        return cachedContent;
+      }
+      
+      // First find the genre by name (case-insensitive)
+      const genreDoc = await GenreModel.findOne({ 
+        name: { $regex: new RegExp(genre, 'i') }
+      });
+      
+      if (!genreDoc) {
+        return [];
+      }
+      
+      // Find content IDs associated with this genre
+      const contentGenreDocs = await ContentGenre.find({ genreId: genreDoc._id });
+      
+      if (contentGenreDocs.length === 0) {
+        return [];
+      }
+      
+      const contentIds = contentGenreDocs.map(cg => cg.contentId);
+      
+      // Get content items
+      const contents = await ContentModel.find({ _id: { $in: contentIds } })
+        .sort({ createdAt: -1 })
+        .skip(offset)
+        .limit(limit);
+      
+      const result = contents.map(this.mongoContentToContent);
+      
+      // Store in cache for future requests
+      this.contentCache.set(cacheKey, result);
+      
+      return result;
+    } catch (error) {
+      console.error(`Error fetching content by genre ${genre}:`, error);
+      return [];
+    }
+  }
+
   async searchContent(query: string, filters: any = {}): Promise<Content[]> {
     try {
       let searchQuery: any = {};
@@ -465,6 +512,7 @@ export class MongoDBStorage implements IStorage {
       // Invalidate content caches when a new content is added
       this.contentCache.invalidateByPrefix('getAllContent');
       this.contentCache.invalidateByPrefix('getContentByType');
+      this.contentCache.invalidateByPrefix('getContentByGenre');
       this.contentCache.invalidateByPrefix('getLatestContent');
       
       return this.mongoContentToContent(savedContent);
@@ -643,6 +691,9 @@ export class MongoDBStorage implements IStorage {
       });
       
       await contentGenre.save();
+      
+      // Invalidate cache for content by genre since associations have changed
+      this.contentCache.invalidateByPrefix('getContentByGenre');
     } catch (error) {
       console.error(`Error adding genre ${genreId} to content ${contentId}:`, error);
       throw error;

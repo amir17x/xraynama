@@ -33,6 +33,7 @@ import AnimationsPage from "@/pages/animations-page";
 import DocumentariesPage from "@/pages/documentaries-page";
 import AllContentPage from "@/pages/all-content-page";
 import AdvancedSearchPage from "@/pages/advanced-search-page";
+import CategoriesPage from "@/pages/categories/CategoriesPage";
 
 // Admin pages
 import AdminDashboard from "@/pages/admin/Dashboard";
@@ -64,6 +65,7 @@ function Router() {
       <Route path="/documentaries" component={DocumentariesPage} />
       <Route path="/all-content" component={AllContentPage} />
       <Route path="/advanced-search" component={AdvancedSearchPage} />
+      <Route path="/categories/:categoryId?" component={CategoriesPage} />
       
       {/* Password reset pages */}
       <Route path="/forgot-password" component={ForgotPasswordPage} />

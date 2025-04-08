@@ -133,6 +133,29 @@ export const FileTextIcon: React.FC<IconProps> = ({ className }) => (
   </svg>
 );
 
+export const SparklesIcon: React.FC<IconProps> = ({ className }) => (
+  <svg
+    className={cn("h-4 w-4 text-blue-500", className)}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <path d="M12 3v18" />
+    <path d="M8 6l8 0" />
+    <path d="M7 12h10" />
+    <path d="M8 18h8" />
+    <path d="M19 10c0 4.438-3.562 8-8 8" />
+    <path d="M5 10c0 4.438 3.562 8 8 8" />
+    <path d="M5 22v-3" />
+    <path d="M5 2v3" />
+    <path d="M19 2v3" />
+    <path d="M19 22v-3" />
+  </svg>
+);
+
 export const TagIcon: React.FC<IconProps> = ({ className }) => (
   <svg
     className={cn("h-4 w-4 text-blue-500", className)}

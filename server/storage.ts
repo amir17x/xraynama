@@ -63,6 +63,7 @@ export interface IStorage {
   getAllContent(limit?: number, offset?: number): Promise<Content[]>;
   getContentById(id: number): Promise<Content | undefined>;
   getContentByType(type: string, limit?: number, offset?: number): Promise<Content[]>;
+  getContentByGenre(genre: string, limit?: number, offset?: number): Promise<Content[]>;
   searchContent(query: string, filters?: any): Promise<Content[]>;
   getLatestContent(limit?: number): Promise<Content[]>;
   getTopRatedContent(limit?: number): Promise<Content[]>;
@@ -348,6 +349,27 @@ export class MemStorage implements IStorage {
       .filter(content => content.type === type)
       .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
       .slice(offset, offset + limit);
+  }
+  
+  async getContentByGenre(genre: string, limit: number = 10, offset: number = 0): Promise<Content[]> {
+    // First find the genre ID based on the genre name
+    const genreObj = Array.from(this.genresMap.values())
+      .find(g => g.name.toLowerCase() === genre.toLowerCase());
+    
+    if (!genreObj) return [];
+    
+    // Find all content associated with this genre
+    const contentIds = Array.from(this.contentGenresMap.values())
+      .filter(cg => cg.genreId === genreObj.id)
+      .map(cg => cg.contentId);
+    
+    // Get the content items
+    const contentItems = Array.from(this.contentMap.values())
+      .filter(content => contentIds.includes(content.id))
+      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
+      .slice(offset, offset + limit);
+    
+    return contentItems;
   }
 
   async searchContent(query: string, filters: any = {}): Promise<Content[]> {

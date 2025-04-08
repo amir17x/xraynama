@@ -42,11 +42,12 @@ export function Footer() {
           <div>
             <h3 className="text-lg font-semibold text-foreground mb-4">دسته‌بندی‌ها</h3>
             <ul className="space-y-2 text-muted-foreground">
-              <li><Link href="/search?genre=action" className="hover:text-primary transition-colors">اکشن</Link></li>
-              <li><Link href="/search?genre=comedy" className="hover:text-primary transition-colors">کمدی</Link></li>
-              <li><Link href="/search?genre=drama" className="hover:text-primary transition-colors">درام</Link></li>
-              <li><Link href="/search?genre=sci-fi" className="hover:text-primary transition-colors">علمی-تخیلی</Link></li>
-              <li><Link href="/search?genre=horror" className="hover:text-primary transition-colors">ترسناک</Link></li>
+              <li><Link href="/categories/action" className="hover:text-primary transition-colors">اکشن</Link></li>
+              <li><Link href="/categories/comedy" className="hover:text-primary transition-colors">کمدی</Link></li>
+              <li><Link href="/categories/drama" className="hover:text-primary transition-colors">درام</Link></li>
+              <li><Link href="/categories/sci-fi" className="hover:text-primary transition-colors">علمی-تخیلی</Link></li>
+              <li><Link href="/categories/horror" className="hover:text-primary transition-colors">ترسناک</Link></li>
+              <li><Link href="/categories" className="hover:text-primary text-primary flex items-center"><span className="ml-1">همه دسته‌بندی‌ها</span> <span className="text-xs">&#10148;</span></Link></li>
             </ul>
           </div>
           

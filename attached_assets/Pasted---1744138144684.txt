@@ -1,0 +1,98 @@
+برای بازطراحی بخش‌های فیلم‌ها، سریال‌ها، انیمیشن‌ها، مستندها، هنرمندان و اپلیکیشن‌ها که دکمه‌های آن‌ها در هدر سایت قرار دارد، می‌توانید از این پرامپت استفاده کنید. این پرامپت شامل جزئیات دقیق و حرفه‌ای است که به هوش مصنوعی دستور می‌دهد این بخش‌ها را با استفاده از استایل گلاسمورفیسم بازطراحی کرده و تمام مشکلات و باگ‌های موجود را رفع کند.
+
+---
+
+### **پرامپت برای بازطراحی بخش‌های فیلم‌ها، سریال‌ها، انیمیشن‌ها، مستندها، هنرمندان و اپلیکیشن‌ها**
+
+> I need to redesign the sections for Movies, TV Shows, Animations, Documentaries, Artists, and Apps in the header of the website. These sections should be modernized and made consistent with the overall design of the website, incorporating **Glassmorphism** effects and resolving any existing bugs or issues. The new design should be smooth, interactive, and user-friendly. Please follow the detailed instructions below:
+   
+#### **1. Overall Structure and Layout:**
+   - The sections (Movies, TV Shows, Animations, Documentaries, Artists, Apps) should be displayed as individual **cards** or **panels** within a grid layout on the page.
+   - Use a **full-width layout** for each section that is consistent with the header and the overall website design.
+   - Each section should have a **glass-like frosted effect** (backdrop-filter) applied to the background, with a slight blur to enhance the aesthetic of the site.
+     - Example CSS for the glass effect:
+       ```css
+       .glass-panel {
+           background: rgba(255, 255, 255, 0.1);
+           backdrop-filter: blur(12px);
+           border-radius: 16px;
+           padding: 20px;
+           transition: transform 0.3s ease;
+       }
+       .glass-panel:hover {
+           transform: scale(1.05);
+       }
+       ```
+
+#### **2. Navigation & Buttons:**
+   - The buttons used for navigating to each section (Movies, TV Shows, Animations, Documentaries, Artists, Apps) should have a **glass-like hover effect**. When the user hovers over the button, the background should slightly change and provide smooth animations for better interactivity.
+   - Each button should be clearly visible and should stand out with proper spacing, but it should maintain the minimalist and modern look.
+     - Example CSS for buttons:
+       ```css
+       .nav-button {
+           background: rgba(255, 255, 255, 0.2);
+           backdrop-filter: blur(6px);
+           border-radius: 8px;
+           padding: 12px 18px;
+           font-size: 16px;
+           text-align: center;
+           transition: background-color 0.3s ease, transform 0.3s ease;
+       }
+       .nav-button:hover {
+           background-color: rgba(255, 255, 255, 0.4);
+           transform: scale(1.05);
+       }
+       ```
+
+#### **3. Dynamic Content Loading & Performance Optimization:**
+   - Use **lazy loading** for images and videos within each section to avoid blocking the initial page load. This will ensure the sections load faster and improve the performance of the website.
+   - The content for each section (Movies, TV Shows, etc.) should be **dynamically loaded** as the user scrolls, ensuring smooth transitions between sections without causing any lag.
+   - For sections with large images (e.g., Movie Posters, TV Show Thumbnails), ensure that **optimized images** are used to reduce page load time.
+   - Implement **infinite scroll** for content-heavy sections like Movies and TV Shows to allow the user to explore more without having to navigate to a new page.
+
+#### **4. Section-Specific Enhancements:**
+
+   - **Movies**: 
+     - Display movie posters and titles in a **grid format** with a **Glassmorphism card style**. Each card should have hover effects that reveal more information about the movie (e.g., rating, year, and description).
+     - Use smooth **carousel effects** to scroll through popular or recommended movies.
+   
+   - **TV Shows**: 
+     - Use a similar grid layout with **glass-like hover effects** for TV shows, with an emphasis on show name, rating, and genres.
+     - Add a **filter bar** at the top of the section for sorting TV shows by genre, release date, and popularity.
+   
+   - **Animations**: 
+     - The animation section should focus on **vivid thumbnails** and include a preview of animated scenes when the user hovers over the thumbnail.
+     - Use subtle **animation on hover** for the images (e.g., zoom in/out or fade-in effects).
+   
+   - **Documentaries**:
+     - Documentaries should be presented in a **clean, simple layout**, with glass panels showcasing each documentary's title and a short description. Focus on highlighting the **educational nature** and **informative content** of documentaries.
+   
+   - **Artists**:
+     - For the Artists section, display a **portrait grid** for each artist, using the same glass card effect with smooth hover animations that reveal brief artist information (e.g., name, genre, and bio).
+     - Clicking on an artist should bring the user to their detailed profile page or a list of movies/shows they've participated in.
+   
+   - **Apps**:
+     - The Apps section should highlight the **app icon** and name, providing a description of the app when hovered over. Ensure that the user can easily **download or learn more** about each app.
+
+#### **5. Mobile Responsiveness:**
+   - Ensure the **entire layout** is fully responsive. For smaller screens, the grid layout should **collapse** into a single column, and the glass effects should still be present but simplified to ensure smooth loading.
+   - The navigation buttons should be large enough on smaller screens and optimized for **touch interactions**.
+
+#### **6. Fixing Bugs and Issues:**
+   - Ensure that all the **hover effects**, **click interactions**, and **dynamic loading** work correctly across all browsers.
+   - Fix any issues where **menus or elements may appear off-screen** or get **misaligned** when switching between different sections or screen sizes.
+   - Ensure that when the user clicks on any of the sections, the content loads **smoothly** without lag or visual glitches.
+   
+#### **7. Typography & Color Scheme:**
+   - Maintain consistent **typography** across all sections, using **sans-serif fonts** like **Roboto**, **Poppins**, or **Montserrat** for a modern look.
+   - Use **light shades of white or gray** for the text to ensure readability on the **glass background**, with darker text for titles and headings.
+   - Ensure that the **call-to-action buttons** (e.g., "Explore More", "Watch Now", etc.) are visually distinct and have **appropriate contrast**.
+
+---
+
+### **Summary:**
+- Redesign the **Movies, TV Shows, Animations, Documentaries, Artists, and Apps sections** to follow a **Glassmorphism style**, creating sleek, modern designs with frosted glass effects.
+- Apply smooth **hover animations**, **dynamic content loading**, and **responsive layouts** for a fluid user experience.
+- Optimize for **performance** by using **lazy loading**, **infinite scroll**, and **optimized images**.
+- Address all **bugs and issues**, ensuring that all interactive elements (buttons, menus, filters) function correctly and smoothly across devices and browsers.
+
