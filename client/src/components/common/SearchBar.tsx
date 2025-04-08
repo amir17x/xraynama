@@ -1,6 +1,10 @@
 import { useState, useRef, useEffect } from 'react';
 import { useLocation } from 'wouter';
-import { Search, X, SlidersHorizontal, BellRing } from 'lucide-react';
+import { 
+  Search, X, SlidersHorizontal, BellRing, 
+  Info, AlertCircle, MessageCircle, ArrowLeftCircle, 
+  Bell, Clock as ClockIcon
+} from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { ContentType, SearchFilters } from '@/types';
@@ -84,7 +88,7 @@ export function AdvancedSearchButton() {
   );
 }
 
-// کامپوننت نمایش اعلانات - برای استفاده در بخش بنفش رنگ هدر
+// کامپوننت نمایش اعلانات - طراحی بهبود یافته با افکت گلاسمورفیسم
 export function NotificationsButton() {
   const [isOpen, setIsOpen] = useState(false);
   const [notifications, setNotifications] = useState([
@@ -93,38 +97,76 @@ export function NotificationsButton() {
       title: 'پخش آنلاین',
       text: 'جهت پخش مروگر Chrome را به آخرین نسخه آپدیت نمایید.',
       date: '2 ماه پیش',
+      isNew: true,
+      icon: 'info',
     },
     {
       id: 2,
       title: 'پخش آنلاین',
       text: 'پخش آنلاین تنها با مرورگر Chrome امکان پذیر است.',
       date: '2 ماه پیش',
+      isNew: false,
+      icon: 'warning',
     },
     {
       id: 3,
       title: 'انتقاد و پیشنهاد',
       text: 'نظر، انتقاد و پیشنهادات خود را از طریق تیکت برای ما ارسال نمو...',
       date: '2 ماه پیش',
+      isNew: false,
+      icon: 'message',
     },
   ]);
   const buttonRef = useRef<HTMLButtonElement>(null);
+  const hasUnreadNotifications = notifications.some(n => n.isNew);
+
+  // رندر آیکون مناسب برای هر نوع اعلان
+  const renderNotificationIcon = (icon: string) => {
+    switch (icon) {
+      case 'info':
+        return <Info className="h-4 w-4 text-blue-400" />;
+      case 'warning':
+        return <AlertCircle className="h-4 w-4 text-amber-400" />;
+      case 'message':
+        return <MessageCircle className="h-4 w-4 text-green-400" />;
+      default:
+        return <Info className="h-4 w-4 text-blue-400" />;
+    }
+  };
+
+  const handleNotificationClick = (id: number) => {
+    // در یک پیاده‌سازی واقعی، این مورد به API درخواست ارسال می‌کند
+    // برای آزمایش، وضعیت isNew را تغییر می‌دهیم
+    setNotifications(
+      notifications.map(notif => 
+        notif.id === id ? { ...notif, isNew: false } : notif
+      )
+    );
+  };
 
   return (
-    <div className="relative">
+    <div className="relative z-50">
       <Button
         ref={buttonRef}
         variant="ghost"
         size="icon"
-        className="glassmorphic-icon relative w-9 h-9 flex items-center justify-center"
+        className="glassmorphic-icon relative w-9 h-9 flex items-center justify-center overflow-hidden"
         onClick={() => setIsOpen(!isOpen)}
         aria-haspopup="true"
         aria-expanded={isOpen}
         aria-label="اعلانات"
       >
-        <BellRing className="h-5 w-5 text-[#00BFFF]" />
-        {notifications.length > 0 && (
-          <span className="absolute top-0 right-0 h-2 w-2 bg-red-500 rounded-full shadow-sm shadow-red-500/50"></span>
+        <BellRing className={`h-5 w-5 ${hasUnreadNotifications ? 'text-[#00BFFF]' : 'text-white'} transition-colors duration-300`} />
+        
+        {/* نشانگر اعلان جدید با انیمیشن پالس */}
+        {hasUnreadNotifications && (
+          <span className="absolute top-0 right-0 h-2.5 w-2.5 bg-red-500 rounded-full shadow-md animate-pulse">
+            <span className="absolute inset-0 rounded-full bg-red-500 animate-ping opacity-75"></span>
+          </span>
         )}
+        
+        {/* افکت هاله نور در هنگام هاور */}
+        <span className="absolute inset-0 rounded-full bg-[#00BFFF]/0 hover:bg-[#00BFFF]/10 transition-all duration-300"></span>
       </Button>
       
       {/* استفاده از PortalOverride بهبود یافته برای منوی اعلان‌ها */}
@@ -134,41 +176,79 @@ export function NotificationsButton() {
         onClose={() => setIsOpen(false)}
         alignRight={false}
         maxHeight={450}
-        minWidth={300}
-        forceMaxHeight={true}
+        minWidth={320}
+        forceMaxHeight={false}
         stickyHeader={
-          <div className="font-bold text-lg border-b border-[#00BFFF]/10 p-3 flex items-center bg-[#00142c]/95">
-            <BellRing className="h-5 w-5 ml-2 text-[#00BFFF]" />
+          <div className="font-bold text-lg border-b border-[#00BFFF]/20 p-4 flex items-center bg-[#00142c]/95 sticky top-0 backdrop-blur-lg">
+            <BellRing className="h-5 w-5 ml-3 text-[#00BFFF]" />
             <span>اعلانات</span>
+            {hasUnreadNotifications && (
+              <span className="mr-2 px-2 py-0.5 rounded-full bg-red-500/20 text-xs font-normal text-red-400">
+                جدید
+              </span>
+            )}
           </div>
         }
         stickyFooter={
-          <div className="text-center border-t border-[#00BFFF]/10 p-2 bg-[#00142c]/95">
-            <Button variant="link" size="sm" className="text-[#00BFFF] text-xs hover:text-[#00BFFF]/80">
+          <div className="text-center border-t border-[#00BFFF]/20 p-3 bg-[#00142c]/95 sticky bottom-0 backdrop-blur-lg">
+            <Button 
+              variant="link" 
+              size="sm" 
+              className="text-[#00BFFF] text-xs hover:text-[#00BFFF]/80 transition-all duration-300"
+            >
               مشاهده همه اعلانات
+              <ArrowLeftCircle className="mr-1 h-3.5 w-3.5" />
             </Button>
           </div>
         }
       >
         <div className="dropdown-glass text-white">
-          <div className="space-y-1 p-2">
-            {notifications.map(notification => (
-              <div 
-                key={notification.id} 
-                className="border-b border-[#00BFFF]/10 pb-3 hover:bg-[#00BFFF]/5 p-2 rounded-md transition-colors duration-200"
-              >
-                <div className="font-bold text-sm">{notification.title}</div>
-                <p className="text-xs text-gray-300 mt-1">{notification.text}</p>
-                <div className="text-[10px] text-gray-400 mt-1">{notification.date}</div>
-              </div>
-            ))}
-            
-            {notifications.length === 0 && (
-              <div className="py-8 text-center text-gray-400">
-                هیچ اعلانی وجود ندارد
-              </div>
-            )}
-          </div>
+          {notifications.length === 0 ? (
+            <div className="flex flex-col items-center justify-center p-8 text-center">
+              <Bell className="h-12 w-12 text-[#00BFFF]/30 mb-3" />
+              <p className="text-sm text-gray-400">اعلان جدیدی ندارید</p>
+            </div>
+          ) : (
+            <div className="space-y-1 p-3">
+              {notifications.map(notification => (
+                <div 
+                  key={notification.id} 
+                  className={`
+                    border-b border-[#00BFFF]/10 pb-3 mb-3 hover:bg-[#00BFFF]/10 p-3 rounded-lg 
+                    transition-all duration-300 cursor-pointer relative overflow-hidden
+                    ${notification.isNew ? 'bg-[#00BFFF]/5 border-r-2 border-r-[#00BFFF]' : ''}
+                  `}
+                  onClick={() => handleNotificationClick(notification.id)}
+                >
+                  {/* افکت شیمر برای اعلان‌های جدید */}
+                  {notification.isNew && <div className="shimmer-effect"></div>}
+                  
+                  <div className="flex items-start">
+                    <div className="ml-3 p-2 rounded-full bg-[#00BFFF]/10">
+                      {renderNotificationIcon(notification.icon)}
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex items-center justify-between">
+                        <div className="font-bold text-sm">
+                          {notification.title}
+                          {notification.isNew && (
+                            <span className="mr-2 px-1.5 py-0.5 text-[10px] bg-red-500/20 text-red-400 rounded-full">
+                              جدید
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                      <p className="text-xs text-gray-300 mt-1 leading-5">{notification.text}</p>
+                      <div className="text-[10px] text-gray-400 mt-2 flex items-center">
+                        <ClockIcon className="h-3 w-3 ml-1" />
+                        {notification.date}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </PortalOverride>
     </div>

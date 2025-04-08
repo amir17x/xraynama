@@ -1,0 +1,120 @@
+برای رفع مشکلات مربوط به لودینگ و پرش ناگهانی محتوای صفحه به خصوص در هنگام اسکرول سریع، نیاز به بهینه‌سازی‌های مربوط به لود تصاویر و انیمیشن‌های مربوطه دارید. این پرامپت به صورت تخصصی، دقیق و حرفه‌ای طراحی شده است تا همزمان مشکلات لودینگ، گلیچ‌ها، و ظاهر نازیبا را حل کند و در عین حال استایل گلاسمورفیسم حفظ شود.
+
+---
+
+### **پرامپت برای بهینه‌سازی لودینگ و رفع پرش‌ها و گلیچ‌ها در صفحات وب با استایل گلاسمورفیسم**:
+
+> My website experiences visual glitches and stutter effects when content is loading, especially when scrolling quickly. For example, when the large background images or movie posters load, they cause a "jump" effect, and the content appears to "flicker" or "glitch" when the page is scrolled quickly. I need you to optimize this by applying a smooth loading mechanism for these sections. Specifically, fix the following issues:
+
+#### 1. **Smooth Loading of Content (Images & Sections)**:
+   - **Lazy Loading**: Implement **lazy loading** for images and sections. Only load content when it comes into view while scrolling. This ensures that content isn't loaded all at once and reduces the chances of UI jumps. Make sure that all media-heavy content, especially movie posters and background images, uses this technique.
+   - **Transition Effects**: Use **smooth CSS transitions** to animate the opacity or position of content when it becomes visible. This will prevent content from abruptly appearing and will make it look more polished.
+     - Example: `opacity: 0; transition: opacity 0.3s ease-in-out;`
+   - For content-heavy sections, consider implementing **fade-in animations** using JavaScript or CSS.
+   
+#### 2. **Background Image and Large Content Handling**:
+   - For large images like movie posters and background images, ensure they are loaded with a **smooth transition** effect to avoid abrupt rendering. Set the initial state of the images to **blurred** or use a **low-resolution placeholder**, and then gradually load the high-resolution version.
+   - Implement a **progressive image loading** strategy to load smaller, lower-quality images first, and replace them with the full-quality version once the image is fully loaded.
+   - **CSS Example**:
+     ```css
+     .image-container {
+         background-image: url('low-res-placeholder.jpg');
+         transition: background-image 1s ease-in-out;
+     }
+     .image-container.loaded {
+         background-image: url('high-res-image.jpg');
+     }
+     ```
+
+#### 3. **Prevent Layout Shifts (CLS)**:
+   - Avoid layout shifts that occur when images or other content load and cause the layout to jump. This can be done by reserving **space for images** and dynamic content using **CSS aspect ratios** or setting **explicit width/height** for images and containers.
+     - For images: Use `width` and `height` attributes in HTML, or use **CSS aspect ratio** properties.
+     - For instance: 
+       ```css
+       .image-container {
+           aspect-ratio: 16/9;
+       }
+       ```
+   - For any content that loads asynchronously, make sure it has **proper padding or margin space** reserved in the layout to prevent content from jumping around when it finally loads.
+
+#### 4. **Optimize Smooth Scrolling and Transitions**:
+   - **CSS Scroll Snap**: Use **scroll snapping** to ensure that the page scrolls smoothly and snaps to the next section or card without abrupt jumps. This can also prevent parts of the page from overlapping or creating a glitchy visual.
+   - Implement **smooth scrolling** for the entire page by adding the following CSS to enable a fluid, uninterrupted scroll experience:
+     ```css
+     html {
+         scroll-behavior: smooth;
+     }
+     ```
+
+#### 5. **Improved Rendering on Scroll**:
+   - To enhance the performance of the scrolling experience, ensure that sections that load dynamically have **optimized rendering** when they come into view. This can be done by using **Intersection Observer API** to detect when an element enters the viewport and apply smooth animations only at that point.
+   - Example of Intersection Observer for fading in:
+     ```javascript
+     const observer = new IntersectionObserver((entries) => {
+       entries.forEach(entry => {
+         if (entry.isIntersecting) {
+           entry.target.classList.add('fade-in');
+         }
+       });
+     });
+     document.querySelectorAll('.lazy-load').forEach(element => {
+       observer.observe(element);
+     });
+     ```
+     And in your CSS:
+     ```css
+     .lazy-load {
+         opacity: 0;
+         transition: opacity 0.5s ease;
+     }
+     .fade-in {
+         opacity: 1;
+     }
+     ```
+
+#### 6. **Staggered Animations & Delays**:
+   - Apply **staggered animations** for content that loads in quick succession. This will prevent multiple sections from appearing at the same time and reduce visual noise.
+   - Add **delays** to certain animations using `animation-delay` to create a cascading visual effect. This ensures that sections load smoothly one after another without overwhelming the user with multiple animations at once.
+   
+#### 7. **Optimize and Enhance Performance**:
+   - **Debouncing Scroll Events**: Since fast scrolling can trigger many events, it is essential to implement **debouncing** on scroll events to ensure the page doesn't lag. This will prevent excessive calculations and rendering while the user is scrolling rapidly.
+     - Example using `lodash.debounce`:
+       ```javascript
+       const handleScroll = _.debounce(() => {
+           // Code to handle scroll events
+       }, 100);
+       
+       window.addEventListener('scroll', handleScroll);
+       ```
+   - **Reduce Image Size**: Ensure all images, especially background and large poster images, are **compressed** and optimized for the web. Use modern formats like **WebP** or **AVIF** for smaller file sizes and faster loading times.
+   - **Code Splitting**: If your page has large JavaScript bundles, implement **code splitting** to only load necessary scripts for the current view. Use tools like **webpack** or **Parcel** to manage this.
+
+#### 8. **Glassmorphism Effects**:
+   - Maintain the **Glassmorphism** aesthetic with **frosted glass** effects but optimize the performance of these effects. Use **CSS `backdrop-filter`** for the glass effect and apply it to the appropriate elements, such as modal windows, profile sections, and navigation bars.
+   - **Performance Tip**: Avoid applying `backdrop-filter` to large areas or repeatedly animated elements, as it can be CPU-intensive. Apply it only where necessary and use fallback solid colors for non-supported browsers.
+     - Example of Glassmorphism effect:
+       ```css
+       .glass-card {
+           background: rgba(255, 255, 255, 0.1);
+           backdrop-filter: blur(10px);
+           border-radius: 15px;
+           padding: 20px;
+           transition: background 0.3s ease-in-out;
+       }
+       ```
+
+#### 9. **Final Tweaks and Visual Enhancements**:
+   - When designing the content that’s loading (e.g., movie posters or other assets), use a **smooth fade-in effect** when the content fully loads to avoid abrupt or jarring transitions.
+   - **Opacity Transition**: You can set initial opacity to `0` and transition it to `1` when the content is loaded, giving a much smoother appearance.
+   - Add **soft shadows** or **subtle animations** to enhance the depth effect of glassmorphism and make the UI feel more interactive and modern.
+
+---
+
+### **Summary**:
+The above optimizations will ensure that:
+1. Content (especially images and background content) loads smoothly without visual glitches.
+2. No abrupt jumps or flickers when elements appear as the user scrolls down.
+3. The **Glassmorphism effect** is applied without causing performance issues.
+4. **Lazy loading**, **debouncing**, and **progressive image loading** help improve overall user experience and reduce lag during fast scrolling.
+
+By using these techniques, you will create a more seamless, fast, and visually appealing web application.

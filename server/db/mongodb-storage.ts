@@ -11,6 +11,48 @@ import {
   Playlist, InsertPlaylist
 } from '@shared/schema';
 
+// Simple in-memory cache for frequently accessed data
+class SimpleCache<T> {
+  private cache: Map<string, { data: T, expiry: number }> = new Map();
+  
+  constructor(private defaultTTL: number = 60000) {} // Default TTL: 1 minute
+  
+  set(key: string, value: T, ttl: number = this.defaultTTL): void {
+    const expiry = Date.now() + ttl;
+    this.cache.set(key, { data: value, expiry });
+  }
+  
+  get(key: string): T | null {
+    const entry = this.cache.get(key);
+    
+    if (!entry) return null;
+    
+    // Check if cache entry has expired
+    if (entry.expiry < Date.now()) {
+      this.cache.delete(key);
+      return null;
+    }
+    
+    return entry.data;
+  }
+  
+  invalidate(key: string): void {
+    this.cache.delete(key);
+  }
+  
+  invalidateByPrefix(prefix: string): void {
+    for (const key of this.cache.keys()) {
+      if (key.startsWith(prefix)) {
+        this.cache.delete(key);
+      }
+    }
+  }
+  
+  clear(): void {
+    this.cache.clear();
+  }
+}
+
 import {
   User as UserModel,
   Content as ContentModel,
@@ -41,6 +83,11 @@ const MongoDBStore = connectMongoDBSession.default(session);
 export class MongoDBStorage implements IStorage {
   // Lazy-loaded session store
   private _sessionStore: any = null;
+  // Cache for frequently accessed data
+  private contentCache = new SimpleCache<Content[]>(300000); // 5 minutes TTL
+  private genreCache = new SimpleCache<Genre[]>(600000); // 10 minutes TTL
+  private tagCache = new SimpleCache<Tag[]>(600000); // 10 minutes TTL
+  private userCache = new SimpleCache<User>(300000); // 5 minutes TTL
   
   public get sessionStore(): any {
     // Lazy initialize the session store only when needed
@@ -142,12 +189,27 @@ export class MongoDBStorage implements IStorage {
   // Content operations
   async getAllContent(limit: number = 10, offset: number = 0): Promise<Content[]> {
     try {
+      // Generate a cache key based on parameters
+      const cacheKey = `getAllContent:${limit}:${offset}`;
+      
+      // Try to get from cache first
+      const cachedContent = this.contentCache.get(cacheKey);
+      if (cachedContent) {
+        return cachedContent;
+      }
+      
+      // If not in cache, fetch from database
       const contents = await ContentModel.find()
         .sort({ createdAt: -1 })
         .skip(offset)
         .limit(limit);
 
-      return contents.map(this.mongoContentToContent);
+      const result = contents.map(this.mongoContentToContent);
+      
+      // Store in cache for future requests (TTL: 5 minutes)
+      this.contentCache.set(cacheKey, result);
+      
+      return result;
     } catch (error) {
       console.error('Error fetching all content:', error);
       return [];
@@ -201,12 +263,27 @@ export class MongoDBStorage implements IStorage {
 
   async getContentByType(type: string, limit: number = 10, offset: number = 0): Promise<Content[]> {
     try {
+      // Generate a cache key based on parameters
+      const cacheKey = `getContentByType:${type}:${limit}:${offset}`;
+      
+      // Try to get from cache first
+      const cachedContent = this.contentCache.get(cacheKey);
+      if (cachedContent) {
+        return cachedContent;
+      }
+      
+      // If not in cache, fetch from database
       const contents = await ContentModel.find({ type })
         .sort({ createdAt: -1 })
         .skip(offset)
         .limit(limit);
 
-      return contents.map(this.mongoContentToContent);
+      const result = contents.map(this.mongoContentToContent);
+      
+      // Store in cache for future requests
+      this.contentCache.set(cacheKey, result);
+      
+      return result;
     } catch (error) {
       console.error(`Error fetching content by type ${type}:`, error);
       return [];
@@ -264,11 +341,26 @@ export class MongoDBStorage implements IStorage {
 
   async getLatestContent(limit: number = 10): Promise<Content[]> {
     try {
+      // Generate a cache key based on parameters
+      const cacheKey = `getLatestContent:${limit}`;
+      
+      // Try to get from cache first
+      const cachedContent = this.contentCache.get(cacheKey);
+      if (cachedContent) {
+        return cachedContent;
+      }
+      
+      // If not in cache, fetch from database
       const contents = await ContentModel.find()
         .sort({ createdAt: -1 })
         .limit(limit);
 
-      return contents.map(this.mongoContentToContent);
+      const result = contents.map(this.mongoContentToContent);
+      
+      // Store in cache for future requests
+      this.contentCache.set(cacheKey, result);
+      
+      return result;
     } catch (error) {
       console.error('Error fetching latest content:', error);
       return [];
@@ -277,29 +369,86 @@ export class MongoDBStorage implements IStorage {
 
   async getTopRatedContent(limit: number = 10): Promise<Content[]> {
     try {
-      // First get all content
-      const allContents = await ContentModel.find();
+      // Generate a cache key based on parameters
+      const cacheKey = `getTopRatedContent:${limit}`;
       
-      // Now calculate average ratings for each piece of content
-      const contentsWithRatings = await Promise.all(
-        allContents.map(async (content) => {
-          const ratings = await RatingModel.find({ contentId: content._id });
-          const avgRating = ratings.length > 0 
-            ? ratings.reduce((sum, rating) => sum + rating.score, 0) / ratings.length 
-            : 0;
-          
-          return { content, avgRating };
-        })
+      // Try to get from cache first (this method is expensive, so longer TTL)
+      const cachedContent = this.contentCache.get(cacheKey);
+      if (cachedContent) {
+        return cachedContent;
+      }
+      
+      // Use MongoDB aggregation pipeline for better performance
+      const aggregationResult = await RatingModel.aggregate([
+        // Group by contentId and calculate average score
+        { 
+          $group: { 
+            _id: "$contentId", 
+            avgRating: { $avg: "$score" },
+            count: { $sum: 1 }
+          } 
+        },
+        // Sort by average rating descending
+        { $sort: { avgRating: -1 } },
+        // Limit to the requested number of results
+        { $limit: limit },
+        // Lookup content details from the content collection
+        {
+          $lookup: {
+            from: 'contents',
+            localField: '_id',
+            foreignField: '_id',
+            as: 'content'
+          }
+        },
+        // Unwind the content array to get individual documents
+        { $unwind: '$content' },
+        // Project only the content field and rating info
+        {
+          $project: {
+            content: 1,
+            avgRating: 1
+          }
+        }
+      ]);
+
+      // Map the aggregation results to content objects
+      const result = aggregationResult.map(item => 
+        this.mongoContentToContent(item.content)
       );
       
-      // Sort by average rating and return top N
-      return contentsWithRatings
-        .sort((a, b) => b.avgRating - a.avgRating)
-        .slice(0, limit)
-        .map(item => this.mongoContentToContent(item.content));
+      // If there are not enough rated contents, supplement with latest content
+      if (result.length < limit) {
+        const remainingLimit = limit - result.length;
+        const existingIds = result.map(content => content.id);
+        
+        const latestContents = await ContentModel.find({ 
+          _id: { $nin: existingIds } 
+        })
+        .sort({ createdAt: -1 })
+        .limit(remainingLimit);
+        
+        result.push(...latestContents.map(this.mongoContentToContent));
+      }
+      
+      // Store in cache for future requests (10 minutes TTL since this is expensive)
+      this.contentCache.set(cacheKey, result, 600000);
+      
+      return result;
     } catch (error) {
       console.error('Error fetching top rated content:', error);
-      return [];
+      
+      // Fallback to uncached but simpler approach if aggregation fails
+      try {
+        const contents = await ContentModel.find()
+          .sort({ createdAt: -1 })
+          .limit(limit);
+          
+        return contents.map(this.mongoContentToContent);
+      } catch (fallbackError) {
+        console.error('Fallback error:', fallbackError);
+        return [];
+      }
     }
   }
 
@@ -312,6 +461,12 @@ export class MongoDBStorage implements IStorage {
       });
       
       const savedContent = await newContent.save();
+      
+      // Invalidate content caches when a new content is added
+      this.contentCache.invalidateByPrefix('getAllContent');
+      this.contentCache.invalidateByPrefix('getContentByType');
+      this.contentCache.invalidateByPrefix('getLatestContent');
+      
       return this.mongoContentToContent(savedContent);
     } catch (error) {
       console.error('Error creating content:', error);
@@ -417,8 +572,23 @@ export class MongoDBStorage implements IStorage {
   // Genres operations
   async getAllGenres(): Promise<Genre[]> {
     try {
+      // Generate a cache key
+      const cacheKey = 'getAllGenres';
+      
+      // Try to get from cache first
+      const cachedGenres = this.genreCache.get(cacheKey);
+      if (cachedGenres) {
+        return cachedGenres;
+      }
+      
+      // If not in cache, fetch from database
       const genres = await GenreModel.find().sort({ name: 1 });
-      return genres.map(this.mongoGenreToGenre);
+      const result = genres.map(this.mongoGenreToGenre);
+      
+      // Store in cache for future requests
+      this.genreCache.set(cacheKey, result);
+      
+      return result;
     } catch (error) {
       console.error('Error fetching all genres:', error);
       return [];
@@ -452,6 +622,10 @@ export class MongoDBStorage implements IStorage {
       });
       
       const savedGenre = await newGenre.save();
+      
+      // Invalidate genre cache when a new genre is added
+      this.genreCache.invalidateByPrefix('getAllGenres');
+      
       return this.mongoGenreToGenre(savedGenre);
     } catch (error) {
       console.error('Error creating genre:', error);
@@ -478,8 +652,23 @@ export class MongoDBStorage implements IStorage {
   // Tags operations
   async getAllTags(): Promise<Tag[]> {
     try {
+      // Generate a cache key
+      const cacheKey = 'getAllTags';
+      
+      // Try to get from cache first
+      const cachedTags = this.tagCache.get(cacheKey);
+      if (cachedTags) {
+        return cachedTags;
+      }
+      
+      // If not in cache, fetch from database
       const tags = await TagModel.find().sort({ name: 1 });
-      return tags.map(this.mongoTagToTag);
+      const result = tags.map(this.mongoTagToTag);
+      
+      // Store in cache for future requests
+      this.tagCache.set(cacheKey, result);
+      
+      return result;
     } catch (error) {
       console.error('Error fetching all tags:', error);
       return [];
@@ -513,6 +702,10 @@ export class MongoDBStorage implements IStorage {
       });
       
       const savedTag = await newTag.save();
+      
+      // Invalidate tag cache when a new tag is added
+      this.tagCache.invalidateByPrefix('getAllTags');
+      
       return this.mongoTagToTag(savedTag);
     } catch (error) {
       console.error('Error creating tag:', error);
@@ -568,6 +761,10 @@ export class MongoDBStorage implements IStorage {
       });
       
       const savedRating = await newRating.save();
+      
+      // Invalidate top rated content cache when a new rating is added
+      this.contentCache.invalidateByPrefix('getTopRatedContent');
+      
       return this.mongoRatingToRating(savedRating);
     } catch (error) {
       console.error('Error creating rating:', error);
@@ -584,6 +781,10 @@ export class MongoDBStorage implements IStorage {
       );
       
       if (!updatedRating) return undefined;
+      
+      // Invalidate top rated content cache when a rating is updated
+      this.contentCache.invalidateByPrefix('getTopRatedContent');
+      
       return this.mongoRatingToRating(updatedRating);
     } catch (error) {
       console.error(`Error updating rating ${id}:`, error);

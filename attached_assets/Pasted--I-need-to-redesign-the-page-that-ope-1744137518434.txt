@@ -1,0 +1,116 @@
+پرامپت برای طراحی صفحه دسته‌بندی‌های فیلم با استایل گلاسمورفیسم
+I need to redesign the page that opens when a user clicks on the categories in the footer of the site (Action, Comedy, Drama, Sci-Fi, Horror). The new design should follow a modern Glassmorphism aesthetic, consistent with the rest of the website. The design should be clean, smooth, and responsive, with seamless integration of glass-like effects. Follow the specific details below:
+
+1. Overall Layout & Structure:
+Create a full-width page layout with a fixed header and footer consistent with the rest of the site.
+
+Glassmorphism Effect: The background of the page should have a frosted-glass effect (using backdrop-filter: blur()), with a slight blur to the background while maintaining clarity of the content. The cards containing each movie category should have a subtle glass-like effect.
+
+Example CSS:
+
+css
+Copy
+Edit
+.glass-background {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border-radius: 15px;
+    padding: 20px;
+}
+2. Category Cards Design (Action, Comedy, Drama, Sci-Fi, Horror):
+For each category (e.g., Action, Comedy, Drama, Sci-Fi, Horror), create visually appealing cards that display the name of the category and a thumbnail or icon representing the genre.
+
+The cards should be responsive and scale well on different screen sizes.
+
+Each card should have the Glassmorphism effect applied, with subtle animations on hover (e.g., card expansion or a slight blur effect to add interactivity).
+
+The categories should appear in a grid layout, with spacing between the cards, and the grid should adjust automatically for mobile screens.
+
+Example CSS for cards:
+
+css
+Copy
+Edit
+.category-card {
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(8px);
+    border-radius: 12px;
+    padding: 20px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.category-card:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+}
+3. Navigation and Transitions:
+Implement smooth page transitions when switching between categories. Use fade-in/fade-out animations to enhance the user experience.
+
+For each category click (e.g., Action, Comedy, Drama, etc.), load the relevant movies or shows dynamically without refreshing the page, maintaining a fluid user experience.
+
+Use JavaScript or React for dynamic loading, ensuring that users don’t experience page reloads. Consider implementing lazy loading for images.
+
+4. Category Filters and Sorting Options:
+Provide filter options (e.g., by rating, release year, etc.) on the left or top of the page, and these should appear as glass-like dropdown menus that fit the Glassmorphism style.
+
+Ensure that these filter options are close to the categories for better usability.
+
+Example CSS for filter dropdowns:
+
+css
+Copy
+Edit
+.filter-dropdown {
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(8px);
+    border-radius: 8px;
+    padding: 10px;
+    transition: opacity 0.3s ease;
+}
+5. Typography and Color Scheme:
+Use elegant, clean typography that complements the Glassmorphism design. Use fonts like Roboto, Open Sans, or Montserrat for headings and body text.
+
+The text color should be in contrast with the background to ensure readability, with shades of light gray or white for titles and content text.
+
+Ensure that the primary brand colors are incorporated subtly in the design, e.g., for buttons, hover states, or section highlights.
+
+6. Interactive Elements (Buttons, Hover Effects):
+The page should feature interactive buttons (e.g., "See More" or "View Movies") that align with the Glassmorphism style, incorporating frosted-glass effects, subtle hover animations, and smooth transitions.
+
+Buttons should expand slightly on hover and change background color to a light shade, indicating interactivity.
+
+Example CSS for buttons:
+
+css
+Copy
+Edit
+.btn {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(8px);
+    border-radius: 12px;
+    padding: 12px 20px;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+}
+.btn:hover {
+    background-color: rgba(255, 255, 255, 0.3);
+    transform: scale(1.05);
+}
+7. Footer Design:
+The footer should maintain the same glass-like appearance as the rest of the site but should be more minimalistic to avoid visual clutter. Include social media links, and other relevant footer content (e.g., copyright, contact info).
+
+The footer can also have a blurred background with simple text or icons, providing a clean and modern look.
+
+8. Performance Optimization:
+Use lazy loading for images and sections, especially for the category thumbnails and posters, to ensure the page loads efficiently without slowing down.
+
+Use SVG icons for genres or other graphical elements to reduce load times and keep the design sharp on all screen sizes.
+
+Summary:
+Glassmorphism effects should be applied consistently throughout the design.
+
+The categories (Action, Comedy, Drama, Sci-Fi, Horror) should be displayed in sleek, responsive cards with hover animations.
+
+Navigation should be intuitive, with filters and sorting options close to the categories, using glass-like dropdown menus.
+
+The design should be fluid and modern, with smooth animations and transitions that make the user experience seamless.
+
+Implement dynamic content loading and lazy loading techniques for faster performanc

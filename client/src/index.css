@@ -12,6 +12,22 @@
     box-shadow: 0 0 15px -3px rgba(29, 78, 216, 0.2), 0 0 6px -2px rgba(59, 130, 246, 0.1);
   }
   
+  /* انیمیشن برای لودینگ و شیمر افکت */
+  @keyframes shimmer {
+    0% {
+      background-position: -1000px 0;
+    }
+    100% {
+      background-position: 1000px 0;
+    }
+  }
+  
+  .shimmer-effect {
+    background: linear-gradient(to right, rgba(255, 255, 255, 0.02) 8%, rgba(255, 255, 255, 0.05) 18%, rgba(255, 255, 255, 0.02) 33%);
+    background-size: 2000px 100%;
+    animation: shimmer 2s infinite linear;
+  }
+  
   /* انیمیشن‌های مربوط به toast notification */
   @keyframes fadeInUp {
     from {
@@ -42,6 +58,22 @@
     animation: scan 1.5s ease-in-out infinite;
   }
   
+  /* انیمیشن نمایش محتوا با اسکرول */
+  @keyframes content-enter {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  .content-enter {
+    animation: content-enter 0.5s ease-out forwards;
+  }
+  
   /* انیمیشن ظاهر شدن منوی کشویی */
   @keyframes dropdown-fade-in {
     from {
@@ -66,13 +98,19 @@
     }
   }
   
-  /* استایل برای منوهای کشویی */
+  /* استایل بهبود یافته برای منوهای کشویی با افکت گلاسمورفیسم */
   .dropdown-glass {
-    background-color: rgba(0, 20, 44, 0.95);
-    backdrop-filter: blur(8px);
-    border: 1px solid rgba(0, 191, 255, 0.2);
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5), 0 0 5px rgba(0, 191, 255, 0.1);
-    border-radius: 0.5rem;
+    background-color: rgba(0, 20, 44, 0.85);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(0, 191, 255, 0.25);
+    box-shadow: 
+      0 10px 30px rgba(0, 0, 0, 0.5), 
+      0 0 15px rgba(0, 0, 0, 0.3), 
+      0 0 5px rgba(0, 191, 255, 0.2), 
+      inset 0 0 2px rgba(0, 191, 255, 0.1);
+    border-radius: 0.75rem;
+    transform-origin: top center;
+    animation: dropdown-fade-in 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
   }
   
   /* اسکرول‌بار نازک */
@@ -456,33 +494,62 @@
     @apply p-2 rounded-md bg-background/80 hover:bg-[#00BFFF]/20 text-foreground hover:text-[#00BFFF] border border-border hover:border-[#00BFFF]/30 transition-all duration-300;
   }
   
-  /* طرح شیشه‌ای و شفاف برای هدر - با گرادیان آبی-سیاه فوتوریستیک */
+  /* طرح گلاسمورفیسم بهبود یافته برای هدر - با گرادیان آبی-سیاه فوتوریستیک */
   .glass-header {
-    @apply backdrop-blur-md shadow-sm border transition-all duration-500 ease-in-out;
-    background-color: rgba(10, 15, 35, 0.65);
+    @apply backdrop-blur-lg shadow-sm border transition-all duration-500 ease-in-out;
+    background-color: rgba(0, 20, 44, 0.75);
     background-image: 
       linear-gradient(to bottom, 
-        rgba(0, 191, 255, 0.07) 0%, 
-        rgba(0, 80, 170, 0.04) 50%, 
-        rgba(0, 20, 60, 0.07) 100%);
+        rgba(0, 191, 255, 0.08) 0%, 
+        rgba(0, 80, 170, 0.05) 50%, 
+        rgba(0, 20, 60, 0.08) 100%);
     background-size: 200% 200%;
-    border-color: rgba(0, 191, 255, 0.12);
+    border-color: rgba(0, 191, 255, 0.15);
     box-shadow: 
-      0 10px 30px -10px rgba(0, 0, 0, 0.3),
-      0 1px 2px rgba(0, 191, 255, 0.1),
-      inset 0 1px 1px rgba(0, 191, 255, 0.05);
-    backdrop-filter: blur(12px);
+      0 10px 30px rgba(0, 0, 0, 0.3),
+      0 4px 10px rgba(0, 0, 0, 0.2),
+      0 2px 5px rgba(0, 191, 255, 0.12),
+      inset 0 1px 1px rgba(0, 191, 255, 0.08);
+    backdrop-filter: blur(15px);
+    position: relative;
+    overflow: hidden;
+  }
+  
+  /* افکت شیمر (درخشش) در هدر */
+  .glass-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 50%;
+    height: 100%;
+    background: linear-gradient(
+      to left,
+      transparent,
+      rgba(0, 191, 255, 0.05),
+      transparent
+    );
+    z-index: 1;
+    pointer-events: none;
+    animation: glass-header-shimmer 8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  }
+  
+  @keyframes glass-header-shimmer {
+    0% { left: -100%; }
+    50% { left: 100%; }
+    100% { left: 100%; }
   }
   
   /* هدر در حالت اسکرول - با افکت درخشش بیشتر */
   .glass-header.header-shadow {
-    background-color: rgba(10, 15, 35, 0.85);
-    border-color: rgba(0, 191, 255, 0.18);
+    background-color: rgba(0, 20, 44, 0.9);
+    border-color: rgba(0, 191, 255, 0.25);
     box-shadow: 
-      0 10px 30px -5px rgba(0, 0, 0, 0.4),
-      0 4px 15px rgba(0, 191, 255, 0.1),
-      inset 0 1px 0 rgba(0, 191, 255, 0.08);
-    backdrop-filter: blur(15px);
+      0 10px 30px rgba(0, 0, 0, 0.4),
+      0 4px 15px rgba(0, 0, 0, 0.2), 
+      0 2px 8px rgba(0, 191, 255, 0.15),
+      inset 0 1px 1px rgba(0, 191, 255, 0.12);
+    backdrop-filter: blur(20px);
   }
 
   /* انیمیشن نرم برای هدر */

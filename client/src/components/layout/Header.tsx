@@ -180,84 +180,117 @@ export function Header() {
                     <ChevronDown className={`mr-1 text-[#00BFFF] h-4 w-4 md:hidden transition-transform duration-200 ${isMenuOpen ? 'transform rotate-180' : ''}`} />
                   </Button>
                   
-                  {/* استفاده از PortalOverride بهبود یافته برای منوی پروفایل */}
+                  {/* استفاده از PortalOverride بهبود یافته برای منوی پروفایل با طراحی گلاسمورفیسم */}
                   <PortalOverride 
                     triggerRef={triggerRef} 
                     isOpen={isMenuOpen} 
                     onClose={() => setIsMenuOpen(false)}
                     alignRight={true}
-                    maxHeight={400}
-                    minWidth={240}
+                    maxHeight={500}
+                    minWidth={280}
                     stickyHeader={
-                      <div className="py-2 px-3 border-b border-[#00BFFF]/10 bg-[#00142c]/95">
-                        <div className="text-sm font-medium text-white truncate">{user.name || user.username}</div>
-                        <div className="text-xs text-[#00BFFF]/80 truncate">
-                          {user?.role === 'admin' ? 'مدیر سیستم' : 'کاربر معمولی'}
+                      <div className="py-4 px-4 border-b border-[#00BFFF]/20 bg-[#00142c]/95 backdrop-blur-lg flex items-center">
+                        <Avatar className="w-12 h-12 mr-3 border-2 border-[#00BFFF]/50 shadow-glow-sm shadow-[#00BFFF]/20">
+                          <AvatarImage src={user.avatar || undefined} />
+                          <AvatarFallback className="bg-[#00142c] text-[#00BFFF] font-semibold text-lg">
+                            {user.name?.charAt(0) || user.username.charAt(0)}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div className="flex-1">
+                          <div className="text-base font-medium text-white truncate">{user.name || user.username}</div>
+                          <div className="text-xs text-[#00BFFF] truncate flex items-center mt-1">
+                            {user?.role === 'admin' ? (
+                              <>
+                                <ShieldAlert className="h-3 w-3 ml-1" />
+                                <span>مدیر سیستم</span>
+                              </>
+                            ) : (
+                              <>
+                                <User className="h-3 w-3 ml-1" />
+                                <span>کاربر</span>
+                              </>
+                            )}
+                          </div>
                         </div>
                       </div>
                     }
                   >
-                    <div className="dropdown-glass text-white p-2">
+                    <div className="dropdown-glass text-white p-3">
                       <Link 
                         href="/profile"
-                        className="w-full flex items-center p-2 rounded-md text-sm hover:bg-[#00BFFF]/10 transition-colors duration-200"
+                        className="w-full flex items-center p-3 rounded-md text-sm hover:bg-[#00BFFF]/10 transition-all duration-300 group"
                         onClick={() => setIsMenuOpen(false)}
                       >
-                        <User className="ml-2 h-4 w-4 text-[#00BFFF]" />
+                        <div className="ml-3 w-8 h-8 rounded-full bg-[#00BFFF]/10 flex items-center justify-center group-hover:bg-[#00BFFF]/20 transition-all duration-300">
+                          <User className="h-4 w-4 text-[#00BFFF]" />
+                        </div>
                         <span>پروفایل</span>
                       </Link>
                       
                       <Link 
                         href="/profile?tab=favorites"
-                        className="w-full flex items-center p-2 rounded-md text-sm hover:bg-[#00BFFF]/10 transition-colors duration-200"
+                        className="w-full flex items-center p-3 rounded-md text-sm hover:bg-[#00BFFF]/10 transition-all duration-300 group"
                         onClick={() => setIsMenuOpen(false)}
                       >
-                        <Heart className="ml-2 h-4 w-4 text-[#00BFFF]" />
+                        <div className="ml-3 w-8 h-8 rounded-full bg-[#00BFFF]/10 flex items-center justify-center group-hover:bg-[#00BFFF]/20 transition-all duration-300">
+                          <Heart className="h-4 w-4 text-[#00BFFF]" />
+                        </div>
                         <span>علاقه‌مندی‌ها</span>
                       </Link>
                       
                       <Link 
                         href="/profile?tab=playlists"
-                        className="w-full flex items-center p-2 rounded-md text-sm hover:bg-[#00BFFF]/10 transition-colors duration-200"
+                        className="w-full flex items-center p-3 rounded-md text-sm hover:bg-[#00BFFF]/10 transition-all duration-300 group"
                         onClick={() => setIsMenuOpen(false)}
                       >
-                        <ListVideo className="ml-2 h-4 w-4 text-[#00BFFF]" />
+                        <div className="ml-3 w-8 h-8 rounded-full bg-[#00BFFF]/10 flex items-center justify-center group-hover:bg-[#00BFFF]/20 transition-all duration-300">
+                          <ListVideo className="h-4 w-4 text-[#00BFFF]" />
+                        </div>
                         <span>پلی‌لیست‌ها</span>
                       </Link>
                       
                       <Link 
                         href="/profile?tab=settings"
-                        className="w-full flex items-center p-2 rounded-md text-sm hover:bg-[#00BFFF]/10 transition-colors duration-200"
+                        className="w-full flex items-center p-3 rounded-md text-sm hover:bg-[#00BFFF]/10 transition-all duration-300 group"
                         onClick={() => setIsMenuOpen(false)}
                       >
-                        <Settings className="ml-2 h-4 w-4 text-[#00BFFF]" />
+                        <div className="ml-3 w-8 h-8 rounded-full bg-[#00BFFF]/10 flex items-center justify-center group-hover:bg-[#00BFFF]/20 transition-all duration-300">
+                          <Settings className="h-4 w-4 text-[#00BFFF]" />
+                        </div>
                         <span>تنظیمات</span>
                       </Link>
                       
-                      {/* نمایش گزینه مدیر سیستم فقط برای کاربران ادمین */}
+                      {/* نمایش گزینه مدیر سیستم فقط برای کاربران ادمین با طراحی بهبود یافته */}
                       {user?.role === 'admin' && (
                         <>
-                          <div className="h-px bg-[#00BFFF]/10 my-1"></div>
+                          <div className="h-0.5 bg-gradient-to-r from-[#00BFFF]/0 via-[#00BFFF]/20 to-[#00BFFF]/0 my-3"></div>
                           <Link 
                             href="/admin/dashboard"
-                            className="w-full flex items-center p-2 rounded-md bg-[#00BFFF]/10 text-[#00BFFF] hover:bg-[#00BFFF]/20 text-sm font-semibold transition-all duration-300"
+                            className="w-full flex items-center p-3 rounded-md bg-[#00BFFF]/5 text-white hover:bg-[#00BFFF]/15 text-sm font-medium transition-all duration-300 group"
                             onClick={() => setIsMenuOpen(false)}
                           >
-                            <ShieldAlert className="ml-2 h-4 w-4" />
-                            <span>مدیر سیستم</span>
+                            <div className="ml-3 w-8 h-8 rounded-full bg-[#00BFFF]/15 flex items-center justify-center group-hover:bg-[#00BFFF]/25 transition-all duration-300">
+                              <ShieldAlert className="h-4 w-4 text-[#00BFFF]" />
+                            </div>
+                            <div>
+                              <span className="font-medium">پنل مدیریت</span>
+                              <p className="text-xs text-[#00BFFF]/70 mt-0.5">دسترسی به تنظیمات سایت</p>
+                            </div>
                           </Link>
                         </>
                       )}
                       
-                      <div className="h-px bg-[#00BFFF]/10 my-1"></div>
+                      <div className="h-0.5 bg-gradient-to-r from-[#00BFFF]/0 via-[#00BFFF]/20 to-[#00BFFF]/0 my-3"></div>
                       <button 
-                        className="w-full flex items-center p-2 rounded-md text-sm hover:bg-red-500/10 hover:text-red-400 transition-colors duration-200"
+                        className="w-full flex items-center p-3 rounded-md text-sm group hover:bg-red-500/10 transition-all duration-300"
                         onClick={() => { handleLogout(); setIsMenuOpen(false); }}
                         disabled={logoutMutation.isPending}
                       >
-                        <LogOut className="ml-2 h-4 w-4" />
-                        <span>خروج</span>
-                        {logoutMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                        <div className="ml-3 w-8 h-8 rounded-full bg-red-500/10 flex items-center justify-center group-hover:bg-red-500/20 transition-all duration-300">
+                          <LogOut className="h-4 w-4 text-red-400" />
+                        </div>
+                        <span className="group-hover:text-red-400 transition-colors duration-300">خروج از حساب کاربری</span>
+                        {logoutMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin text-red-400" />}
                       </button>
                     </div>
                   </PortalOverride>

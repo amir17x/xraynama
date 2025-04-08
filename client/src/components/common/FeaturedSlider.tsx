@@ -1,13 +1,14 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link } from 'wouter';
 import { ContentType } from '@/types';
-import { Play, Download, Heart, Share2, ChevronLeft } from 'lucide-react';
+import { Play, Download, Heart, Share2, ChevronLeft, Image } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { apiRequest, queryClient } from '@/lib/queryClient';
 import { useAuth } from '@/hooks/use-auth';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import { CarouselButton } from './CarouselButton';
+import { useInView } from '@/hooks/use-in-view';
 
 interface FeaturedSliderProps {
   content: ContentType[];
@@ -18,9 +19,14 @@ export function FeaturedSlider({ content, isLoading = false }: FeaturedSliderPro
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isFavorite, setIsFavorite] = useState(false);
   const [isAddingToFavorites, setIsAddingToFavorites] = useState(false);
+  const [imagesLoaded, setImagesLoaded] = useState<Record<number, boolean>>({});
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const { user } = useAuth();
   const { toast } = useToast();
+  const [sliderRef, isVisible] = useInView<HTMLElement>({
+    threshold: 0.1,
+    triggerOnce: false
+  });
 
   // Auto-rotate slider items
   useEffect(() => {
@@ -80,14 +86,14 @@ export function FeaturedSlider({ content, isLoading = false }: FeaturedSliderPro
       const currentContent = content[currentIndex];
       
       if (isFavorite) {
-        await apiRequest("DELETE", `/api/content/${currentContent.id}/favorites`);
+        await apiRequest({ method: "DELETE", url: `/api/content/${currentContent.id}/favorites` });
         setIsFavorite(false);
         toast({
           title: "حذف از علاقه‌مندی‌ها",
           description: `${currentContent.title} از لیست علاقه‌مندی‌های شما حذف شد`,
         });
       } else {
-        await apiRequest("POST", `/api/content/${currentContent.id}/favorites`);
+        await apiRequest({ method: "POST", url: `/api/content/${currentContent.id}/favorites` });
         setIsFavorite(true);
         toast({
           title: "افزودن به علاقه‌مندی‌ها",
@@ -167,23 +173,77 @@ export function FeaturedSlider({ content, isLoading = false }: FeaturedSliderPro
     );
   }
 
+  // Handler for image loading
+  const handleImageLoad = (index: number) => {
+    setImagesLoaded(prev => ({
+      ...prev,
+      [index]: true
+    }));
+  };
+
+  // Reset image loaded state when changing slide
+  useEffect(() => {
+    // Pre-load next and previous images
+    const preloadIndices = [
+      currentIndex,
+      (currentIndex + 1) % content.length,
+      (currentIndex - 1 + content.length) % content.length
+    ];
+    
+    // If we're changing to an unloaded image, show loading state
+    if (!imagesLoaded[currentIndex]) {
+      // Preload images
+      preloadIndices.forEach(index => {
+        if (!imagesLoaded[index] && content[index]) {
+          // Create an image element to preload
+          const img = document.createElement('img');
+          img.src = content[index].backdrop || content[index].poster;
+          img.onload = () => handleImageLoad(index);
+        }
+      });
+    }
+  }, [currentIndex, content, imagesLoaded]);
+
   // If no content is available
   if (!content || content.length === 0) {
     return null;
   }
 
   const currentContent = content[currentIndex];
+  const isBackdropLoaded = imagesLoaded[currentIndex];
 
   return (
-    <section className="content-section-glass mb-12 overflow-hidden backdrop-blur-xl">
+    <section 
+      ref={sliderRef} 
+      className={cn(
+        "content-section-glass mb-12 overflow-hidden backdrop-blur-xl transition-opacity duration-500",
+        isVisible ? "opacity-100" : "opacity-0"
+      )}
+    >
       <div className="relative h-[500px] md:h-[550px] rounded-xl overflow-hidden">
         {/* Featured background image */}
         <div className="absolute inset-0">
+          {/* Placeholder loader */}
+          <div 
+            className={cn(
+              "absolute inset-0 bg-card/30 flex items-center justify-center transition-opacity duration-500",
+              isBackdropLoaded ? "opacity-0" : "opacity-100"
+            )}
+          >
+            <div className="shimmer-effect w-full h-full absolute"></div>
+            <Image className="w-16 h-16 text-white/20" />
+          </div>
+          
           <img 
             src={currentContent.backdrop || currentContent.poster} 
-            className="w-full h-full object-cover" 
+            className={cn(
+              "w-full h-full object-cover transition-opacity duration-500",
+              isBackdropLoaded ? "opacity-100" : "opacity-0"
+            )}
             alt={currentContent.title}
+            onLoad={() => handleImageLoad(currentIndex)}
           />
+          
           {/* Glassmorphism overlay */}
           <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/60 to-background/20 backdrop-blur-sm"></div>
         </div>
