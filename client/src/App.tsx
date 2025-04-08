@@ -23,10 +23,12 @@ import VerifyCodePage from "@/pages/verify-code";
 import ResetPasswordPage from "@/pages/reset-password";
 
 // Admin pages
-import AdminDashboard from "@/pages/admin/dashboard";
-import AdminUsers from "@/pages/admin/users";
-import AdminContent from "@/pages/admin/content";
-import AdminComments from "@/pages/admin/comments";
+import AdminDashboard from "@/pages/admin/Dashboard";
+import AdminUsers from "@/pages/admin/Users";
+import AdminContent from "@/pages/admin/Content";
+import AdminComments from "@/pages/admin/Comments";
+import AdminCategories from "@/pages/admin/Categories";
+import AdminStatistics from "@/pages/admin/Statistics";
 
 function Router() {
   return (
@@ -56,6 +58,8 @@ function Router() {
       <AdminRoute path="/admin/users" component={AdminUsers} />
       <AdminRoute path="/admin/content" component={AdminContent} />
       <AdminRoute path="/admin/comments" component={AdminComments} />
+      <AdminRoute path="/admin/categories" component={AdminCategories} />
+      <AdminRoute path="/admin/statistics" component={AdminStatistics} />
       
       <Route component={NotFound} />
     </Switch>

@@ -13,6 +13,8 @@ type AuthContextType = {
   user: SelectUser | null;
   isLoading: boolean;
   error: Error | null;
+  isAuthenticated: boolean;
+  isAdmin: boolean;
   loginMutation: UseMutationResult<SelectUser, Error, LoginData>;
   logoutMutation: UseMutationResult<void, Error, void>;
   registerMutation: UseMutationResult<SelectUser, Error, RegisterData>;
@@ -137,12 +139,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     },
   });
 
+  // محاسبه احراز هویت کاربر و وضعیت ادمین
+  const isAuthenticated = !!user;
+  const isAdmin = isAuthenticated && user?.role === 'admin';
+
   return (
     <AuthContext.Provider
       value={{
         user: user ?? null,
         isLoading,
         error,
+        isAuthenticated,
+        isAdmin,
         loginMutation,
         logoutMutation,
         registerMutation,

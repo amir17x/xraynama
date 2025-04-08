@@ -1,431 +1,974 @@
 import { Express, Request, Response, NextFunction } from "express";
 import { storage } from "./storage";
 
-// Admin middleware to protect admin routes
+// میان‌افزار بررسی دسترسی ادمین
 export function isAdmin(req: Request, res: Response, next: NextFunction) {
   if (!req.isAuthenticated()) {
-    return res.status(401).json({ message: "شما باید ابتدا وارد شوید" });
+    return res.status(401).json({ message: "ابتدا وارد حساب کاربری خود شوید" });
   }
-
-  // Check if user has admin role
-  if (req.user?.role !== "admin") {
+  
+  if (req.user?.role !== 'admin') {
     return res.status(403).json({ message: "شما دسترسی لازم برای این عملیات را ندارید" });
   }
-
+  
   next();
 }
 
+// تنظیم مسیرهای ادمین
 export function setupAdminRoutes(app: Express) {
-  // Middleware for all admin routes
-  app.use("/api/admin/*", isAdmin);
-
-  // Get admin stats
-  app.get("/api/admin/stats/users", async (req, res, next) => {
+  // === آمار و ارقام ===
+  
+  // آمار کاربران
+  app.get("/api/admin/stats/users", isAdmin, async (req, res) => {
     try {
-      // Get total users count
       const users = await storage.getAllUsers();
-      const total = users.length;
-
-      // Get new users in the last 24 hours
-      const oneDayAgo = new Date();
-      oneDayAgo.setDate(oneDayAgo.getDate() - 1);
-      const newUsers = users.filter(user => new Date(user.createdAt) >= oneDayAgo).length;
-
-      // Get admin users count
-      const adminUsers = users.filter(user => user.role === 'admin').length;
-
+      const totalUsers = users.length;
+      
+      // تعداد کاربران جدید در 7 روز گذشته
+      const oneWeekAgo = new Date();
+      oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+      
+      const newUsers = users.filter(user => 
+        new Date(user.createdAt) > oneWeekAgo
+      ).length;
+      
       res.json({
-        total,
-        new: newUsers,
-        admins: adminUsers
+        total: totalUsers,
+        new: newUsers
       });
     } catch (error) {
-      next(error);
+      console.error("Error fetching user stats:", error);
+      res.status(500).json({ message: "خطا در دریافت آمار کاربران" });
     }
   });
-
-  app.get("/api/admin/stats/content", async (req, res, next) => {
+  
+  // آمار محتوا
+  app.get("/api/admin/stats/content", isAdmin, async (req, res) => {
     try {
-      // Get all content
-      const contentList = await storage.getAllContent(1000); // Fetch a large number
-      const total = contentList.length;
-
-      // Count by type
-      const movies = contentList.filter(item => item.type === 'movie').length;
-      const series = contentList.filter(item => item.type === 'series').length;
-      const animations = contentList.filter(item => item.type === 'animation').length;
-      const documentaries = contentList.filter(item => item.type === 'documentary').length;
-
+      const allContent = await storage.getAllContent();
+      const totalContent = allContent.length;
+      
+      // تفکیک بر اساس نوع
+      const movies = allContent.filter(content => content.type === 'movie').length;
+      const series = allContent.filter(content => content.type === 'series').length;
+      const animations = allContent.filter(content => content.type === 'animation').length;
+      const documentaries = allContent.filter(content => content.type === 'documentary').length;
+      
       res.json({
-        total,
+        total: totalContent,
         movies,
         series,
         animations,
         documentaries
       });
     } catch (error) {
-      next(error);
+      console.error("Error fetching content stats:", error);
+      res.status(500).json({ message: "خطا در دریافت آمار محتوا" });
     }
   });
-
-  app.get("/api/admin/stats/comments", async (req, res, next) => {
+  
+  // آمار نظرات
+  app.get("/api/admin/stats/comments", isAdmin, async (req, res) => {
     try {
-      // Get total comments count
-      const total = await storage.getCommentsCount();
+      const comments = await storage.getAllComments();
+      const totalComments = comments.length;
       
-      // Get pending comments count
-      const pending = await storage.getPendingCommentsCount();
+      // تعداد نظرات در انتظار تایید
+      const pendingComments = comments.filter(comment => !comment.isApproved).length;
       
       res.json({
-        total,
-        pending
+        total: totalComments,
+        pending: pendingComments
       });
     } catch (error) {
-      next(error);
+      console.error("Error fetching comment stats:", error);
+      res.status(500).json({ message: "خطا در دریافت آمار نظرات" });
     }
   });
-
-  app.get("/api/admin/stats/reviews", async (req, res, next) => {
+  
+  // آمار نقدها
+  app.get("/api/admin/stats/reviews", isAdmin, async (req, res) => {
     try {
-      // Get total reviews count
-      const total = await storage.getReviewsCount();
+      const reviews = await storage.getAllReviews();
+      const totalReviews = reviews.length;
       
-      // Get pending reviews count
-      const pending = await storage.getPendingReviewsCount();
+      // تعداد نقدهای در انتظار تایید
+      const pendingReviews = reviews.filter(review => !review.isApproved).length;
       
       res.json({
-        total,
-        pending
+        total: totalReviews,
+        pending: pendingReviews
       });
     } catch (error) {
-      next(error);
+      console.error("Error fetching review stats:", error);
+      res.status(500).json({ message: "خطا در دریافت آمار نقدها" });
     }
   });
-
-  // User management routes
-  app.get("/api/admin/users", async (req, res, next) => {
+  
+  // === مدیریت کاربران ===
+  
+  // لیست کاربران
+  app.get("/api/admin/users", isAdmin, async (req, res) => {
     try {
-      const page = parseInt(req.query.page as string) || 1;
-      const limit = parseInt(req.query.limit as string) || 10;
-      const search = req.query.search as string || '';
-      const role = req.query.role as string || null;
-      
-      const { users, totalUsers, totalPages } = await storage.getFilteredUsers(page, limit, search, role);
-      
-      res.json({
-        users,
-        totalUsers,
-        totalPages,
-        currentPage: page
-      });
+      const users = await storage.getAllUsers();
+      res.json(users);
     } catch (error) {
-      next(error);
+      console.error("Error fetching users:", error);
+      res.status(500).json({ message: "خطا در دریافت لیست کاربران" });
     }
   });
-
-  app.get("/api/admin/users/:id", async (req, res, next) => {
+  
+  // جزئیات یک کاربر
+  app.get("/api/admin/users/:id", isAdmin, async (req, res) => {
     try {
-      const userId = parseInt(req.params.id);
-      const user = await storage.getUser(userId);
-      
+      const user = await storage.getUser(parseInt(req.params.id));
       if (!user) {
-        return res.status(404).json({ message: "کاربر یافت نشد" });
+        return res.status(404).json({ message: "کاربر مورد نظر یافت نشد" });
       }
       
-      res.json(user);
+      // دریافت اطلاعات تکمیلی کاربر
+      const favorites = await storage.getUserFavorites(user.id);
+      const watchlist = await storage.getUserWatchlist(user.id);
+      const history = await storage.getUserHistory(user.id);
+      const comments = await storage.getUserComments(user.id);
+      const reviews = await storage.getUserReviews(user.id);
+      
+      res.json({
+        ...user,
+        favorites,
+        watchlist,
+        history,
+        comments,
+        reviews
+      });
     } catch (error) {
-      next(error);
+      console.error("Error fetching user details:", error);
+      res.status(500).json({ message: "خطا در دریافت جزئیات کاربر" });
     }
   });
-
-  app.patch("/api/admin/users/:id", async (req, res, next) => {
+  
+  // ویرایش کاربر
+  app.patch("/api/admin/users/:id", isAdmin, async (req, res) => {
     try {
-      const userId = parseInt(req.params.id);
       const { username, email, name, role } = req.body;
       
-      // Verify user exists
-      const user = await storage.getUser(userId);
-      if (!user) {
-        return res.status(404).json({ message: "کاربر یافت نشد" });
+      // اطمینان از اینکه اطلاعات کاربر admin قابل تغییر نیست
+      if (username === 'admin' && role !== 'admin') {
+        return res.status(403).json({ message: "تغییر نقش کاربر admin امکان‌پذیر نیست" });
       }
       
-      // Create update data
-      const updateData: any = {};
-      if (username) updateData.username = username;
-      if (email) updateData.email = email;
-      if (name !== undefined) updateData.name = name;
-      if (role && (role === 'user' || role === 'admin')) updateData.role = role;
+      const updatedUser = await storage.updateUser(parseInt(req.params.id), {
+        username,
+        email,
+        name,
+        role
+      });
       
-      // Update user
-      const updatedUser = await storage.updateUser(userId, updateData);
+      if (!updatedUser) {
+        return res.status(404).json({ message: "کاربر مورد نظر یافت نشد" });
+      }
       
       res.json(updatedUser);
     } catch (error) {
-      next(error);
+      console.error("Error updating user:", error);
+      res.status(500).json({ message: "خطا در بروزرسانی اطلاعات کاربر" });
     }
   });
-
-  app.delete("/api/admin/users/:id", async (req, res, next) => {
+  
+  // مسدود کردن/رفع مسدودی کاربر
+  app.patch("/api/admin/users/:id/toggle-block", isAdmin, async (req, res) => {
     try {
-      const userId = parseInt(req.params.id);
-      
-      // Verify user exists
-      const user = await storage.getUser(userId);
+      const user = await storage.getUser(parseInt(req.params.id));
       if (!user) {
-        return res.status(404).json({ message: "کاربر یافت نشد" });
+        return res.status(404).json({ message: "کاربر مورد نظر یافت نشد" });
       }
       
-      // Don't allow to delete yourself
-      if (userId === req.user!.id) {
-        return res.status(400).json({ message: "شما نمی‌توانید حساب کاربری خود را حذف کنید" });
+      // حفاظت از کاربر admin
+      if (user.username === 'admin') {
+        return res.status(403).json({ message: "امکان مسدود کردن کاربر admin وجود ندارد" });
       }
       
-      // Delete user
-      await storage.deleteUser(userId);
+      const isBlocked = user.role === 'blocked';
+      const updatedUser = await storage.updateUser(user.id, {
+        role: isBlocked ? 'user' : 'blocked'
+      });
       
-      res.json({ message: "کاربر با موفقیت حذف شد" });
+      res.json(updatedUser);
     } catch (error) {
-      next(error);
+      console.error("Error toggling user block status:", error);
+      res.status(500).json({ message: "خطا در تغییر وضعیت مسدودی کاربر" });
     }
   });
-
-  // Content management routes
-  app.get("/api/admin/content", async (req, res, next) => {
+  
+  // حذف کاربر
+  app.delete("/api/admin/users/:id", isAdmin, async (req, res) => {
     try {
-      const page = parseInt(req.query.page as string) || 1;
-      const limit = parseInt(req.query.limit as string) || 10;
-      const search = req.query.search as string || '';
-      const type = req.query.type as string || null;
+      const user = await storage.getUser(parseInt(req.params.id));
+      if (!user) {
+        return res.status(404).json({ message: "کاربر مورد نظر یافت نشد" });
+      }
       
-      const { content, totalItems, totalPages } = await storage.getFilteredContent(page, limit, search, type);
+      // حفاظت از کاربر admin
+      if (user.username === 'admin') {
+        return res.status(403).json({ message: "امکان حذف کاربر admin وجود ندارد" });
+      }
+      
+      await storage.deleteUser(user.id);
+      res.status(200).json({ message: "کاربر با موفقیت حذف شد" });
+    } catch (error) {
+      console.error("Error deleting user:", error);
+      res.status(500).json({ message: "خطا در حذف کاربر" });
+    }
+  });
+  
+  // === مدیریت محتوا ===
+  
+  // لیست تمام محتواها
+  app.get("/api/admin/content", isAdmin, async (req, res) => {
+    try {
+      const content = await storage.getAllContent();
+      res.json(content);
+    } catch (error) {
+      console.error("Error fetching content:", error);
+      res.status(500).json({ message: "خطا در دریافت لیست محتوا" });
+    }
+  });
+  
+  // دریافت یک محتوا
+  app.get("/api/admin/content/:id", isAdmin, async (req, res) => {
+    try {
+      const content = await storage.getContent(parseInt(req.params.id));
+      if (!content) {
+        return res.status(404).json({ message: "محتوای مورد نظر یافت نشد" });
+      }
+      
+      // دریافت اطلاعات تکمیلی محتوا
+      const comments = await storage.getContentComments(content.id);
+      const reviews = await storage.getContentReviews(content.id);
+      const genres = await storage.getContentGenres(content.id);
+      const tags = await storage.getContentTags(content.id);
+      const videos = await storage.getContentVideos(content.id);
+      
+      // اگر سریال است، فصل‌ها و قسمت‌ها را هم دریافت کن
+      let seasons = [];
+      let episodes = [];
+      if (content.type === 'series') {
+        seasons = await storage.getContentSeasons(content.id);
+        
+        // برای هر فصل، قسمت‌هایش را دریافت کن
+        for (const season of seasons) {
+          const seasonEpisodes = await storage.getSeasonEpisodes(season.id);
+          episodes = [...episodes, ...seasonEpisodes];
+        }
+      }
       
       res.json({
-        content,
-        totalItems,
-        totalPages,
-        currentPage: page
+        ...content,
+        comments,
+        reviews,
+        genres,
+        tags,
+        videos,
+        ...(content.type === 'series' && { seasons, episodes })
       });
     } catch (error) {
-      next(error);
+      console.error("Error fetching content details:", error);
+      res.status(500).json({ message: "خطا در دریافت جزئیات محتوا" });
     }
   });
-
-  app.delete("/api/admin/content/:id", async (req, res, next) => {
+  
+  // افزودن محتوای جدید
+  app.post("/api/admin/content", isAdmin, async (req, res) => {
+    try {
+      const { 
+        title, englishTitle, type, description, year, 
+        duration, poster, backdrop, imdbRating,
+        hasPersianDubbing, hasPersianSubtitle,
+        genres, tags
+      } = req.body;
+      
+      // ایجاد محتوای جدید
+      const newContent = await storage.createContent({
+        title,
+        englishTitle, 
+        type, 
+        description, 
+        year, 
+        duration, 
+        poster, 
+        backdrop, 
+        imdbRating,
+        hasPersianDubbing, 
+        hasPersianSubtitle
+      });
+      
+      // افزودن ژانرها
+      if (genres && genres.length > 0) {
+        for (const genreId of genres) {
+          await storage.addContentGenre(newContent.id, parseInt(genreId));
+        }
+      }
+      
+      // افزودن تگ‌ها
+      if (tags && tags.length > 0) {
+        for (const tagId of tags) {
+          await storage.addContentTag(newContent.id, parseInt(tagId));
+        }
+      }
+      
+      res.status(201).json(newContent);
+    } catch (error) {
+      console.error("Error creating content:", error);
+      res.status(500).json({ message: "خطا در ایجاد محتوای جدید" });
+    }
+  });
+  
+  // ویرایش محتوا
+  app.patch("/api/admin/content/:id", isAdmin, async (req, res) => {
     try {
       const contentId = parseInt(req.params.id);
+      const { 
+        title, englishTitle, type, description, year, 
+        duration, poster, backdrop, imdbRating,
+        hasPersianDubbing, hasPersianSubtitle,
+        genres, tags
+      } = req.body;
       
-      // Verify content exists
-      const content = await storage.getContentById(contentId);
-      if (!content) {
-        return res.status(404).json({ message: "محتوا یافت نشد" });
+      // ویرایش محتوا
+      const updatedContent = await storage.updateContent(contentId, {
+        title,
+        englishTitle, 
+        type, 
+        description, 
+        year, 
+        duration, 
+        poster, 
+        backdrop, 
+        imdbRating,
+        hasPersianDubbing, 
+        hasPersianSubtitle
+      });
+      
+      if (!updatedContent) {
+        return res.status(404).json({ message: "محتوای مورد نظر یافت نشد" });
       }
       
-      // Delete content
+      // بروزرسانی ژانرها
+      if (genres && genres.length > 0) {
+        // حذف ژانرهای قبلی
+        await storage.removeContentGenres(contentId);
+        
+        // افزودن ژانرهای جدید
+        for (const genreId of genres) {
+          await storage.addContentGenre(contentId, parseInt(genreId));
+        }
+      }
+      
+      // بروزرسانی تگ‌ها
+      if (tags && tags.length > 0) {
+        // حذف تگ‌های قبلی
+        await storage.removeContentTags(contentId);
+        
+        // افزودن تگ‌های جدید
+        for (const tagId of tags) {
+          await storage.addContentTag(contentId, parseInt(tagId));
+        }
+      }
+      
+      res.json(updatedContent);
+    } catch (error) {
+      console.error("Error updating content:", error);
+      res.status(500).json({ message: "خطا در بروزرسانی محتوا" });
+    }
+  });
+  
+  // حذف محتوا
+  app.delete("/api/admin/content/:id", isAdmin, async (req, res) => {
+    try {
+      const contentId = parseInt(req.params.id);
+      const content = await storage.getContent(contentId);
+      
+      if (!content) {
+        return res.status(404).json({ message: "محتوای مورد نظر یافت نشد" });
+      }
+      
+      // حذف همه وابستگی‌ها
+      await storage.removeContentGenres(contentId);
+      await storage.removeContentTags(contentId);
+      await storage.removeContentVideos(contentId);
+      
+      // اگر سریال است، فصل‌ها و قسمت‌ها را هم حذف کن
+      if (content.type === 'series') {
+        const seasons = await storage.getContentSeasons(contentId);
+        for (const season of seasons) {
+          await storage.removeSeasonEpisodes(season.id);
+        }
+        await storage.removeContentSeasons(contentId);
+      }
+      
+      // حذف نظرات و نقدها
+      await storage.removeContentComments(contentId);
+      await storage.removeContentReviews(contentId);
+      
+      // حذف محتوا
       await storage.deleteContent(contentId);
       
-      res.json({ message: "محتوا با موفقیت حذف شد" });
+      res.status(200).json({ message: "محتوا با موفقیت حذف شد" });
     } catch (error) {
-      next(error);
+      console.error("Error deleting content:", error);
+      res.status(500).json({ message: "خطا در حذف محتوا" });
     }
   });
-
-  // Comments management routes
-  app.get("/api/admin/comments", async (req, res, next) => {
+  
+  // === فصل‌ها و قسمت‌ها (برای سریال‌ها) ===
+  
+  // افزودن فصل جدید
+  app.post("/api/admin/content/:id/seasons", isAdmin, async (req, res) => {
     try {
-      const page = parseInt(req.query.page as string) || 1;
-      const limit = parseInt(req.query.limit as string) || 10;
-      const search = req.query.search as string || '';
-      const status = req.query.status as string || 'pending';
+      const contentId = parseInt(req.params.id);
+      const { title, seasonNumber, year } = req.body;
       
-      const { comments, totalItems, totalPages } = await storage.getFilteredComments(page, limit, search, status);
+      const content = await storage.getContent(contentId);
+      if (!content) {
+        return res.status(404).json({ message: "محتوای مورد نظر یافت نشد" });
+      }
       
-      res.json({
-        comments,
-        totalItems,
-        totalPages,
-        currentPage: page
+      if (content.type !== 'series') {
+        return res.status(400).json({ message: "افزودن فصل فقط برای سریال‌ها امکان‌پذیر است" });
+      }
+      
+      const newSeason = await storage.createSeason({
+        contentId,
+        title,
+        seasonNumber,
+        year
       });
+      
+      res.status(201).json(newSeason);
     } catch (error) {
-      next(error);
+      console.error("Error creating season:", error);
+      res.status(500).json({ message: "خطا در ایجاد فصل جدید" });
     }
   });
-
-  app.patch("/api/admin/comments/:id/approve", async (req, res, next) => {
+  
+  // ویرایش فصل
+  app.patch("/api/admin/seasons/:id", isAdmin, async (req, res) => {
     try {
-      const commentId = parseInt(req.params.id);
+      const seasonId = parseInt(req.params.id);
+      const { title, seasonNumber, year } = req.body;
       
-      // Approve comment
-      await storage.approveComment(commentId);
-      
-      res.json({ message: "نظر با موفقیت تأیید شد" });
-    } catch (error) {
-      next(error);
-    }
-  });
-
-  app.patch("/api/admin/comments/:id/reject", async (req, res, next) => {
-    try {
-      const commentId = parseInt(req.params.id);
-      
-      // Reject comment
-      await storage.rejectComment(commentId);
-      
-      res.json({ message: "نظر با موفقیت رد شد" });
-    } catch (error) {
-      next(error);
-    }
-  });
-
-  app.delete("/api/admin/comments/:id", async (req, res, next) => {
-    try {
-      const commentId = parseInt(req.params.id);
-      
-      // Delete comment
-      await storage.deleteComment(commentId);
-      
-      res.json({ message: "نظر با موفقیت حذف شد" });
-    } catch (error) {
-      next(error);
-    }
-  });
-
-  // Reviews management routes
-  app.get("/api/admin/reviews", async (req, res, next) => {
-    try {
-      const page = parseInt(req.query.page as string) || 1;
-      const limit = parseInt(req.query.limit as string) || 10;
-      const search = req.query.search as string || '';
-      const status = req.query.status as string || 'pending';
-      
-      const { reviews, totalItems, totalPages } = await storage.getFilteredReviews(page, limit, search, status);
-      
-      res.json({
-        reviews,
-        totalItems,
-        totalPages,
-        currentPage: page
+      const updatedSeason = await storage.updateSeason(seasonId, {
+        title,
+        seasonNumber,
+        year
       });
+      
+      if (!updatedSeason) {
+        return res.status(404).json({ message: "فصل مورد نظر یافت نشد" });
+      }
+      
+      res.json(updatedSeason);
     } catch (error) {
-      next(error);
+      console.error("Error updating season:", error);
+      res.status(500).json({ message: "خطا در بروزرسانی فصل" });
     }
   });
-
-  app.patch("/api/admin/reviews/:id/approve", async (req, res, next) => {
+  
+  // حذف فصل
+  app.delete("/api/admin/seasons/:id", isAdmin, async (req, res) => {
     try {
-      const reviewId = parseInt(req.params.id);
+      const seasonId = parseInt(req.params.id);
       
-      // Approve review
-      await storage.approveReview(reviewId);
+      // حذف تمام قسمت‌های فصل
+      await storage.removeSeasonEpisodes(seasonId);
       
-      res.json({ message: "نقد با موفقیت تأیید شد" });
+      // حذف فصل
+      await storage.deleteSeason(seasonId);
+      
+      res.status(200).json({ message: "فصل با موفقیت حذف شد" });
     } catch (error) {
-      next(error);
+      console.error("Error deleting season:", error);
+      res.status(500).json({ message: "خطا در حذف فصل" });
     }
   });
-
-  app.patch("/api/admin/reviews/:id/reject", async (req, res, next) => {
+  
+  // افزودن قسمت جدید
+  app.post("/api/admin/seasons/:id/episodes", isAdmin, async (req, res) => {
     try {
-      const reviewId = parseInt(req.params.id);
+      const seasonId = parseInt(req.params.id);
+      const { title, episodeNumber, duration, description, thumbnail } = req.body;
       
-      // Reject review
-      await storage.rejectReview(reviewId);
+      const season = await storage.getSeason(seasonId);
+      if (!season) {
+        return res.status(404).json({ message: "فصل مورد نظر یافت نشد" });
+      }
       
-      res.json({ message: "نقد با موفقیت رد شد" });
+      const newEpisode = await storage.createEpisode({
+        seasonId,
+        title,
+        episodeNumber,
+        duration,
+        description,
+        thumbnail
+      });
+      
+      res.status(201).json(newEpisode);
     } catch (error) {
-      next(error);
+      console.error("Error creating episode:", error);
+      res.status(500).json({ message: "خطا در ایجاد قسمت جدید" });
     }
   });
-
-  app.delete("/api/admin/reviews/:id", async (req, res, next) => {
+  
+  // ویرایش قسمت
+  app.patch("/api/admin/episodes/:id", isAdmin, async (req, res) => {
     try {
-      const reviewId = parseInt(req.params.id);
+      const episodeId = parseInt(req.params.id);
+      const { title, episodeNumber, duration, description, thumbnail } = req.body;
       
-      // Delete review
-      await storage.deleteReview(reviewId);
+      const updatedEpisode = await storage.updateEpisode(episodeId, {
+        title,
+        episodeNumber,
+        duration,
+        description,
+        thumbnail
+      });
       
-      res.json({ message: "نقد با موفقیت حذف شد" });
+      if (!updatedEpisode) {
+        return res.status(404).json({ message: "قسمت مورد نظر یافت نشد" });
+      }
+      
+      res.json(updatedEpisode);
     } catch (error) {
-      next(error);
+      console.error("Error updating episode:", error);
+      res.status(500).json({ message: "خطا در بروزرسانی قسمت" });
     }
   });
-
-  // Genres management routes
-  app.get("/api/admin/genres", async (req, res, next) => {
+  
+  // حذف قسمت
+  app.delete("/api/admin/episodes/:id", isAdmin, async (req, res) => {
+    try {
+      const episodeId = parseInt(req.params.id);
+      
+      // حذف ویدیوهای مرتبط با قسمت
+      await storage.removeEpisodeVideos(episodeId);
+      
+      // حذف قسمت
+      await storage.deleteEpisode(episodeId);
+      
+      res.status(200).json({ message: "قسمت با موفقیت حذف شد" });
+    } catch (error) {
+      console.error("Error deleting episode:", error);
+      res.status(500).json({ message: "خطا در حذف قسمت" });
+    }
+  });
+  
+  // === مدیریت ویدیوها ===
+  
+  // افزودن ویدیو به محتوا
+  app.post("/api/admin/content/:id/videos", isAdmin, async (req, res) => {
+    try {
+      const contentId = parseInt(req.params.id);
+      const { quality, streamUrl, downloadUrl, size } = req.body;
+      
+      const content = await storage.getContent(contentId);
+      if (!content) {
+        return res.status(404).json({ message: "محتوای مورد نظر یافت نشد" });
+      }
+      
+      const newVideo = await storage.createVideo({
+        contentId,
+        episodeId: null,
+        quality,
+        streamUrl,
+        downloadUrl,
+        size
+      });
+      
+      res.status(201).json(newVideo);
+    } catch (error) {
+      console.error("Error adding video to content:", error);
+      res.status(500).json({ message: "خطا در افزودن ویدیو به محتوا" });
+    }
+  });
+  
+  // افزودن ویدیو به قسمت
+  app.post("/api/admin/episodes/:id/videos", isAdmin, async (req, res) => {
+    try {
+      const episodeId = parseInt(req.params.id);
+      const { quality, streamUrl, downloadUrl, size } = req.body;
+      
+      const episode = await storage.getEpisode(episodeId);
+      if (!episode) {
+        return res.status(404).json({ message: "قسمت مورد نظر یافت نشد" });
+      }
+      
+      const newVideo = await storage.createVideo({
+        contentId: null,
+        episodeId,
+        quality,
+        streamUrl,
+        downloadUrl,
+        size
+      });
+      
+      res.status(201).json(newVideo);
+    } catch (error) {
+      console.error("Error adding video to episode:", error);
+      res.status(500).json({ message: "خطا در افزودن ویدیو به قسمت" });
+    }
+  });
+  
+  // ویرایش ویدیو
+  app.patch("/api/admin/videos/:id", isAdmin, async (req, res) => {
+    try {
+      const videoId = parseInt(req.params.id);
+      const { quality, streamUrl, downloadUrl, size } = req.body;
+      
+      const updatedVideo = await storage.updateVideo(videoId, {
+        quality,
+        streamUrl,
+        downloadUrl,
+        size
+      });
+      
+      if (!updatedVideo) {
+        return res.status(404).json({ message: "ویدیو مورد نظر یافت نشد" });
+      }
+      
+      res.json(updatedVideo);
+    } catch (error) {
+      console.error("Error updating video:", error);
+      res.status(500).json({ message: "خطا در بروزرسانی ویدیو" });
+    }
+  });
+  
+  // حذف ویدیو
+  app.delete("/api/admin/videos/:id", isAdmin, async (req, res) => {
+    try {
+      const videoId = parseInt(req.params.id);
+      
+      await storage.deleteVideo(videoId);
+      
+      res.status(200).json({ message: "ویدیو با موفقیت حذف شد" });
+    } catch (error) {
+      console.error("Error deleting video:", error);
+      res.status(500).json({ message: "خطا در حذف ویدیو" });
+    }
+  });
+  
+  // === مدیریت ژانرها ===
+  
+  // دریافت تمام ژانرها
+  app.get("/api/admin/genres", isAdmin, async (req, res) => {
     try {
       const genres = await storage.getAllGenres();
       res.json(genres);
     } catch (error) {
-      next(error);
+      console.error("Error fetching genres:", error);
+      res.status(500).json({ message: "خطا در دریافت لیست ژانرها" });
     }
   });
-
-  app.post("/api/admin/genres", async (req, res, next) => {
+  
+  // افزودن ژانر جدید
+  app.post("/api/admin/genres", isAdmin, async (req, res) => {
     try {
       const { name, slug } = req.body;
       
-      if (!name || !slug) {
-        return res.status(400).json({ message: "نام و اسلاگ ژانر الزامی است" });
+      // بررسی تکراری نبودن نام ژانر
+      const existingGenre = await storage.getGenreBySlug(slug);
+      if (existingGenre) {
+        return res.status(400).json({ message: "ژانر با این نام قبلاً ثبت شده است" });
       }
       
-      // Create genre
-      const genre = await storage.createGenre({ name, slug });
-      
-      res.status(201).json(genre);
+      const newGenre = await storage.createGenre({ name, slug });
+      res.status(201).json(newGenre);
     } catch (error) {
-      next(error);
+      console.error("Error creating genre:", error);
+      res.status(500).json({ message: "خطا در ایجاد ژانر جدید" });
     }
   });
-
-  app.delete("/api/admin/genres/:id", async (req, res, next) => {
+  
+  // ویرایش ژانر
+  app.patch("/api/admin/genres/:id", isAdmin, async (req, res) => {
+    try {
+      const genreId = parseInt(req.params.id);
+      const { name, slug } = req.body;
+      
+      // بررسی تکراری نبودن نام ژانر
+      const existingGenre = await storage.getGenreBySlug(slug);
+      if (existingGenre && existingGenre.id !== genreId) {
+        return res.status(400).json({ message: "ژانر با این نام قبلاً ثبت شده است" });
+      }
+      
+      const updatedGenre = await storage.updateGenre(genreId, { name, slug });
+      
+      if (!updatedGenre) {
+        return res.status(404).json({ message: "ژانر مورد نظر یافت نشد" });
+      }
+      
+      res.json(updatedGenre);
+    } catch (error) {
+      console.error("Error updating genre:", error);
+      res.status(500).json({ message: "خطا در بروزرسانی ژانر" });
+    }
+  });
+  
+  // حذف ژانر
+  app.delete("/api/admin/genres/:id", isAdmin, async (req, res) => {
     try {
       const genreId = parseInt(req.params.id);
       
-      // Delete genre
+      // حذف ارتباط‌های ژانر با محتواها
+      await storage.removeGenreFromContent(genreId);
+      
+      // حذف ژانر
       await storage.deleteGenre(genreId);
       
-      res.json({ message: "ژانر با موفقیت حذف شد" });
+      res.status(200).json({ message: "ژانر با موفقیت حذف شد" });
     } catch (error) {
-      next(error);
+      console.error("Error deleting genre:", error);
+      res.status(500).json({ message: "خطا در حذف ژانر" });
     }
   });
-
-  // Tags management routes
-  app.get("/api/admin/tags", async (req, res, next) => {
+  
+  // === مدیریت تگ‌ها ===
+  
+  // دریافت تمام تگ‌ها
+  app.get("/api/admin/tags", isAdmin, async (req, res) => {
     try {
       const tags = await storage.getAllTags();
       res.json(tags);
     } catch (error) {
-      next(error);
+      console.error("Error fetching tags:", error);
+      res.status(500).json({ message: "خطا در دریافت لیست تگ‌ها" });
     }
   });
-
-  app.post("/api/admin/tags", async (req, res, next) => {
+  
+  // افزودن تگ جدید
+  app.post("/api/admin/tags", isAdmin, async (req, res) => {
     try {
       const { name, slug } = req.body;
       
-      if (!name || !slug) {
-        return res.status(400).json({ message: "نام و اسلاگ برچسب الزامی است" });
+      // بررسی تکراری نبودن نام تگ
+      const existingTag = await storage.getTagBySlug(slug);
+      if (existingTag) {
+        return res.status(400).json({ message: "تگ با این نام قبلاً ثبت شده است" });
       }
       
-      // Create tag
-      const tag = await storage.createTag({ name, slug });
-      
-      res.status(201).json(tag);
+      const newTag = await storage.createTag({ name, slug });
+      res.status(201).json(newTag);
     } catch (error) {
-      next(error);
+      console.error("Error creating tag:", error);
+      res.status(500).json({ message: "خطا در ایجاد تگ جدید" });
     }
   });
-
-  app.delete("/api/admin/tags/:id", async (req, res, next) => {
+  
+  // ویرایش تگ
+  app.patch("/api/admin/tags/:id", isAdmin, async (req, res) => {
+    try {
+      const tagId = parseInt(req.params.id);
+      const { name, slug } = req.body;
+      
+      // بررسی تکراری نبودن نام تگ
+      const existingTag = await storage.getTagBySlug(slug);
+      if (existingTag && existingTag.id !== tagId) {
+        return res.status(400).json({ message: "تگ با این نام قبلاً ثبت شده است" });
+      }
+      
+      const updatedTag = await storage.updateTag(tagId, { name, slug });
+      
+      if (!updatedTag) {
+        return res.status(404).json({ message: "تگ مورد نظر یافت نشد" });
+      }
+      
+      res.json(updatedTag);
+    } catch (error) {
+      console.error("Error updating tag:", error);
+      res.status(500).json({ message: "خطا در بروزرسانی تگ" });
+    }
+  });
+  
+  // حذف تگ
+  app.delete("/api/admin/tags/:id", isAdmin, async (req, res) => {
     try {
       const tagId = parseInt(req.params.id);
       
-      // Delete tag
+      // حذف ارتباط‌های تگ با محتواها
+      await storage.removeTagFromContent(tagId);
+      
+      // حذف تگ
       await storage.deleteTag(tagId);
       
-      res.json({ message: "برچسب با موفقیت حذف شد" });
+      res.status(200).json({ message: "تگ با موفقیت حذف شد" });
     } catch (error) {
-      next(error);
+      console.error("Error deleting tag:", error);
+      res.status(500).json({ message: "خطا در حذف تگ" });
+    }
+  });
+  
+  // === مدیریت نظرات ===
+  
+  // دریافت تمام نظرات
+  app.get("/api/admin/comments", isAdmin, async (req, res) => {
+    try {
+      const comments = await storage.getAllComments();
+      
+      // اطلاعات کاربر و محتوای مرتبط با هر نظر را اضافه می‌کنیم
+      const commentsWithDetails = await Promise.all(
+        comments.map(async (comment) => {
+          const user = await storage.getUser(comment.userId);
+          const content = await storage.getContent(comment.contentId);
+          
+          return {
+            ...comment,
+            user: user ? { id: user.id, username: user.username, name: user.name } : null,
+            content: content ? { id: content.id, title: content.title } : null
+          };
+        })
+      );
+      
+      res.json(commentsWithDetails);
+    } catch (error) {
+      console.error("Error fetching comments:", error);
+      res.status(500).json({ message: "خطا در دریافت لیست نظرات" });
+    }
+  });
+  
+  // تایید نظر
+  app.patch("/api/admin/comments/:id/approve", isAdmin, async (req, res) => {
+    try {
+      const commentId = parseInt(req.params.id);
+      
+      const updatedComment = await storage.updateComment(commentId, {
+        isApproved: true
+      });
+      
+      if (!updatedComment) {
+        return res.status(404).json({ message: "نظر مورد نظر یافت نشد" });
+      }
+      
+      res.json(updatedComment);
+    } catch (error) {
+      console.error("Error approving comment:", error);
+      res.status(500).json({ message: "خطا در تایید نظر" });
+    }
+  });
+  
+  // رد نظر
+  app.patch("/api/admin/comments/:id/reject", isAdmin, async (req, res) => {
+    try {
+      const commentId = parseInt(req.params.id);
+      
+      const updatedComment = await storage.updateComment(commentId, {
+        isApproved: false,
+        isRejected: true
+      });
+      
+      if (!updatedComment) {
+        return res.status(404).json({ message: "نظر مورد نظر یافت نشد" });
+      }
+      
+      res.json(updatedComment);
+    } catch (error) {
+      console.error("Error rejecting comment:", error);
+      res.status(500).json({ message: "خطا در رد نظر" });
+    }
+  });
+  
+  // حذف نظر
+  app.delete("/api/admin/comments/:id", isAdmin, async (req, res) => {
+    try {
+      const commentId = parseInt(req.params.id);
+      
+      await storage.deleteComment(commentId);
+      
+      res.status(200).json({ message: "نظر با موفقیت حذف شد" });
+    } catch (error) {
+      console.error("Error deleting comment:", error);
+      res.status(500).json({ message: "خطا در حذف نظر" });
+    }
+  });
+  
+  // === مدیریت نقدها ===
+  
+  // دریافت تمام نقدها
+  app.get("/api/admin/reviews", isAdmin, async (req, res) => {
+    try {
+      const reviews = await storage.getAllReviews();
+      
+      // اطلاعات کاربر و محتوای مرتبط با هر نقد را اضافه می‌کنیم
+      const reviewsWithDetails = await Promise.all(
+        reviews.map(async (review) => {
+          const user = await storage.getUser(review.userId);
+          const content = await storage.getContent(review.contentId);
+          
+          return {
+            ...review,
+            user: user ? { id: user.id, username: user.username, name: user.name } : null,
+            content: content ? { id: content.id, title: content.title } : null
+          };
+        })
+      );
+      
+      res.json(reviewsWithDetails);
+    } catch (error) {
+      console.error("Error fetching reviews:", error);
+      res.status(500).json({ message: "خطا در دریافت لیست نقدها" });
+    }
+  });
+  
+  // تایید نقد
+  app.patch("/api/admin/reviews/:id/approve", isAdmin, async (req, res) => {
+    try {
+      const reviewId = parseInt(req.params.id);
+      
+      const updatedReview = await storage.updateReview(reviewId, {
+        isApproved: true
+      });
+      
+      if (!updatedReview) {
+        return res.status(404).json({ message: "نقد مورد نظر یافت نشد" });
+      }
+      
+      res.json(updatedReview);
+    } catch (error) {
+      console.error("Error approving review:", error);
+      res.status(500).json({ message: "خطا در تایید نقد" });
+    }
+  });
+  
+  // رد نقد
+  app.patch("/api/admin/reviews/:id/reject", isAdmin, async (req, res) => {
+    try {
+      const reviewId = parseInt(req.params.id);
+      
+      const updatedReview = await storage.updateReview(reviewId, {
+        isApproved: false,
+        isRejected: true
+      });
+      
+      if (!updatedReview) {
+        return res.status(404).json({ message: "نقد مورد نظر یافت نشد" });
+      }
+      
+      res.json(updatedReview);
+    } catch (error) {
+      console.error("Error rejecting review:", error);
+      res.status(500).json({ message: "خطا در رد نقد" });
+    }
+  });
+  
+  // حذف نقد
+  app.delete("/api/admin/reviews/:id", isAdmin, async (req, res) => {
+    try {
+      const reviewId = parseInt(req.params.id);
+      
+      await storage.deleteReview(reviewId);
+      
+      res.status(200).json({ message: "نقد با موفقیت حذف شد" });
+    } catch (error) {
+      console.error("Error deleting review:", error);
+      res.status(500).json({ message: "خطا در حذف نقد" });
     }
   });
 }
