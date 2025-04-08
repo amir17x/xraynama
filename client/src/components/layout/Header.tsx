@@ -3,10 +3,10 @@ import { Link, useLocation } from 'wouter';
 import { SearchBar, AdvancedSearchButton, NotificationsButton } from '@/components/common/SearchBar';
 import { useAuth } from '@/hooks/use-auth';
 import { Loader2, Menu, ChevronDown, User, Heart, ListVideo, Settings, LogOut, ShieldAlert } from 'lucide-react';
+import { PortalOverride } from '@/components/common/PortalOverride';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { MobileMenu } from './MobileMenu';
-import { motion } from 'framer-motion';
 
 export function Header() {
   const { user, isLoading, logoutMutation } = useAuth();
@@ -18,12 +18,20 @@ export function Header() {
   
   // Handle scroll effect with enhanced animation
   useEffect(() => {
+    let lastScrollY = window.scrollY;
+    
     const handleScroll = () => {
-      if (window.scrollY > 50) {
+      const currentScrollY = window.scrollY;
+      // اسکرول به پایین - هدر را کوچکتر و بالاتر می‌کند
+      if (currentScrollY > 50) {
         setIsScrolled(true);
-      } else {
+      } 
+      // اسکرول به بالا یا در بالای صفحه - هدر به حالت عادی برمی‌گردد
+      else if (currentScrollY <= 50) {
         setIsScrolled(false);
       }
+      
+      lastScrollY = currentScrollY;
     };
     
     window.addEventListener('scroll', handleScroll);
@@ -60,18 +68,18 @@ export function Header() {
 
   return (
     <>
-      <motion.header 
-        initial={{ backdropFilter: "blur(5px)", backgroundColor: "rgba(10, 10, 10, 0.2)" }}
-        animate={{ 
-          backdropFilter: isScrolled ? "blur(15px)" : "blur(5px)",
-          backgroundColor: isScrolled ? "rgba(10, 10, 10, 0.9)" : "rgba(10, 10, 10, 0.2)",
-          boxShadow: isScrolled ? "0 4px 20px rgba(0, 0, 0, 0.2)" : "none",
-          y: isScrolled ? 0 : 8,
-          height: isScrolled ? "70px" : "80px"
-        }}
-        transition={{ duration: 0.3 }}
-        className="sticky z-50 px-6 py-4 mx-4 my-2 flex items-center justify-between rounded-xl glass-header transition-all duration-300"
-      >
+      <header className={`
+        sticky z-50 
+        px-6 py-4 
+        mx-4 my-2
+        flex items-center justify-between 
+        rounded-xl 
+        glass-header
+        ${isScrolled 
+          ? 'header-shadow top-2 header-scroll-transition' 
+          : 'top-3'
+        }
+      `}>
         <div className="flex items-center">
           <div className="mr-4">
             <Link href="/" className="flex items-center">
@@ -140,13 +148,7 @@ export function Header() {
                 </Button>
                 
                 {isMenuOpen && (
-                  <motion.div 
-                    style={{ right: '0', left: 'auto' }} 
-                    className="profile-dropdown w-48 bg-popover border rounded-md shadow-md p-1 text-popover-foreground z-50 absolute top-full mt-2"
-                    initial={{ opacity: 0, y: -5, scale: 0.95 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    transition={{ duration: 0.2 }}
-                  >
+                  <div style={{ right: '0', left: 'auto' }} className="profile-dropdown w-48 bg-popover border rounded-md shadow-md p-1 text-popover-foreground animate-fade-in z-50 absolute top-full mt-2">
                     <button 
                       className="w-full flex items-center p-2 rounded hover:bg-[#006bd6]/10 hover:text-[#006bd6] text-sm transition-all duration-300"
                       onClick={() => { setLocation('/profile'); setIsMenuOpen(false); }}
@@ -203,7 +205,7 @@ export function Header() {
                       <span>خروج</span>
                       {logoutMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                     </button>
-                  </motion.div>
+                  </div>
                 )}
               </div>
             )}
@@ -221,7 +223,7 @@ export function Header() {
             </Button>
           </div>
         </div>
-      </motion.header>
+      </header>
 
       {/* Mobile menu */}
       <MobileMenu 
