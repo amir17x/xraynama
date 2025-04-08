@@ -49,7 +49,7 @@ export function CommentsList({ contentId }: CommentsListProps) {
   
   // Format and filter the data based on the active tab and filters
   const getFilteredData = () => {
-    let combinedData = [];
+    let combinedData: any[] = [];
     
     // Handle if data hasn't loaded yet
     if (isLoading || isReviewsLoading) return [];
@@ -123,6 +123,60 @@ export function CommentsList({ contentId }: CommentsListProps) {
   };
   
   const { comments, reviews, questions } = getCounts();
+
+  // نمایش لودینگ
+  const renderLoading = () => (
+    <div className="space-y-4">
+      {[...Array(3)].map((_, i) => (
+        <div key={i} className="bg-card rounded-md p-4 border">
+          <div className="flex items-start">
+            <Skeleton className="h-10 w-10 rounded-full" />
+            <div className="flex-1 mr-3 space-y-2">
+              <Skeleton className="h-5 w-40" />
+              <Skeleton className="h-4 w-full" />
+              <Skeleton className="h-4 w-full" />
+              <Skeleton className="h-4 w-3/4" />
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+
+  // نمایش خطا
+  const renderError = () => (
+    <div className="text-center p-6 text-muted-foreground">
+      خطا در بارگذاری دیدگاه‌ها. لطفا دوباره تلاش کنید.
+    </div>
+  );
+
+  // نمایش حالت خالی
+  const renderEmpty = () => (
+    <div className="text-center p-6 text-muted-foreground">
+      هنوز دیدگاهی ثبت نشده است. اولین نفری باشید که دیدگاه خود را ثبت می‌کند.
+    </div>
+  );
+
+  // نمایش لیست نظرات
+  const renderComments = () => (
+    <div className="space-y-4">
+      {filteredData.map((comment: any) => (
+        <CommentItem
+          key={comment.id}
+          comment={comment}
+          contentId={contentId}
+        />
+      ))}
+    </div>
+  );
+
+  // انتخاب محتوا بر اساس وضعیت
+  const renderContent = () => {
+    if (isLoading || isReviewsLoading) return renderLoading();
+    if (error) return renderError();
+    if (filteredData.length === 0) return renderEmpty();
+    return renderComments();
+  };
   
   return (
     <div className="space-y-4">
@@ -226,66 +280,15 @@ export function CommentsList({ contentId }: CommentsListProps) {
         
         {/* محتوای تب‌ها */}
         <TabsContent value="all" className="mt-6">
-          {renderCommentsList()}
+          {renderContent()}
         </TabsContent>
         <TabsContent value="reviews" className="mt-6">
-          {renderCommentsList()}
+          {renderContent()}
         </TabsContent>
         <TabsContent value="comments" className="mt-6">
-          {renderCommentsList()}
+          {renderContent()}
         </TabsContent>
       </Tabs>
-      
-      {/* تابع رندر کردن لیست نظرات */}
-      {function renderCommentsList() {
-        if (isLoading || isReviewsLoading) {
-          return (
-            <div className="space-y-4">
-              {[...Array(3)].map((_, i) => (
-                <div key={i} className="bg-card rounded-md p-4 border">
-                  <div className="flex items-start">
-                    <Skeleton className="h-10 w-10 rounded-full" />
-                    <div className="flex-1 mr-3 space-y-2">
-                      <Skeleton className="h-5 w-40" />
-                      <Skeleton className="h-4 w-full" />
-                      <Skeleton className="h-4 w-full" />
-                      <Skeleton className="h-4 w-3/4" />
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          );
-        }
-        
-        if (error) {
-          return (
-            <div className="text-center p-6 text-muted-foreground">
-              خطا در بارگذاری دیدگاه‌ها. لطفا دوباره تلاش کنید.
-            </div>
-          );
-        }
-        
-        if (filteredData.length === 0) {
-          return (
-            <div className="text-center p-6 text-muted-foreground">
-              هنوز دیدگاهی ثبت نشده است. اولین نفری باشید که دیدگاه خود را ثبت می‌کند.
-            </div>
-          );
-        }
-        
-        return (
-          <div className="space-y-4">
-            {filteredData.map((comment: any) => (
-              <CommentItem
-                key={comment.id}
-                comment={comment}
-                contentId={contentId}
-              />
-            ))}
-          </div>
-        );
-      }}
     </div>
   );
 }

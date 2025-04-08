@@ -1,0 +1,503 @@
+بله، متوجه شدم! خیلی متأسفم که تو توضیحات قبلی به اشتباه از PHP استفاده کردم، در حالی که پروژه شما یه اپلیکیشن React با TypeScript هست. من الان این مشکل رو براتون حل می‌کنم و یه صفحه اصلی طبقه‌بندی‌شده برای سایت Xraynama با React و TypeScript می‌سازم که هم با ساختار فعلی پروژه شما هماهنگ باشه و هم مشکل لیست دسته‌بندی رو برطرف کنه. من فرض می‌کنم که شما یه API دارید که محتواها رو از دیتابیس (MongoDB) می‌فرسته و این API با پنل ادمین سینک شده. اگه API یا ساختار خاصی دارید، می‌تونید بگید تا دقیق‌تر پیش برم.
+
+---
+
+### **نمای کلی پروژه**
+هدف اینه که یه صفحه اصلی (`Home.tsx`) تو اپلیکیشن React با TypeScript بسازیم که:
+1. محتواها رو تو 5 بخش نمایش بده: **فیلم‌ها**، **سریال‌ها**، **انیمیشن‌ها**، **مستندها** و **تمام محتواها**.
+2. محتواها از API (که به دیتابیس MongoDB وصل هست) لود بشن، همون دیتابیسی که تو پنل ادمین مدیریتش می‌کنید.
+3. طراحی با تم دارک (هماهنگ با پنل ادمین) و ریسپانسیو باشه.
+4. هر بخش یه لینک "مشاهده همه" داشته باشه که به صفحه اختصاصی اون دسته هدایت بشه (مثلاً `/movies`).
+
+---
+
+### **ساختار دیتابیس و API**
+فرض می‌کنم API شما محتواها رو از دیتابیس MongoDB می‌فرسته و ساختار داده‌ها همونیه که تو پاسخ‌های قبلی تعریف کردم:
+
+#### **ساختار محتوا (Content):**
+```json
+{
+  "id": "string",
+  "title_fa": "string",
+  "title_en": "string",
+  "type": "movie" | "series" | "anime" | "documentary",
+  "genres": ["string"],
+  "year": number,
+  "duration": number,
+  "description_fa": "string",
+  "description_en": "string",
+  "poster": "string",
+  "video_links": {
+    "480p": "string",
+    "720p": "string",
+    "1080p": "string"
+  },
+  "subtitles": {
+    "fa": "string",
+    "en": "string",
+    "ar": "string"
+  },
+  "trailer": "string",
+  "views": number,
+  "rating": number,
+  "created_at": "string"
+}
+```
+
+#### **فرض API:**
+- **GET /api/contents?type={type}&limit={limit}**: برای لود محتواها بر اساس نوع (مثلاً `type=movie` برای فیلم‌ها).
+- **GET /api/contents?limit={limit}**: برای لود تمام محتواها.
+- پاسخ API یه آرایه از محتواها با ساختار بالا برمی‌گردونه.
+
+---
+
+### **فایل Home.tsx (صفحه اصلی طبقه‌بندی)**
+
+#### **مراحل کلی:**
+1. **ساختار پروژه:** فرض می‌کنم پروژه شما با React و TypeScript ساخته شده و از یه ابزار مدیریت حالت (مثلاً Redux یا Context) استفاده نمی‌کنید، پس از `useState` و `useEffect` برای لود داده‌ها استفاده می‌کنم.
+2. **لود داده‌ها:** از API محتواها رو لود می‌کنیم.
+3. **طراحی:** یه صفحه با تم دارک و 5 بخش برای طبقه‌بندی محتواها می‌سازیم.
+4. **رفع مشکل دسته‌بندی:** مطمئن می‌شیم که لیست دسته‌بندی درست کار کنه و محتواها به درستی نمایش داده بشن.
+
+#### **فایل types.ts (تعریف نوع Content):**
+اول یه فایل برای تعریف نوع `Content` می‌سازیم تا TypeScript بتونه داده‌ها رو درست مدیریت کنه.
+
+```typescript
+// src/types.ts
+export interface Content {
+  id: string;
+  title_fa: string;
+  title_en: string;
+  type: 'movie' | 'series' | 'anime' | 'documentary';
+  genres: string[];
+  year: number;
+  duration: number;
+  description_fa: string;
+  description_en: string;
+  poster: string;
+  video_links: {
+    '480p': string;
+    '720p': string;
+    '1080p': string;
+  };
+  subtitles: {
+    fa: string;
+    en: string;
+    ar: string;
+  };
+  trailer: string;
+  views: number;
+  rating: number;
+  created_at: string;
+}
+```
+
+#### **فایل Home.tsx (صفحه اصلی):**
+```typescript
+// src/pages/Home.tsx
+import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import { Content } from '../types';
+import './Home.css';
+
+const Home: React.FC = () => {
+  // حالت‌ها برای ذخیره محتواها
+  const [movies, setMovies] = useState<Content[]>([]);
+  const [series, setSeries] = useState<Content[]>([]);
+  const [animes, setAnimes] = useState<Content[]>([]);
+  const [documentaries, setDocumentaries] = useState<Content[]>([]);
+  const [allContents, setAllContents] = useState<Content[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // تابع برای لود محتواها از API
+  const fetchContents = async (type?: string, limit: number = 6) => {
+    try {
+      const url = type
+        ? `/api/contents?type=${type}&limit=${limit}`
+        : `/api/contents?limit=${limit}`;
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error('خطا در لود محتواها');
+      }
+      const data: Content[] = await response.json();
+      return data;
+    } catch (err) {
+      setError('خطا در لود محتواها: ' + (err as Error).message);
+      return [];
+    }
+  };
+
+  // لود محتواها موقع لود صفحه
+  useEffect(() => {
+    const loadContents = async () => {
+      setLoading(true);
+      const [moviesData, seriesData, animesData, documentariesData, allData] = await Promise.all([
+        fetchContents('movie'),
+        fetchContents('series'),
+        fetchContents('anime'),
+        fetchContents('documentary'),
+        fetchContents(),
+      ]);
+
+      setMovies(moviesData);
+      setSeries(seriesData);
+      setAnimes(animesData);
+      setDocumentaries(documentariesData);
+      setAllContents(allData);
+      setLoading(false);
+    };
+
+    loadContents();
+  }, []);
+
+  // کامپوننت برای نمایش هر بخش
+  const ContentSection: React.FC<{ title: string; contents: Content[]; link: string }> = ({ title, contents, link }) => (
+    <section className="section">
+      <div className="section-title">
+        <span>{title}</span>
+        <Link to={link}>مشاهده همه</Link>
+      </div>
+      <div className="content-grid">
+        {contents.length > 0 ? (
+          contents.map((content) => (
+            <Link to={`/content/${content.id}`} key={content.id} className="content-card">
+              <img src={content.poster} alt={content.title_fa} loading="lazy" />
+              <div className="info">
+                <div className="title">{content.title_fa}</div>
+                <div className="meta">
+                  {content.year} | {content.genres.join(', ')}
+                </div>
+              </div>
+            </Link>
+          ))
+        ) : (
+          <p>محتوایی برای نمایش وجود ندارد.</p>
+        )}
+      </div>
+    </section>
+  );
+
+  if (loading) {
+    return <div className="loading">در حال بارگذاری...</div>;
+  }
+
+  if (error) {
+    return <div className="error">{error}</div>;
+  }
+
+  return (
+    <div className="home">
+      {/* هدر */}
+      <header className="header">
+        <div className="logo">Xraynama</div>
+        <input type="text" className="search-bar" placeholder="جستجو..." />
+        <div className="user-actions">
+          {/* دکمه‌های کاربری مثل ورود/خروج */}
+        </div>
+      </header>
+
+      {/* بخش فیلم‌ها */}
+      <ContentSection title="فیلم‌ها" contents={movies} link="/movies" />
+
+      {/* بخش سریال‌ها */}
+      <ContentSection title="سریال‌ها" contents={series} link="/series" />
+
+      {/* بخش انیمیشن‌ها */}
+      <ContentSection title="انیمیشن‌ها" contents={animes} link="/animes" />
+
+      {/* بخش مستندها */}
+      <ContentSection title="مستندها" contents={documentaries} link="/documentaries" />
+
+      {/* بخش تمام محتواها */}
+      <ContentSection title="تمام محتواها" contents={allContents} link="/all-contents" />
+    </div>
+  );
+};
+
+export default Home;
+```
+
+#### **فایل Home.css (استایل‌ها):**
+```css
+/* src/pages/Home.css */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'IRANSans', sans-serif;
+}
+
+.home {
+  background: #1A1A1A;
+  color: #FFFFFF;
+  direction: rtl;
+}
+
+.header {
+  background: rgba(26, 26, 26, 0.8);
+  backdrop-filter: blur(10px);
+  padding: 15px;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.header .logo {
+  font-size: 20px;
+  font-weight: 600;
+  color: #0078D4;
+}
+
+.header .search-bar {
+  width: 300px;
+  padding: 8px;
+  border-radius: 8px;
+  background: #2A2A2A;
+  border: none;
+  color: #FFFFFF;
+  font-size: 14px;
+}
+
+.section {
+  padding: 20px;
+}
+
+.section-title {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.section-title a {
+  font-size: 14px;
+  color: #0078D4;
+  text-decoration: none;
+}
+
+.section-title a:hover {
+  text-decoration: underline;
+}
+
+.content-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 15px;
+}
+
+.content-card {
+  background: #2A2A2A;
+  border-radius: 8px;
+  overflow: hidden;
+  transition: transform 0.3s ease;
+  text-decoration: none;
+  color: inherit;
+}
+
+.content-card:hover {
+  transform: scale(1.05);
+}
+
+.content-card img {
+  width: 100%;
+  height: 240px;
+  object-fit: cover;
+}
+
+.content-card .info {
+  padding: 10px;
+}
+
+.content-card .title {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 5px;
+}
+
+.content-card .meta {
+  font-size: 12px;
+  color: #A0A0A0;
+}
+
+.loading,
+.error {
+  text-align: center;
+  padding: 20px;
+  font-size: 16px;
+}
+
+@media (max-width: 768px) {
+  .header .search-bar {
+    width: 200px;
+  }
+
+  .content-grid {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  }
+}
+```
+
+---
+
+### **رفع مشکل لیست دسته‌بندی**
+#### **مشکل احتمالی:**
+تو توضیحات گفتید که لیست دسته‌بندی قبلیتون خراب شده و کار نمی‌کنه. احتمالاً مشکل از یکی از این موارد بوده:
+1. **لود نادرست داده‌ها:** ممکنه API داده‌ها رو درست برنگردونده یا خطایی تو لود کردن داده‌ها وجود داشته.
+2. **نمایش نادرست:** ممکنه شرط‌های رندر کردن (مثلاً شرط `if` برای نمایش محتواها) درست کار نکرده باشن.
+3. **عدم همگام‌سازی:** ممکنه API با دیتابیس سینک نبوده یا داده‌ها به درستی فیلتر نشده باشن.
+
+#### **راه‌حل:**
+- **لود داده‌ها:** تو کد بالا، از `Promise.all` استفاده کردم تا همه درخواست‌ها (فیلم‌ها، سریال‌ها و غیره) به صورت همزمان لود بشن و خطاها مدیریت بشن.
+- **نمایش محتواها:** یه شرط ساده اضافه کردم که اگه محتوایی وجود نداشت، پیام "محتوایی برای نمایش وجود ندارد" نمایش داده بشه.
+- **مدیریت خطا:** حالت `loading` و `error` اضافه کردم تا کاربر بفهمه چه اتفاقی داره می‌افته.
+- **فیلتر نوع:** مطمئن شدم که API محتواها رو بر اساس `type` درست فیلتر می‌کنه (مثلاً `type=movie` برای فیلم‌ها).
+
+#### **چک کردن API:**
+برای اینکه مطمئن بشید مشکل از API نیست، می‌تونید این درخواست‌ها رو تو مرورگر یا Postman تست کنید:
+- `GET /api/contents?type=movie&limit=6`
+- `GET /api/contents?type=series&limit=6`
+- و غیره.
+اگه API داده‌ها رو درست برنگردونده، باید بک‌اند رو چک کنید (مثلاً مطمئن بشید که فیلد `type` تو دیتابیس درست پر شده).
+
+---
+
+### **همگام‌سازی با پنل ادمین**
+- **دیتابیس:** همون دیتابیس MongoDB که تو پنل ادمین استفاده می‌کنید، اینجا هم استفاده می‌شه. API داده‌ها رو از همون مجموعه `contents` می‌خونه.
+- **سینک شدن:** چون داده‌ها مستقیم از API لود می‌شن، هر تغییری تو پنل ادمین (مثلاً اضافه کردن یه فیلم جدید) بلافاصله تو این صفحه هم دیده می‌شه (بعد از رفرش یا لود مجدد).
+- **مثال:** اگه تو پنل ادمین یه سریال جدید با `type: series` اضافه کنید، تو بخش "سریال‌ها" تو این صفحه نمایش داده می‌شه.
+
+---
+
+### **روتینگ (Routing)**
+فرض کردم که از `react-router-dom` برای روتینگ استفاده می‌کنید. برای اینکه لینک‌های "مشاهده همه" کار کنن، باید روت‌ها رو تو فایل `App.tsx` تنظیم کنید:
+
+#### **فایل App.tsx (روتینگ):**
+```typescript
+// src/App.tsx
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Home from './pages/Home';
+import Movies from './pages/Movies';
+import Series from './pages/Series';
+import Animes from './pages/Animes';
+import Documentaries from './pages/Documentaries';
+import AllContents from './pages/AllContents';
+import ContentDetail from './pages/ContentDetail';
+
+const App: React.FC = () => {
+  return (
+    <Router>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/movies" element={<Movies />} />
+        <Route path="/series" element={<Series />} />
+        <Route path="/animes" element={<Animes />} />
+        <Route path="/documentaries" element={<Documentaries />} />
+        <Route path="/all-contents" element={<AllContents />} />
+        <Route path="/content/:id" element={<ContentDetail />} />
+      </Routes>
+    </Router>
+  );
+};
+
+export default App;
+```
+
+#### **فایل Movies.tsx (صفحه همه فیلم‌ها - نمونه):**
+```typescript
+// src/pages/Movies.tsx
+import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import { Content } from '../types';
+import './Home.css'; // همون استایل Home.css
+
+const Movies: React.FC = () => {
+  const [movies, setMovies] = useState<Content[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchMovies = async () => {
+      try {
+        const response = await fetch('/api/contents?type=movie');
+        if (!response.ok) {
+          throw new Error('خطا در لود فیلم‌ها');
+        }
+        const data: Content[] = await response.json();
+        setMovies(data);
+        setLoading(false);
+      } catch (err) {
+        setError('خطا در لود فیلم‌ها: ' + (err as Error).message);
+        setLoading(false);
+      }
+    };
+
+    fetchMovies();
+  }, []);
+
+  if (loading) return <div className="loading">در حال بارگذاری...</div>;
+  if (error) return <div className="error">{error}</div>;
+
+  return (
+    <div className="home">
+      <header className="header">
+        <div className="logo">Xraynama</div>
+        <input type="text" className="search-bar" placeholder="جستجو..." />
+      </header>
+
+      <section className="section">
+        <div className="section-title">
+          <span>همه فیلم‌ها</span>
+        </div>
+        <div className="content-grid">
+          {movies.length > 0 ? (
+            movies.map((content) => (
+              <Link to={`/content/${content.id}`} key={content.id} className="content-card">
+                <img src={content.poster} alt={content.title_fa} loading="lazy" />
+                <div className="info">
+                  <div className="title">{content.title_fa}</div>
+                  <div class="meta">
+                    {content.year} | {content.genres.join(', ')}
+                  </div>
+                </div>
+              </Link>
+            ))
+          ) : (
+            <p>فیلمی برای نمایش وجود ندارد.</p>
+          )}
+        </div>
+      </section>
+    </div>
+  );
+};
+
+export default Movies;
+```
+
+---
+
+### **بهینه‌سازی‌ها**
+- **سرعت:** تصاویر با `loading="lazy"` لود می‌شن تا سرعت صفحه بالا بره.
+- **امنیت:** داده‌ها از API لود می‌شن و نیازی به Sanitization تو فرانت‌اند نیست (باید تو بک‌اند انجام بشه).
+- **SEO:** اگه از SSR (مثلاً Next.js) استفاده می‌کنید، متا تگ‌ها رو برای هر صفحه تنظیم کنید.
+- **ریسپانسیو:** طراحی با CSS Grid کاملاً ریسپانسیو هست.
+- **UX:** انیمیشن نرم (Scale) موقع هاور روی کارت‌ها اضافه شده.
+
+---
+
+### **چطور مشکل دسته‌بندی رو برطرف کردم؟**
+- **لود جداگانه هر دسته:** هر دسته (فیلم‌ها، سریال‌ها و غیره) جداگانه از API لود می‌شه تا اگه یه دسته داده نداشت، بقیه دسته‌ها همچنان نمایش داده بشن.
+- **مدیریت خطا:** اگه API خطا بده، پیام خطا نمایش داده می‌شه و بقیه صفحه خراب نمی‌شه.
+- **نمایش پیش‌فرض:** اگه محتوایی تو یه دسته نبود، پیام "محتوایی برای نمایش وجود ندارد" نشون داده می‌شه.
+- **چک کردن API:** مطمئن شدم که API داده‌ها رو بر اساس `type` درست فیلتر می‌کنه.
+
+---
+
+### **حرف آخر**
+این صفحه `Home.tsx` یه صفحه طبقه‌بندی محتوا با React و TypeScript براتون ایجاد می‌کنه که با API و دیتابیس MongoDB سینک هست و مشکل لیست دسته‌بندی رو برطرف می‌کنه. اگه API شما ساختار متفاوتی داره یا بخوای بخش خاصی رو تغییر بدی (مثلاً طراحی کارت‌ها، اضافه کردن فیلتر یا جستجو)، بگو تا باهم پیش بریم! راضی هستی؟
