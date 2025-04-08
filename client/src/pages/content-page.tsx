@@ -12,6 +12,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Textarea } from "@/components/ui/textarea";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
+import { CommentsSection } from "@/components/comments";
 import {
   Accordion,
   AccordionContent,
@@ -619,65 +620,12 @@ export default function ContentPage() {
                   </div>
                   
                   {/* Comments Section */}
-                  <div className="mt-12 bg-black/50 p-6 rounded-lg">
-                    <h3 className="text-lg font-bold text-white mb-6 flex items-center">
-                      <MessageSquare className="h-5 w-5 mr-2 text-primary" />
-                      دیدگاه‌های کاربران
-                    </h3>
-                    
-                    {/* Comment Form */}
-                    <form onSubmit={handleSubmitComment} className="mb-8">
-                      <div className="mb-4">
-                        <Textarea
-                          placeholder="دیدگاه خود را درباره این فیلم بنویسید..."
-                          className="min-h-[100px] bg-black/40 border-gray-700 focus:border-primary"
-                          value={commentText}
-                          onChange={(e) => setCommentText(e.target.value)}
-                        />
-                      </div>
-                      <div className="flex justify-end">
-                        <Button type="submit">ارسال دیدگاه</Button>
-                      </div>
-                    </form>
-                    
-                    {/* Comments List */}
-                    <div className="space-y-6">
-                      {mockComments.map((comment) => (
-                        <div key={comment.id} className="border-b border-gray-800 pb-6 last:border-0 last:pb-0">
-                          <div className="flex items-start gap-3">
-                            <Avatar>
-                              <AvatarFallback className="bg-primary/20 text-primary">
-                                {comment.user.name.charAt(0)}
-                              </AvatarFallback>
-                            </Avatar>
-                            <div className="flex-1">
-                              <div className="flex justify-between mb-1">
-                                <h4 className="font-medium text-white">{comment.user.name}</h4>
-                                <span className="text-xs text-gray-500">{comment.date}</span>
-                              </div>
-                              <p className="text-sm text-gray-300 mb-3">{comment.text}</p>
-                              <div className="flex items-center gap-4">
-                                <button 
-                                  className="flex items-center text-xs text-gray-400 hover:text-primary transition-colors"
-                                  onClick={() => handleCommentReaction(comment.id, true)}
-                                >
-                                  <ThumbsUp className="h-4 w-4 mr-1" />
-                                  <span>{comment.likes}</span>
-                                </button>
-                                <button 
-                                  className="flex items-center text-xs text-gray-400 hover:text-primary transition-colors"
-                                  onClick={() => handleCommentReaction(comment.id, false)}
-                                >
-                                  <ThumbsDown className="h-4 w-4 mr-1" />
-                                  <span>{comment.dislikes}</span>
-                                </button>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
+                  {displayContent && (
+                    <CommentsSection
+                      contentId={displayContent.id}
+                      contentTitle={displayContent.title}
+                    />
+                  )}
                 </div>
               </div>
             )}
