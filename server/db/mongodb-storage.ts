@@ -613,6 +613,59 @@ export class MongoDBStorage implements IStorage {
       throw error;
     }
   }
+  
+  async getReviewsCount(): Promise<number> {
+    try {
+      return await ReviewModel.countDocuments();
+    } catch (error) {
+      console.error('Error getting reviews count:', error);
+      return 0;
+    }
+  }
+  
+  async getPendingReviewsCount(): Promise<number> {
+    try {
+      return await ReviewModel.countDocuments({ isApproved: false });
+    } catch (error) {
+      console.error('Error getting pending reviews count:', error);
+      return 0;
+    }
+  }
+  
+  async getFilteredReviews(
+    page: number = 1, 
+    limit: number = 10, 
+    sortField: string = 'createdAt', 
+    sortOrder: string = 'desc',
+    filter?: { isApproved?: boolean }
+  ): Promise<{ reviews: Review[], total: number }> {
+    try {
+      const skip = (page - 1) * limit;
+      const sort: any = {};
+      sort[sortField || 'createdAt'] = sortOrder === 'asc' ? 1 : -1;
+      
+      let query = {};
+      if (filter && filter.isApproved !== undefined) {
+        query = { isApproved: filter.isApproved };
+      }
+      
+      const [reviews, total] = await Promise.all([
+        ReviewModel.find(query)
+          .sort(sort)
+          .skip(skip)
+          .limit(limit),
+        ReviewModel.countDocuments(query)
+      ]);
+      
+      return {
+        reviews: reviews.map(this.mongoReviewToReview),
+        total
+      };
+    } catch (error) {
+      console.error('Error getting filtered reviews:', error);
+      return { reviews: [], total: 0 };
+    }
+  }
 
   // Comments operations
   async getCommentsByContentId(contentId: number): Promise<Comment[]> {
@@ -624,6 +677,59 @@ export class MongoDBStorage implements IStorage {
     } catch (error) {
       console.error(`Error fetching comments for content ${contentId}:`, error);
       return [];
+    }
+  }
+  
+  async getCommentsCount(): Promise<number> {
+    try {
+      return await CommentModel.countDocuments();
+    } catch (error) {
+      console.error('Error getting comments count:', error);
+      return 0;
+    }
+  }
+  
+  async getPendingCommentsCount(): Promise<number> {
+    try {
+      return await CommentModel.countDocuments({ isApproved: false });
+    } catch (error) {
+      console.error('Error getting pending comments count:', error);
+      return 0;
+    }
+  }
+  
+  async getFilteredComments(
+    page: number = 1, 
+    limit: number = 10, 
+    sortField: string = 'createdAt', 
+    sortOrder: string = 'desc',
+    filter?: { isApproved?: boolean }
+  ): Promise<{ comments: Comment[], total: number }> {
+    try {
+      const skip = (page - 1) * limit;
+      const sort: any = {};
+      sort[sortField || 'createdAt'] = sortOrder === 'asc' ? 1 : -1;
+      
+      let query = {};
+      if (filter && filter.isApproved !== undefined) {
+        query = { isApproved: filter.isApproved };
+      }
+      
+      const [comments, total] = await Promise.all([
+        CommentModel.find(query)
+          .sort(sort)
+          .skip(skip)
+          .limit(limit),
+        CommentModel.countDocuments(query)
+      ]);
+      
+      return {
+        comments: comments.map(this.mongoCommentToComment),
+        total
+      };
+    } catch (error) {
+      console.error('Error getting filtered comments:', error);
+      return { comments: [], total: 0 };
     }
   }
 
