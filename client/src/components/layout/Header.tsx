@@ -22,18 +22,23 @@ export function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const triggerRef = useRef<HTMLButtonElement>(null);
-  const headerRef = useRef<HTMLElement>(null);
   
   // Handle scroll effect with enhanced animation
   useEffect(() => {
-    // Simple scroll event handler
+    let lastScrollY = window.scrollY;
+    
     const handleScroll = () => {
-      // تنظیم وضعیت هدر بر اساس موقعیت اسکرول
-      if (window.scrollY > 50) {
+      const currentScrollY = window.scrollY;
+      // اسکرول به پایین - هدر را کوچکتر و بالاتر می‌کند
+      if (currentScrollY > 50) {
         setIsScrolled(true);
-      } else {
+      } 
+      // اسکرول به بالا یا در بالای صفحه - هدر به حالت عادی برمی‌گردد
+      else if (currentScrollY <= 50) {
         setIsScrolled(false);
       }
+      
+      lastScrollY = currentScrollY;
     };
     
     window.addEventListener('scroll', handleScroll);
@@ -70,9 +75,7 @@ export function Header() {
 
   return (
     <>
-      <header 
-        ref={headerRef}
-        className={`
+      <header className={`
         sticky z-50 
         px-6 py-4 
         mx-4 my-2
