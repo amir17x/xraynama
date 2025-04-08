@@ -5,6 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { AuthProvider } from "@/hooks/use-auth";
 import { ProtectedRoute, AdminRoute } from "@/lib/protected-route";
 import { LoadingProvider } from "@/contexts/LoadingContext";
+import BlueSphereBackground from "@/components/common/BlueSphereBackground";
 
 import HomePage from "@/pages/home-page";
 import NotFound from "@/pages/not-found";
@@ -92,6 +93,7 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <LoadingProvider>
+          <BlueSphereBackground />
           <Router />
           <Toaster />
         </LoadingProvider>

@@ -33,6 +33,34 @@
     0 0 300px 100px rgba(0, 68, 170, 0.2);
   opacity: 0.85;
   animation: rotate 80s linear infinite, pulse 10s ease-in-out infinite;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* استایل برای لوگوی X */
+.x-logo,
+.blue-sphere-logo-img {
+  width: 180px;
+  height: 180px;
+  position: relative;
+  z-index: 2;
+  animation: float 6s ease-in-out infinite;
+  filter: drop-shadow(0 0 20px rgba(0, 119, 255, 0.8));
+}
+
+.blue-sphere-logo {
+  position: relative;
+  z-index: 2;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-15px);
+  }
 }
 
 @keyframes rotate {

@@ -1,0 +1,70 @@
+Sure! Here's a **detailed, technical English prompt** you can use to describe the UI structure shown in your screenshot, tailored for developers working with **React + TailwindCSS + Lucide/FontAwesome icons** (or any modern web tech stack):
+
+---
+
+### ✅ **English Prompt (Detailed & Technical)**
+
+```
+Design a horizontal navigation header bar similar to the attached image. It should be styled using TailwindCSS and follow RTL (right-to-left) direction. Each navigation item (menu button) should contain the following structure:
+
+1. A vertically stacked layout:
+   - An icon at the top (use Lucide, FontAwesome, or custom SVG icons).
+   - A primary label in **Persian (Farsi)** script.
+   - A secondary label below in **English (all uppercase)**.
+
+2. Style & layout requirements:
+   - Use Flexbox with `flex-col` and `items-center` to align icon and text vertically.
+   - Apply `text-white` or light gray color by default.
+   - On hover:
+     - Change icon and English text color to **orange** (e.g., `text-orange-400` or `#FFA500`).
+     - Persian label color remains unchanged on hover.
+   - Ensure appropriate spacing between icon, Persian text, and English text (e.g., `space-y-1` or `gap-y-1`).
+   - Provide padding and hover transitions for smooth interactivity.
+
+3. Global layout:
+   - Header container should be a `flex` row with `justify-center` or `justify-between`.
+   - Apply `bg-black` or dark background color.
+   - Add horizontal padding and vertical padding for spacing (e.g., `px-6 py-3`).
+   - Apply RTL direction: `dir="rtl"` or `flex-row-reverse` if needed.
+
+4. Items to include in order (from right to left in RTL layout):
+
+   - **Home**
+     - Persian label: خانه
+     - English label: HOME
+     - Icon: house or home icon
+
+   - **Movies**
+     - Persian label: دانلود فیلم
+     - English label: MOVIES
+     - Icon: film or clapperboard icon
+
+   - **Series**
+     - Persian label: دانلود سریال
+     - English label: SERIES
+     - Icon: TV or monitor icon
+
+   - **Artists**
+     - Persian label: هنرمندان
+     - English label: ARTISTS
+     - Icon: theater masks or person icon
+
+   - **App**
+     - Persian label: اپلیکیشن
+     - English label: APP
+     - Icon: Android icon (green `#3DDC84` color)
+
+5. Responsiveness (optional):
+   - On small screens, the menu can scroll horizontally (`overflow-x-auto`), or stack items vertically if needed.
+
+6. Accessibility:
+   - Add `aria-label` or `title` attributes for icons and labels.
+   - Use semantic `<nav>` and `<ul>/<li>` structure or `<button>/<a>` for each menu item.
+
+Deliver the code in either HTML + Tailwind or React JSX. Keep the layout clean and modular.
+```
+
+---
+
+Would you like me to **generate the actual React JSX code** for this, based on this prompt?  
+Let me know if you're using `lucide-react`, `react-icons`, or a custom icon system.

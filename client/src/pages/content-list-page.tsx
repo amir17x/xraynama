@@ -3,27 +3,13 @@ import { useQuery } from '@tanstack/react-query';
 import { useLocation } from 'wouter';
 import { Search, Filter, ChevronLeft, ChevronRight } from 'lucide-react';
 
-import { Header } from '../components/layout/Header';
-import { ContentCard } from '../components/common/ContentCard';
-import { Input } from '../components/ui/input';
-import { Button } from '../components/ui/button';
-import { Skeleton } from '../components/ui/skeleton';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
-
-interface Content {
-  id: string;
-  title: string;
-  englishTitle: string;
-  type: 'movie' | 'series' | 'animation' | 'documentary';
-  year: number;
-  duration: number;
-  poster: string;
-  imdbRating: number;
-  description: string;
-  genres?: string[];
-  hasPersianDubbing?: boolean;
-  hasPersianSubtitle?: boolean;
-}
+import AppLayout from '@/components/layout/AppLayout';
+import { ContentCard } from '@/components/common/ContentCard';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { ContentType } from '@/types';
 
 interface ContentListPageProps {
   title: string;
@@ -38,7 +24,7 @@ const ContentListPage: React.FC<ContentListPageProps> = ({ title, contentType, s
   const itemsPerPage = 24;
   
   // Fetch content based on type or all content
-  const { data: allContents, isLoading } = useQuery<Content[]>({
+  const { data: allContents, isLoading } = useQuery<ContentType[]>({
     queryKey: [contentType ? `/api/content/type/${contentType}` : '/api/content'],
     retry: false,
   });
@@ -52,7 +38,12 @@ const ContentListPage: React.FC<ContentListPageProps> = ({ title, contentType, s
       content.title.toLowerCase().includes(searchLower) ||
       content.englishTitle.toLowerCase().includes(searchLower) ||
       content.description.toLowerCase().includes(searchLower) ||
-      content.genres?.some(genre => genre.toLowerCase().includes(searchLower))
+      (content.genres && typeof content.genres === 'object' && 
+        Array.isArray(content.genres) && 
+        content.genres.some(genre => 
+          typeof genre === 'string' && genre.toLowerCase().includes(searchLower)
+        )
+      )
     );
   });
   
@@ -63,9 +54,9 @@ const ContentListPage: React.FC<ContentListPageProps> = ({ title, contentType, s
     return [...filteredContents].sort((a, b) => {
       switch (sortBy) {
         case 'newest':
-          return (b.id as any) - (a.id as any); // assuming id can be used for chronological sorting
+          return b.year - a.year;
         case 'oldest':
-          return (a.id as any) - (b.id as any);
+          return a.year - b.year;
         case 'highest-rating':
           return b.imdbRating - a.imdbRating;
         case 'lowest-rating':
@@ -93,8 +84,7 @@ const ContentListPage: React.FC<ContentListPageProps> = ({ title, contentType, s
   }, [searchTerm, sortBy]);
   
   return (
-    <>
-      <Header />
+    <AppLayout>
       <main className="min-h-screen bg-[#111827] bg-gradient-to-b from-black/70 to-gray-900/70 pt-6">
         <div className="container mx-auto px-4 py-8">
           <h1 className="text-2xl md:text-3xl font-bold text-white mb-8">{title}</h1>
@@ -216,7 +206,7 @@ const ContentListPage: React.FC<ContentListPageProps> = ({ title, contentType, s
           )}
         </div>
       </main>
-    </>
+    </AppLayout>
   );
 };
 

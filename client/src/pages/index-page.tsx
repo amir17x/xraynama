@@ -3,23 +3,13 @@ import { Link } from 'wouter';
 import { useQuery } from '@tanstack/react-query';
 import { Star, ChevronLeft, ChevronRight, Play, Search, Heart, Plus } from 'lucide-react';
 
-import { Header } from '@/components/layout/Header';
-import { Footer } from '@/components/layout/Footer';
+import AppLayout from '@/components/layout/AppLayout';
 import { ContentCard } from '@/components/common/ContentCard';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
-
-// کامپوننت پس‌زمینه کره آبی
-const SplineBackground: React.FC = () => {
-  return (
-    <div className="blue-sphere-bg">
-      <div className="blue-sphere"></div>
-    </div>
-  );
-};
 
 import { ContentType } from '@/types';
 
@@ -284,10 +274,8 @@ const IndexPage: React.FC = () => {
   });
 
   return (
-    <>
-      <Header />
-      <SplineBackground />
-      <main className="min-h-screen bg-gradient-to-b from-black/40 via-gray-900/30 to-gray-900/60 pb-12 relative z-1" dir="rtl">
+    <AppLayout>
+      <div className="bg-gradient-to-b from-black/40 via-gray-900/30 to-gray-900/60" dir="rtl">
         {/* Search bar for mobile - only visible on small screens */}
         <div className="md:hidden px-4 py-3 sticky top-16 z-10 bg-gray-900/95 backdrop-blur-md">
           <div className="relative">
@@ -357,9 +345,8 @@ const IndexPage: React.FC = () => {
           contents={allContent || []}
           isLoading={allContentLoading}
         />
-      </main>
-      <Footer />
-    </>
+      </div>
+    </AppLayout>
   );
 };
 
