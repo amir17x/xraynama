@@ -118,8 +118,8 @@ export function Header() {
                       <span>تنظیمات</span>
                     </DropdownMenuItem>
                     
-                    {/* نمایش گزینه پنل ادمین فقط برای کاربران ادمین */}
-                    {user.role === 'admin' && (
+                    {/* نمایش گزینه مدیر سیستم فقط برای کاربران ادمین */}
+                    {user?.role === 'admin' && (
                       <>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem onClick={() => setLocation('/admin/dashboard')} className="text-primary font-semibold">

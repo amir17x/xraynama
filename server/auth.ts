@@ -243,7 +243,19 @@ export function setupAuth(app: Express) {
       
       req.login(user, (err) => {
         if (err) return next(err);
-        return res.status(200).json(user);
+        
+        // Make sure the role is included in the response
+        const userWithRole = { ...user }; 
+        if (!userWithRole.role) {
+          userWithRole.role = 'user'; // Default role
+          
+          // If username is admin, explicitly set admin role
+          if (userWithRole.username === 'admin') {
+            userWithRole.role = 'admin';
+          }
+        }
+        
+        return res.status(200).json(userWithRole);
       });
     })(req, res, next);
   });
@@ -257,7 +269,19 @@ export function setupAuth(app: Express) {
 
   app.get("/api/user", (req, res) => {
     if (!req.isAuthenticated()) return res.sendStatus(401);
-    res.json(req.user);
+    
+    // Make sure the role is included in the response
+    const user = { ...req.user };
+    if (!user.role) {
+      user.role = 'user'; // Default role
+      
+      // If username is admin, explicitly set admin role
+      if (user.username === 'admin') {
+        user.role = 'admin';
+      }
+    }
+    
+    res.json(user);
   });
   
   // Password reset routes
