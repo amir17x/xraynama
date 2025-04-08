@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'wouter';
 import { useQuery } from '@tanstack/react-query';
-import { Star, ChevronLeft, ChevronRight, Play, Search, Heart, Plus } from 'lucide-react';
+import { Star, ChevronLeft, ChevronRight, Play, Search, Heart, Plus, Tv } from 'lucide-react';
 
 import AppLayout from '@/components/layout/AppLayout';
 import { ContentCard } from '@/components/common/ContentCard';
+import LatestSeriesSection from '@/components/common/LatestSeriesSection';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
@@ -304,47 +305,63 @@ const IndexPage: React.FC = () => {
             />
           </div>
         </section>
-
-        {/* Movies Section */}
-        <ContentSection
-          title="فیلم‌ها"
-          linkTo="/movies"
-          contents={movies || []}
-          isLoading={moviesLoading}
-          icon={<Play className="h-5 w-5" />}
-        />
-
-        {/* Series Section */}
-        <ContentSection
-          title="سریال‌ها"
-          linkTo="/series"
-          contents={series || []}
-          isLoading={seriesLoading}
-        />
-
-        {/* Animations Section */}
-        <ContentSection
-          title="انیمیشن‌ها"
-          linkTo="/animations"
-          contents={animations || []}
-          isLoading={animationsLoading}
-        />
-
-        {/* Documentaries Section */}
-        <ContentSection
-          title="مستندها"
-          linkTo="/documentaries"
-          contents={documentaries || []}
-          isLoading={documentariesLoading}
-        />
-
-        {/* All Content Section */}
-        <ContentSection
-          title="تمام محتواها"
-          linkTo="/all-content"
-          contents={allContent || []}
-          isLoading={allContentLoading}
-        />
+        
+        {/* Two-column layout with Latest Series and regular content */}
+        <section className="py-6">
+          <div className="container mx-auto px-4">
+            <div className="flex flex-col lg:flex-row gap-6">
+              {/* Main content column */}
+              <div className="w-full lg:w-3/4 space-y-6">
+                {/* Movies Section */}
+                <ContentSection
+                  title="فیلم‌ها"
+                  linkTo="/movies"
+                  contents={movies || []}
+                  isLoading={moviesLoading}
+                  icon={<Play className="h-5 w-5" />}
+                />
+                
+                {/* Series Section */}
+                <ContentSection
+                  title="سریال‌ها"
+                  linkTo="/series"
+                  contents={series || []}
+                  isLoading={seriesLoading}
+                  icon={<Tv className="h-5 w-5" />}
+                />
+                
+                {/* Animations Section */}
+                <ContentSection
+                  title="انیمیشن‌ها"
+                  linkTo="/animations"
+                  contents={animations || []}
+                  isLoading={animationsLoading}
+                />
+                
+                {/* Documentaries Section */}
+                <ContentSection
+                  title="مستندها"
+                  linkTo="/documentaries"
+                  contents={documentaries || []}
+                  isLoading={documentariesLoading}
+                />
+                
+                {/* All Content Section */}
+                <ContentSection
+                  title="تمام محتواها"
+                  linkTo="/all-content"
+                  contents={allContent || []}
+                  isLoading={allContentLoading}
+                />
+              </div>
+              
+              {/* Sidebar column with Latest Series */}
+              <div className="w-full lg:w-1/4">
+                <LatestSeriesSection />
+              </div>
+            </div>
+          </div>
+        </section>
       </div>
     </AppLayout>
   );

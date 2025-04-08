@@ -42,6 +42,54 @@ export async function registerRoutes(app: Express): Promise<Server> {
       next(error);
     }
   });
+  
+  // API برای دریافت سریال‌های به‌روز شده
+  app.get("/api/series", async (req, res, next) => {
+    try {
+      // دریافت محتواهایی که نوع آن‌ها سریال است
+      const series = await storage.getContentByType('series', 20, 0);
+      
+      // تبدیل داده‌ها به فرمت مورد نیاز کامپوننت
+      const seriesList = series.map(item => {
+        // تعیین اینکه آیا سریال قسمت جدید دارد یا خیر (برای مثال، اگر کمتر از 7 روز از انتشار گذشته باشد)
+        const latestEpisodeDate = item.updatedAt || item.createdAt || new Date();
+        const daysSinceRelease = Math.floor((Date.now() - new Date(latestEpisodeDate).getTime()) / (1000 * 60 * 60 * 24));
+        
+        const networkMapping: any = {
+          'netflix': 'نتفلیکس',
+          'hulu': 'هولو',
+          'amazon': 'آمازون',
+          'hbo': 'اچ‌بی‌او',
+          'apple': 'اپل تی‌وی+'
+        };
+        
+        // تولید اطلاعات قسمت و فصل به صورت تصادفی برای نمونه
+        const season = Math.floor(Math.random() * 5) + 1;
+        const episode = Math.floor(Math.random() * 10) + 1;
+        
+        return {
+          id: item.id.toString(),
+          title: item.title,
+          thumbnail: item.poster, // استفاده از پوستر به عنوان تصویر بندانگشتی
+          network: item.network || networkMapping[item.country?.toLowerCase()] || 'ایران‌نما',
+          networkLogo: `/logos/${item.network?.toLowerCase() || 'default'}.png`,
+          description: `قسمت ${episode}، فصل ${season}`,
+          latestEpisodeDate: latestEpisodeDate,
+          hasNewEpisode: daysSinceRelease < 7, // نمایش به عنوان جدید اگر کمتر از 7 روز گذشته باشد
+          url: `/content/${item.id}`
+        };
+      });
+      
+      // مرتب‌سازی بر اساس تاریخ انتشار آخرین قسمت
+      const sortedSeriesList = seriesList.sort((a, b) => {
+        return new Date(b.latestEpisodeDate).getTime() - new Date(a.latestEpisodeDate).getTime();
+      });
+      
+      res.json(sortedSeriesList);
+    } catch (error) {
+      next(error);
+    }
+  });
 
   // جستجوی محتوا با استفاده از اسلاگ (عنوان انگلیسی)
   app.get("/api/content/slug/:slug", async (req, res, next) => {
