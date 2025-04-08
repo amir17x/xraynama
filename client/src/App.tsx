@@ -23,6 +23,14 @@ import VerifyCodePage from "@/pages/verify-code";
 import ResetPasswordPage from "@/pages/reset-password";
 import TestReviews from "@/pages/TestReviews";
 
+// New categorized pages
+import IndexPage from "@/pages/index-page";
+import MoviesPage from "@/pages/movies-page";
+import SeriesPage from "@/pages/series-page";
+import AnimationsPage from "@/pages/animations-page";
+import DocumentariesPage from "@/pages/documentaries-page";
+import AllContentPage from "@/pages/all-content-page";
+
 // Admin pages
 import AdminDashboard from "@/pages/admin/Dashboard";
 import AdminUsers from "@/pages/admin/Users";
@@ -42,6 +50,14 @@ function Router() {
       <Route path="/top-imdb" component={TopIMDBPage} />
       <ProtectedRoute path="/profile" component={ProfilePage} />
       <Route path="/test-reviews" component={TestReviews} />
+      
+      {/* New categorized pages */}
+      <Route path="/index" component={IndexPage} />
+      <Route path="/movies" component={MoviesPage} />
+      <Route path="/series" component={SeriesPage} />
+      <Route path="/animations" component={AnimationsPage} />
+      <Route path="/documentaries" component={DocumentariesPage} />
+      <Route path="/all-content" component={AllContentPage} />
       
       {/* Password reset pages */}
       <Route path="/forgot-password" component={ForgotPasswordPage} />

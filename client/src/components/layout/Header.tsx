@@ -36,10 +36,12 @@ export function Header() {
 
   const navItems = [
     { label: 'صفحه اصلی', href: '/' },
-    { label: 'فیلم‌ها', href: '/category/movie' },
-    { label: 'سریال‌ها', href: '/category/series' },
-    { label: 'انیمیشن', href: '/category/animation' },
-    { label: 'مستند', href: '/category/documentary' },
+    { label: 'صفحه دسته‌بندی شده', href: '/index' },
+    { label: 'فیلم‌ها', href: '/movies' },
+    { label: 'سریال‌ها', href: '/series' },
+    { label: 'انیمیشن‌ها', href: '/animations' },
+    { label: 'مستندها', href: '/documentaries' },
+    { label: 'همه محتواها', href: '/all-content' },
   ];
 
   return (
