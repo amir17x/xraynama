@@ -179,68 +179,83 @@ export function Header() {
                   </Button>
                   
                   {isMenuOpen && (
-                    <div style={{ right: '0', left: 'auto' }} className="profile-dropdown w-48 bg-[#00142c]/95 border border-[#00BFFF]/20 rounded-lg shadow-lg backdrop-blur-md p-2 text-white animate-fade-in z-50 absolute top-full mt-2">
-                      <Link 
-                        href="/profile"
-                        className="w-full flex items-center p-2 rounded-md text-sm hover:bg-[#00BFFF]/10 transition-colors duration-200"
-                        onClick={() => setIsMenuOpen(false)}
+                    <div className="fixed inset-0 z-40 bg-black/20 backdrop-blur-sm" onClick={() => setIsMenuOpen(false)}>
+                      <div 
+                        onClick={(e) => e.stopPropagation()} 
+                        className="profile-dropdown w-56 bg-[#00142c]/95 border border-[#00BFFF]/20 rounded-lg shadow-lg backdrop-blur-md p-2 text-white z-50 absolute top-[calc(100%+4px)] md:right-1 right-2"
+                        style={{
+                          animation: 'dropdown-fade-in 0.25s ease-out'
+                        }}
                       >
-                        <User className="ml-2 h-4 w-4 text-[#00BFFF]" />
-                        <span>پروفایل</span>
-                      </Link>
-                      
-                      <Link 
-                        href="/profile?tab=favorites"
-                        className="w-full flex items-center p-2 rounded-md text-sm hover:bg-[#00BFFF]/10 transition-colors duration-200"
-                        onClick={() => setIsMenuOpen(false)}
-                      >
-                        <Heart className="ml-2 h-4 w-4 text-[#00BFFF]" />
-                        <span>علاقه‌مندی‌ها</span>
-                      </Link>
-                      
-                      <Link 
-                        href="/profile?tab=playlists"
-                        className="w-full flex items-center p-2 rounded-md text-sm hover:bg-[#00BFFF]/10 transition-colors duration-200"
-                        onClick={() => setIsMenuOpen(false)}
-                      >
-                        <ListVideo className="ml-2 h-4 w-4 text-[#00BFFF]" />
-                        <span>پلی‌لیست‌ها</span>
-                      </Link>
-                      
-                      <Link 
-                        href="/profile?tab=settings"
-                        className="w-full flex items-center p-2 rounded-md text-sm hover:bg-[#00BFFF]/10 transition-colors duration-200"
-                        onClick={() => setIsMenuOpen(false)}
-                      >
-                        <Settings className="ml-2 h-4 w-4 text-[#00BFFF]" />
-                        <span>تنظیمات</span>
-                      </Link>
-                      
-                      {/* نمایش گزینه مدیر سیستم فقط برای کاربران ادمین */}
-                      {user?.role === 'admin' && (
-                        <>
-                          <div className="h-px bg-[#00BFFF]/10 my-1"></div>
-                          <Link 
-                            href="/admin/dashboard"
-                            className="w-full flex items-center p-2 rounded-md bg-[#00BFFF]/10 text-[#00BFFF] hover:bg-[#00BFFF]/20 text-sm font-semibold transition-all duration-300"
-                            onClick={() => setIsMenuOpen(false)}
-                          >
-                            <ShieldAlert className="ml-2 h-4 w-4" />
-                            <span>مدیر سیستم</span>
-                          </Link>
-                        </>
-                      )}
-                      
-                      <div className="h-px bg-[#00BFFF]/10 my-1"></div>
-                      <button 
-                        className="w-full flex items-center p-2 rounded-md text-sm hover:bg-red-500/10 hover:text-red-400 transition-colors duration-200"
-                        onClick={() => { handleLogout(); setIsMenuOpen(false); }}
-                        disabled={logoutMutation.isPending}
-                      >
-                        <LogOut className="ml-2 h-4 w-4" />
-                        <span>خروج</span>
-                        {logoutMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                      </button>
+                        <div className="py-2 px-3 mb-1 border-b border-[#00BFFF]/10">
+                          <div className="text-sm font-medium text-white truncate">{user.name || user.username}</div>
+                          <div className="text-xs text-[#00BFFF]/80 truncate">
+                            {user?.role === 'admin' ? 'مدیر سیستم' : 'کاربر معمولی'}
+                          </div>
+                        </div>
+                        
+                        <Link 
+                          href="/profile"
+                          className="w-full flex items-center p-2 rounded-md text-sm hover:bg-[#00BFFF]/10 transition-colors duration-200"
+                          onClick={() => setIsMenuOpen(false)}
+                        >
+                          <User className="ml-2 h-4 w-4 text-[#00BFFF]" />
+                          <span>پروفایل</span>
+                        </Link>
+                        
+                        <Link 
+                          href="/profile?tab=favorites"
+                          className="w-full flex items-center p-2 rounded-md text-sm hover:bg-[#00BFFF]/10 transition-colors duration-200"
+                          onClick={() => setIsMenuOpen(false)}
+                        >
+                          <Heart className="ml-2 h-4 w-4 text-[#00BFFF]" />
+                          <span>علاقه‌مندی‌ها</span>
+                        </Link>
+                        
+                        <Link 
+                          href="/profile?tab=playlists"
+                          className="w-full flex items-center p-2 rounded-md text-sm hover:bg-[#00BFFF]/10 transition-colors duration-200"
+                          onClick={() => setIsMenuOpen(false)}
+                        >
+                          <ListVideo className="ml-2 h-4 w-4 text-[#00BFFF]" />
+                          <span>پلی‌لیست‌ها</span>
+                        </Link>
+                        
+                        <Link 
+                          href="/profile?tab=settings"
+                          className="w-full flex items-center p-2 rounded-md text-sm hover:bg-[#00BFFF]/10 transition-colors duration-200"
+                          onClick={() => setIsMenuOpen(false)}
+                        >
+                          <Settings className="ml-2 h-4 w-4 text-[#00BFFF]" />
+                          <span>تنظیمات</span>
+                        </Link>
+                        
+                        {/* نمایش گزینه مدیر سیستم فقط برای کاربران ادمین */}
+                        {user?.role === 'admin' && (
+                          <>
+                            <div className="h-px bg-[#00BFFF]/10 my-1"></div>
+                            <Link 
+                              href="/admin/dashboard"
+                              className="w-full flex items-center p-2 rounded-md bg-[#00BFFF]/10 text-[#00BFFF] hover:bg-[#00BFFF]/20 text-sm font-semibold transition-all duration-300"
+                              onClick={() => setIsMenuOpen(false)}
+                            >
+                              <ShieldAlert className="ml-2 h-4 w-4" />
+                              <span>مدیر سیستم</span>
+                            </Link>
+                          </>
+                        )}
+                        
+                        <div className="h-px bg-[#00BFFF]/10 my-1"></div>
+                        <button 
+                          className="w-full flex items-center p-2 rounded-md text-sm hover:bg-red-500/10 hover:text-red-400 transition-colors duration-200"
+                          onClick={() => { handleLogout(); setIsMenuOpen(false); }}
+                          disabled={logoutMutation.isPending}
+                        >
+                          <LogOut className="ml-2 h-4 w-4" />
+                          <span>خروج</span>
+                          {logoutMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                        </button>
+                      </div>
                     </div>
                   )}
                 </div>

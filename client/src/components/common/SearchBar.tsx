@@ -137,32 +137,42 @@ export function NotificationsButton() {
       </Button>
       
       {isOpen && (
-        <div className="absolute left-0 top-10 rtl:left-auto rtl:right-0 z-50 w-72 md:w-80 bg-[#00142c]/95 border border-[#00BFFF]/20 rounded-lg shadow-lg backdrop-blur-md p-3 text-white animate-in slide-in-from-top-5 fade-in-20 duration-200">
-          <div className="font-bold text-lg border-b border-[#00BFFF]/10 pb-2 mb-2 flex items-center">
-            <BellRing className="h-5 w-5 ml-2 text-[#00BFFF]" />
-            <span>اعلانات</span>
-          </div>
-          
-          <div className="max-h-96 overflow-y-auto space-y-3">
-            {notifications.map(notification => (
-              <div key={notification.id} className="border-b border-[#00BFFF]/10 pb-3 hover:bg-[#00BFFF]/5 p-2 rounded-md transition-colors duration-200">
-                <div className="font-bold text-sm">{notification.title}</div>
-                <p className="text-xs text-gray-300 mt-1">{notification.text}</p>
-                <div className="text-[10px] text-gray-400 mt-1">{notification.date}</div>
-              </div>
-            ))}
-          </div>
-          
-          {notifications.length === 0 && (
-            <div className="py-4 text-center text-gray-400">
-              هیچ اعلانی وجود ندارد
+        <div className="fixed inset-0 z-40 bg-black/20 backdrop-blur-sm" onClick={() => setIsOpen(false)}>
+          <div 
+            onClick={(e) => e.stopPropagation()}
+            className="absolute left-1 md:left-2 top-10 rtl:left-auto rtl:right-2 z-50 w-72 md:w-80 bg-[#00142c]/95 border border-[#00BFFF]/20 rounded-lg shadow-lg backdrop-blur-md p-3 text-white"
+            style={{
+              animation: 'dropdown-fade-in 0.25s ease-out',
+              maxHeight: 'calc(100vh - 80px)',
+              overflowY: 'auto'
+            }}
+          >
+            <div className="font-bold text-lg border-b border-[#00BFFF]/10 pb-2 mb-2 flex items-center sticky top-0 bg-[#00142c]/95 backdrop-blur-md">
+              <BellRing className="h-5 w-5 ml-2 text-[#00BFFF]" />
+              <span>اعلانات</span>
             </div>
-          )}
-          
-          <div className="mt-2 text-center">
-            <Button variant="link" size="sm" className="text-[#00BFFF] text-xs hover:text-[#00BFFF]/80">
-              مشاهده همه اعلانات
-            </Button>
+            
+            <div className="space-y-3">
+              {notifications.map(notification => (
+                <div key={notification.id} className="border-b border-[#00BFFF]/10 pb-3 hover:bg-[#00BFFF]/5 p-2 rounded-md transition-colors duration-200">
+                  <div className="font-bold text-sm">{notification.title}</div>
+                  <p className="text-xs text-gray-300 mt-1">{notification.text}</p>
+                  <div className="text-[10px] text-gray-400 mt-1">{notification.date}</div>
+                </div>
+              ))}
+            </div>
+            
+            {notifications.length === 0 && (
+              <div className="py-4 text-center text-gray-400">
+                هیچ اعلانی وجود ندارد
+              </div>
+            )}
+            
+            <div className="mt-2 text-center border-t border-[#00BFFF]/10 pt-2 sticky bottom-0 bg-[#00142c]/95 backdrop-blur-md">
+              <Button variant="link" size="sm" className="text-[#00BFFF] text-xs hover:text-[#00BFFF]/80">
+                مشاهده همه اعلانات
+              </Button>
+            </div>
           </div>
         </div>
       )}
