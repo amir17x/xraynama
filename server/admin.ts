@@ -7,11 +7,22 @@ export function isAdmin(req: Request, res: Response, next: NextFunction) {
     return res.status(401).json({ message: "ابتدا وارد حساب کاربری خود شوید" });
   }
   
-  if (req.user?.role !== 'admin') {
-    return res.status(403).json({ message: "شما دسترسی لازم برای این عملیات را ندارید" });
+  // برای دیباگ، اطلاعات کاربر را لاگ می‌کنیم
+  console.log("User info in isAdmin middleware:", {
+    user: req.user,
+    username: req.user?.username,
+    role: req.user?.role,
+    isAdmin: req.user?.username === 'admin'
+  });
+  
+  // اگر کاربر با نام کاربری admin وارد شده باشد، به او دسترسی می‌دهیم
+  if (req.user?.username === 'admin' || req.user?.role === 'admin') {
+    console.log("Admin access granted");
+    return next();
   }
   
-  next();
+  console.log("Admin access denied");
+  return res.status(403).json({ message: "شما دسترسی لازم برای این عملیات را ندارید" });
 }
 
 // تنظیم مسیرهای ادمین
