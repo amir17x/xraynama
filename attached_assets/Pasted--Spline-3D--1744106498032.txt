@@ -1,0 +1,60 @@
+### توضیحات برای طراحی و هدف
+
+تصویر یه طراحی ساده تو Spline رو نشون می‌ده: یه شکل 3D که شبیه یه کره یا قطره آبی‌رنگه، با افکت نورانی و پس‌زمینه مشکی. این طراحی به نظر می‌اد که تعاملیه، یعنی کاربر می‌تونه باهاش تعامل کنه (مثلاً بچرخونتش یا زوم کنه). تو قبلاً تو Spline کد "Integrated Embed" رو کپی کردی، و حالا می‌خوای این طراحی رو با همون روش (به‌صورت تعاملی) تو سایتت بذاری.
+
+هدفت اینه که این طراحی تو یه بخش از سایتت نمایش داده بشه، به‌صورت responsive (یعنی تو موبایل و دسکتاپ درست نمایش داده بشه)، و کاربر بتونه باهاش تعامل کنه. من یه پرامپت انگلیسی می‌نویسم که همه این جزئیات رو به هوش مصنوعی بده تا کد لازم رو برات بنویسه.
+
+---
+
+### پرامپت انگلیسی برای اضافه کردن طراحی Spline به سایت
+
+**Prompt:**
+
+I have a 3D design created in Spline that I want to embed into my website as an interactive element (not a video). The design is a simple glowing blue 3D shape (like a sphere or droplet) with a black background, as shown in the attached image. I have already copied the embed code from Spline's "Integrated Embed" section, which looks like this:
+
+```html
+<script type="module" src="https://unpkg.com/@splinetool/viewer@1.9.29/build/spline-viewer.js"></script>
+<spline-viewer url="https://prod.spline.design/he0PRDTGEl6qwDu/scene.splinecode"></spline-viewer>
+```
+
+I am a beginner in web development and need help embedding this design into my website. My website is a simple HTML page, and I want the Spline design to be displayed in a specific section of the page (inside a `<div>` with the class `spline-container`). Here’s my current HTML structure:
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+    <title>My Website</title>
+</head>
+<body>
+    <h1>Welcome to My Website</h1>
+    <!-- I want the Spline design to go here -->
+</body>
+</html>
+```
+
+### Requirements:
+1. Embed the Spline design into my HTML page using the provided embed code, ensuring it is interactive (users should be able to rotate or interact with the 3D shape using the mouse).
+2. Place the design inside a `<div>` with the class `spline-container`.
+3. Make the design responsive so it looks good on both mobile and desktop devices. The design should take up the full width of its container but have a maximum width of 1200px and a fixed height (e.g., 600px), and it should be centered on the page.
+4. Add CSS to style the container and ensure the design integrates well with the rest of the page (e.g., add some margin or padding if needed).
+5. If there are any best practices for optimizing the loading or performance of the Spline design (e.g., lazy loading or ensuring it doesn’t slow down the page), please include those in the solution.
+6. Provide the complete updated HTML and CSS code, and explain the changes made.
+
+### Additional Context:
+- The Spline design is lightweight (Spline’s performance check says "Your scene is optimized"), so it should load quickly.
+- I have already configured the Spline "Play Settings" as follows: Logo is set to "No", Loading Preview is set to "Yes", Hint is set to "None", and Mouse Events are set to "Local (Canvas Container)" to allow interaction.
+- The website is in Persian (Farsi), but the code and comments can be in English.
+
+Please provide a step-by-step solution with the updated code and explanations.
+
+---
+
+### توضیحات پرامپت:
+- **هدف:** مشخص کردم که می‌خوای طراحی Spline رو به‌صورت تعاملی تو سایتت بذاری.
+- **جزئیات طراحی:** توضیح دادم که طراحی یه شکل 3D آبی‌رنگ با پس‌زمینه مشکیه (بر اساس تصویر).
+- **کد Spline:** کدی که از Spline کپی کردی رو گذاشتم تا هوش مصنوعی بتونه باهاش کار کنه.
+- **نیازها:** گفتم که طراحی باید تو یه `<div>` خاص باشه، responsive باشه، و استایل داشته باشه.
+- **بهینه‌سازی:** ازش خواستم نکات مربوط به لودینگ و عملکرد رو هم بگه.
+- **زمینه:** اشاره کردم که سایتت به فارسیه، ولی کد می‌تونه انگلیسی باشه.
+
+این پرامپت باید به هوش مصنوعی کمک کنه که یه راه‌حل کامل و ساده برات بنویسه. اگه بازم سوالی داری، بگو! 😊

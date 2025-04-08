@@ -197,8 +197,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const contentId = req.params.id;
       
       // تایید اینکه آیا contentId یک ObjectId معتبر است
-      const mongoose = require('mongoose');
-      if (!mongoose.Types.ObjectId.isValid(contentId)) {
+      const { isValidObjectId } = await import('mongoose');
+      if (!isValidObjectId(contentId)) {
         return res.status(400).json({ message: "شناسه محتوا نامعتبر است" });
       }
       
@@ -260,8 +260,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const contentId = req.params.id;
       
       // تایید اینکه آیا contentId یک ObjectId معتبر است
-      const mongoose = require('mongoose');
-      if (!mongoose.Types.ObjectId.isValid(contentId)) {
+      const { isValidObjectId } = await import('mongoose');
+      if (!isValidObjectId(contentId)) {
         return res.status(400).json({ message: "شناسه محتوا نامعتبر است" });
       }
       
