@@ -260,6 +260,51 @@ export default function ContentPage() {
     });
   };
   
+  // نمایش بخش لودینگ یا خطا در صورت لزوم
+  if (isLoading) {
+    return (
+      <>
+        <Header />
+        <div className="container mx-auto px-4 py-10">
+          <div className="p-8 text-center">
+            <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary mx-auto mb-4"></div>
+            <p className="text-white">در حال بارگذاری محتوا...</p>
+          </div>
+        </div>
+      </>
+    );
+  }
+
+  if (error) {
+    return (
+      <>
+        <Header />
+        <div className="container mx-auto px-4 py-10">
+          <div className="bg-red-500/20 border border-red-300 p-8 rounded-lg text-center">
+            <p className="text-white">خطا در بارگذاری محتوا. لطفاً مجدداً تلاش کنید.</p>
+          </div>
+        </div>
+      </>
+    );
+  }
+
+  // استفاده از داده‌های دریافتی از API یا در صورت نبود از داده‌های نمونه
+  const displayContent = content ?? mockContent;
+  
+  // Make sure we have a valid content object (either from API or mock)
+  if (!displayContent) {
+    return (
+      <>
+        <Header />
+        <div className="container mx-auto px-4 py-10">
+          <div className="bg-red-500/20 border border-red-300 p-8 rounded-lg text-center">
+            <p className="text-white">خطا در بارگذاری محتوا. لطفاً مجدداً تلاش کنید.</p>
+          </div>
+        </div>
+      </>
+    );
+  }
+  
   return (
     <>
       <Header />
@@ -269,7 +314,7 @@ export default function ContentPage() {
         <div 
           className="relative bg-cover bg-center"
           style={{ 
-            backgroundImage: `linear-gradient(to bottom, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.9) 90%), url(${mockContent.backdrop})`,
+            backgroundImage: `linear-gradient(to bottom, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.9) 90%), url(${displayContent && displayContent.backdrop})`,
             backgroundPosition: "top center",
             backgroundSize: "cover"
           }}
@@ -282,7 +327,7 @@ export default function ContentPage() {
                   <div className="absolute inset-0 flex items-center justify-center">
                     <div className="text-center p-6">
                       <Film className="h-16 w-16 mx-auto mb-4 text-primary/50 opacity-70" />
-                      <h3 className="text-xl font-medium mb-3 text-white">پخش تریلر فیلم {mockContent.title}</h3>
+                      <h3 className="text-xl font-medium mb-3 text-white">پخش تریلر فیلم {displayContent && displayContent.title}</h3>
                       <p className="text-gray-300 mb-6 max-w-md mx-auto">در نسخه دمو، ویدیو واقعی بارگذاری نشده است. این بخش نمایشی از محل قرارگیری پلیر است.</p>
                       <div className="flex justify-center gap-4">
                         <Button 
@@ -291,7 +336,7 @@ export default function ContentPage() {
                         >
                           بازگشت به جزئیات
                         </Button>
-                        <Button onClick={() => window.open(mockContent.trailer, "_blank")}>
+                        <Button onClick={() => window.open(displayContent && displayContent.trailer || "#", "_blank")}>
                           تماشا در یوتیوب
                         </Button>
                       </div>
@@ -303,15 +348,15 @@ export default function ContentPage() {
                 <div className="flex justify-between items-center mt-4 bg-black/30 p-3 rounded-lg">
                   <div className="flex items-center">
                     <img 
-                      src={mockContent.poster} 
-                      alt={mockContent.title} 
+                      src={displayContent && displayContent.poster} 
+                      alt={displayContent && displayContent.title} 
                       className="w-12 h-16 object-cover rounded mr-3"
                     />
                     <div>
                       <h3 className="font-bold text-white">
-                        {mockContent.title}
+                        {displayContent && displayContent.title}
                       </h3>
-                      <p className="text-sm text-gray-300">{mockContent.englishTitle} ({mockContent.year})</p>
+                      <p className="text-sm text-gray-300">{displayContent && displayContent.englishTitle} ({displayContent && displayContent.year})</p>
                     </div>
                   </div>
                   
@@ -340,14 +385,14 @@ export default function ContentPage() {
                 <div className="md:col-span-3 order-1 flex flex-col items-center md:items-start">
                   <div className="relative">
                     <img 
-                      src={mockContent.poster} 
-                      alt={mockContent.title} 
+                      src={displayContent && displayContent.poster} 
+                      alt={displayContent && displayContent.title} 
                       className="w-full max-w-[240px] md:max-w-full rounded-lg shadow-2xl"
                     />
-                    {mockContent.ageRating && (
+                    {displayContent && displayContent.ageRating && (
                       <div className="absolute top-2 left-2 bg-black/70 text-white px-2 py-1 rounded text-xs font-bold flex items-center">
                         <Shield className="h-3 w-3 mr-1" />
-                        {mockContent.ageRating}
+                        {displayContent && displayContent.ageRating}
                       </div>
                     )}
                   </div>
@@ -387,56 +432,56 @@ export default function ContentPage() {
                 <div className="md:col-span-9 order-2">
                   <div className="flex flex-wrap gap-2 mb-3">
                     <Badge variant="outline" className="bg-primary/10 text-primary border-primary/30">
-                      {mockContent.type === "movie" ? "فیلم" : 
-                      mockContent.type === "series" ? "سریال" : 
-                      mockContent.type === "animation" ? "انیمیشن" : "مستند"}
+                      {displayContent && displayContent && displayContent.type === "movie" ? "فیلم" : 
+                      displayContent && displayContent && displayContent.type === "series" ? "سریال" : 
+                      displayContent && displayContent && displayContent.type === "animation" ? "انیمیشن" : "مستند"}
                     </Badge>
                     
                     <Badge variant="outline" className="bg-yellow-500/10 text-yellow-500 border-yellow-500/30 flex items-center">
                       <Star className="h-3 w-3 fill-current mr-1" />
-                      {mockContent.imdbRating} / 10
+                      {displayContent && displayContent.imdbRating} / 10
                     </Badge>
                     
                     <Badge variant="outline" className="bg-black/40">
-                      {mockContent.year}
+                      {displayContent && displayContent.year}
                     </Badge>
                     
                     <Badge variant="outline" className="bg-black/40 flex items-center">
                       <Clock className="h-3 w-3 mr-1" />
-                      {mockContent.duration} دقیقه
+                      {displayContent && displayContent.duration} دقیقه
                     </Badge>
                   </div>
                   
-                  <h1 className="text-3xl md:text-4xl font-bold text-white mb-1">{mockContent.title}</h1>
-                  <h2 className="text-lg text-gray-300 mb-6">{mockContent.englishTitle}</h2>
+                  <h1 className="text-3xl md:text-4xl font-bold text-white mb-1">{displayContent && displayContent.title}</h1>
+                  <h2 className="text-lg text-gray-300 mb-6">{displayContent && displayContent.englishTitle}</h2>
                   
                   <div className="prose prose-invert max-w-none mb-8">
                     <p className="text-gray-300 leading-relaxed text-base">
-                      {mockContent.fullDescription}
+                      {displayContent && displayContent.description}
                     </p>
                   </div>
                   
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-y-4 gap-x-8 mb-8 text-sm">
                     <div className="flex">
                       <div className="w-28 text-gray-400">کارگردان:</div>
-                      <div className="flex-1 text-white">{mockContent.director}</div>
+                      <div className="flex-1 text-white">{displayContent && displayContent.director || 'اطلاعات موجود نیست'}</div>
                     </div>
                     
                     <div className="flex">
                       <div className="w-28 text-gray-400">بازیگران:</div>
-                      <div className="flex-1 text-white">{mockContent.actors.join('، ')}</div>
+                      <div className="flex-1 text-white">{displayContent && displayContent.actors && displayContent && displayContent.actors.length > 0 ? displayContent && displayContent.actors.join('، ') : 'اطلاعات موجود نیست'}</div>
                     </div>
                     
                     <div className="flex">
                       <div className="w-28 text-gray-400">ژانر:</div>
-                      <div className="flex-1 text-white">{mockContent.genres.join('، ')}</div>
+                      <div className="flex-1 text-white">{displayContent && displayContent.genres && displayContent && displayContent.genres.length > 0 ? displayContent && displayContent.genres.join('، ') : 'اطلاعات موجود نیست'}</div>
                     </div>
                     
                     <div className="flex">
                       <div className="w-28 text-gray-400">محصول:</div>
                       <div className="flex-1 text-white flex items-center">
                         <Globe className="h-3.5 w-3.5 mr-1 text-gray-500" />
-                        {mockContent.country}
+                        {displayContent && displayContent.country || 'اطلاعات موجود نیست'}
                       </div>
                     </div>
                     
@@ -444,13 +489,13 @@ export default function ContentPage() {
                       <div className="w-28 text-gray-400">زبان:</div>
                       <div className="flex-1 text-white flex items-center">
                         <Languages className="h-3.5 w-3.5 mr-1 text-gray-500" />
-                        {mockContent.languages}
+                        {displayContent && displayContent.languages || 'اطلاعات موجود نیست'}
                       </div>
                     </div>
                     
                     <div className="flex">
                       <div className="w-28 text-gray-400">زیرنویس:</div>
-                      <div className="flex-1 text-white">{mockContent.subtitles.join('، ')}</div>
+                      <div className="flex-1 text-white">{displayContent && displayContent.subtitles && displayContent && displayContent.subtitles.length > 0 ? displayContent && displayContent.subtitles.join('، ') : 'اطلاعات موجود نیست'}</div>
                     </div>
                   </div>
                   
@@ -461,11 +506,13 @@ export default function ContentPage() {
                       برچسب‌ها:
                     </h3>
                     <div className="flex flex-wrap gap-2">
-                      {mockContent.tags.map((tag, index) => (
+                      {displayContent && displayContent.tags && displayContent && displayContent.tags.length > 0 ? displayContent && displayContent.tags.map((tag: string, index: number) => (
                         <Badge key={index} variant="secondary" className="bg-black/50 hover:bg-black/70 cursor-pointer">
                           {tag}
                         </Badge>
-                      ))}
+                      )) : (
+                        <span className="text-gray-400">برچسبی تعریف نشده است</span>
+                      )}
                     </div>
                   </div>
                   
@@ -480,12 +527,12 @@ export default function ContentPage() {
                       <div className="hidden md:flex items-center gap-2">
                         <div className="flex items-center px-3 py-1 rounded bg-black/60">
                           <Star className="h-4 w-4 text-yellow-500 fill-current mr-1" />
-                          <span className="text-yellow-500 font-medium">{mockContent.imdbRating}</span>
+                          <span className="text-yellow-500 font-medium">{displayContent && displayContent.imdbRating}</span>
                         </div>
                         
                         <div className="flex items-center px-3 py-1 rounded bg-black/60">
                           <Clock className="h-4 w-4 text-gray-400 mr-1" />
-                          <span className="text-gray-300">{mockContent.duration} دقیقه</span>
+                          <span className="text-gray-300">{displayContent && displayContent.duration} دقیقه</span>
                         </div>
                       </div>
                     </div>
