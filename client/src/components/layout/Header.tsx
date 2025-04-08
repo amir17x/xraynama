@@ -128,7 +128,7 @@ export function Header() {
               </div>
             ) : (
               // Logged in
-              <div className="relative">
+              <div className="relative" style={{ position: 'relative' }}>
                 <Button 
                   ref={triggerRef}
                   variant="ghost" 
@@ -148,66 +148,64 @@ export function Header() {
                 </Button>
                 
                 {isMenuOpen && (
-                  <PortalOverride triggerRef={triggerRef}>
-                    <div className="w-48 bg-popover border rounded-md shadow-md p-1 text-popover-foreground animate-fade-in right-aligned">
-                      <button 
-                        className="w-full flex items-center p-2 rounded hover:bg-[#006bd6]/10 hover:text-[#006bd6] text-sm transition-all duration-300"
-                        onClick={() => { setLocation('/profile'); setIsMenuOpen(false); }}
-                      >
-                        <User className="ml-2 h-4 w-4" />
-                        <span>پروفایل</span>
-                      </button>
-                      
-                      <button 
-                        className="w-full flex items-center p-2 rounded hover:bg-[#006bd6]/10 hover:text-[#006bd6] text-sm transition-all duration-300"
-                        onClick={() => { setLocation('/profile?tab=favorites'); setIsMenuOpen(false); }}
-                      >
-                        <Heart className="ml-2 h-4 w-4" />
-                        <span>علاقه‌مندی‌ها</span>
-                      </button>
-                      
-                      <button 
-                        className="w-full flex items-center p-2 rounded hover:bg-[#006bd6]/10 hover:text-[#006bd6] text-sm transition-all duration-300"
-                        onClick={() => { setLocation('/profile?tab=playlists'); setIsMenuOpen(false); }}
-                      >
-                        <ListVideo className="ml-2 h-4 w-4" />
-                        <span>پلی‌لیست‌ها</span>
-                      </button>
-                      
-                      <button 
-                        className="w-full flex items-center p-2 rounded hover:bg-[#006bd6]/10 hover:text-[#006bd6] text-sm transition-all duration-300"
-                        onClick={() => { setLocation('/profile?tab=settings'); setIsMenuOpen(false); }}
-                      >
-                        <Settings className="ml-2 h-4 w-4" />
-                        <span>تنظیمات</span>
-                      </button>
-                      
-                      {/* نمایش گزینه مدیر سیستم فقط برای کاربران ادمین */}
-                      {user?.role === 'admin' && (
-                        <>
-                          <div className="h-px bg-muted my-1 -mx-1"></div>
-                          <button 
-                            className="w-full flex items-center p-2 rounded bg-[#006bd6]/10 text-[#006bd6] hover:bg-[#006bd6]/20 text-sm font-semibold transition-all duration-300"
-                            onClick={() => { setLocation('/admin/dashboard'); setIsMenuOpen(false); }}
-                          >
-                            <ShieldAlert className="ml-2 h-4 w-4" />
-                            <span>مدیر سیستم</span>
-                          </button>
-                        </>
-                      )}
-                      
-                      <div className="h-px bg-muted my-1 -mx-1"></div>
-                      <button 
-                        className="w-full flex items-center p-2 rounded hover:bg-[#006bd6]/10 hover:text-[#006bd6] text-sm transition-all duration-300"
-                        onClick={() => { handleLogout(); setIsMenuOpen(false); }}
-                        disabled={logoutMutation.isPending}
-                      >
-                        <LogOut className="ml-2 h-4 w-4" />
-                        <span>خروج</span>
-                        {logoutMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                      </button>
-                    </div>
-                  </PortalOverride>
+                  <div style={{ right: '0', left: 'auto' }} className="profile-dropdown w-48 bg-popover border rounded-md shadow-md p-1 text-popover-foreground animate-fade-in z-50 absolute top-full mt-2">
+                    <button 
+                      className="w-full flex items-center p-2 rounded hover:bg-[#006bd6]/10 hover:text-[#006bd6] text-sm transition-all duration-300"
+                      onClick={() => { setLocation('/profile'); setIsMenuOpen(false); }}
+                    >
+                      <User className="ml-2 h-4 w-4" />
+                      <span>پروفایل</span>
+                    </button>
+                    
+                    <button 
+                      className="w-full flex items-center p-2 rounded hover:bg-[#006bd6]/10 hover:text-[#006bd6] text-sm transition-all duration-300"
+                      onClick={() => { setLocation('/profile?tab=favorites'); setIsMenuOpen(false); }}
+                    >
+                      <Heart className="ml-2 h-4 w-4" />
+                      <span>علاقه‌مندی‌ها</span>
+                    </button>
+                    
+                    <button 
+                      className="w-full flex items-center p-2 rounded hover:bg-[#006bd6]/10 hover:text-[#006bd6] text-sm transition-all duration-300"
+                      onClick={() => { setLocation('/profile?tab=playlists'); setIsMenuOpen(false); }}
+                    >
+                      <ListVideo className="ml-2 h-4 w-4" />
+                      <span>پلی‌لیست‌ها</span>
+                    </button>
+                    
+                    <button 
+                      className="w-full flex items-center p-2 rounded hover:bg-[#006bd6]/10 hover:text-[#006bd6] text-sm transition-all duration-300"
+                      onClick={() => { setLocation('/profile?tab=settings'); setIsMenuOpen(false); }}
+                    >
+                      <Settings className="ml-2 h-4 w-4" />
+                      <span>تنظیمات</span>
+                    </button>
+                    
+                    {/* نمایش گزینه مدیر سیستم فقط برای کاربران ادمین */}
+                    {user?.role === 'admin' && (
+                      <>
+                        <div className="h-px bg-muted my-1 -mx-1"></div>
+                        <button 
+                          className="w-full flex items-center p-2 rounded bg-[#006bd6]/10 text-[#006bd6] hover:bg-[#006bd6]/20 text-sm font-semibold transition-all duration-300"
+                          onClick={() => { setLocation('/admin/dashboard'); setIsMenuOpen(false); }}
+                        >
+                          <ShieldAlert className="ml-2 h-4 w-4" />
+                          <span>مدیر سیستم</span>
+                        </button>
+                      </>
+                    )}
+                    
+                    <div className="h-px bg-muted my-1 -mx-1"></div>
+                    <button 
+                      className="w-full flex items-center p-2 rounded hover:bg-[#006bd6]/10 hover:text-[#006bd6] text-sm transition-all duration-300"
+                      onClick={() => { handleLogout(); setIsMenuOpen(false); }}
+                      disabled={logoutMutation.isPending}
+                    >
+                      <LogOut className="ml-2 h-4 w-4" />
+                      <span>خروج</span>
+                      {logoutMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                    </button>
+                  </div>
                 )}
               </div>
             )}
