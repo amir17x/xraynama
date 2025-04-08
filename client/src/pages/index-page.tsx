@@ -1,109 +1,297 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'wouter';
 import { useQuery } from '@tanstack/react-query';
-import { Star, ChevronLeft } from 'lucide-react';
+import { Star, ChevronLeft, ChevronRight, Play, Search, Heart, Plus } from 'lucide-react';
 
-import { Header } from '../components/layout/Header';
-import { ContentCard } from '../components/common/ContentCard';
-import { Badge } from '../components/ui/badge';
-import { Skeleton } from '../components/ui/skeleton';
+import { Header } from '@/components/layout/Header';
+import { Footer } from '@/components/layout/Footer';
+import { ContentCard } from '@/components/common/ContentCard';
+import { Badge } from '@/components/ui/badge';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { cn } from '@/lib/utils';
 
-interface Content {
-  id: string;
-  title: string;
-  englishTitle: string;
-  type: 'movie' | 'series' | 'animation' | 'documentary';
-  year: number;
-  duration: number;
-  poster: string;
-  imdbRating: number;
-  description: string;
-  genres?: string[];
-  hasPersianDubbing?: boolean;
-  hasPersianSubtitle?: boolean;
-}
+import { ContentType } from '@/types';
 
-// Component to show a content section with title
+// Component to show a content section with title and horizontal scrolling
 const ContentSection: React.FC<{
   title: string;
   linkTo: string;
-  contents: Content[];
+  contents: ContentType[];
   isLoading: boolean;
-}> = ({ title, linkTo, contents, isLoading }) => {
+  icon?: React.ReactNode;
+}> = ({ title, linkTo, contents, isLoading, icon }) => {
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+  const handleScrollRight = () => {
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollBy({
+        left: -300,
+        behavior: 'smooth'
+      });
+    }
+  };
+  
+  const handleScrollLeft = () => {
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollBy({
+        left: 300,
+        behavior: 'smooth'
+      });
+    }
+  };
+
   return (
-    <section className="py-8">
+    <section className="py-6 lg:py-8 relative">
       <div className="container mx-auto px-4">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-xl md:text-2xl font-bold text-white flex items-center gap-2">
+            {icon && <span className="text-primary">{icon}</span>}
             {title}
           </h2>
           <Link href={linkTo} className="flex items-center text-primary hover:underline text-sm">
             مشاهده همه
-            <ChevronLeft className="h-4 w-4 ml-1" />
+            <ChevronLeft className="h-4 w-4 mr-1" />
           </Link>
         </div>
         
-        {isLoading ? (
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
-            {[...Array(6)].map((_, i) => (
-              <div key={i} className="relative bg-black/20 rounded-lg overflow-hidden">
-                <Skeleton className="w-full aspect-[2/3]" />
-                <div className="p-3">
-                  <Skeleton className="h-4 w-full mb-2" />
-                  <Skeleton className="h-3 w-3/4" />
+        <div className="relative">
+          {/* Scroll buttons */}
+          <button 
+            onClick={handleScrollRight}
+            className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-gray-900/80 text-white p-2 rounded-full shadow-lg hover:bg-gray-800 hidden md:flex"
+            aria-label="Scroll right"
+          >
+            <ChevronRight className="h-5 w-5" />
+          </button>
+          
+          <button 
+            onClick={handleScrollLeft}
+            className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-gray-900/80 text-white p-2 rounded-full shadow-lg hover:bg-gray-800 hidden md:flex"
+            aria-label="Scroll left"
+          >
+            <ChevronLeft className="h-5 w-5" />
+          </button>
+          
+          {isLoading ? (
+            <div className="flex overflow-x-auto scrollbar-hide gap-4 pb-4" ref={scrollContainerRef}>
+              {[...Array(6)].map((_, i) => (
+                <div key={i} className="flex-shrink-0 w-60 bg-card/30 rounded-lg overflow-hidden animate-pulse">
+                  <div className="aspect-[2/3] bg-muted"></div>
+                  <div className="p-3">
+                    <div className="h-4 bg-muted rounded w-3/4 mb-2"></div>
+                    <div className="h-3 bg-muted rounded w-1/2"></div>
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
-            {contents.map((content) => (
-              <ContentCard key={content.id} content={content} />
-            ))}
-          </div>
-        )}
+              ))}
+            </div>
+          ) : (
+            <div 
+              className="flex overflow-x-auto scrollbar-hide gap-4 pb-4" 
+              dir="rtl" 
+              ref={scrollContainerRef}
+            >
+              {contents?.slice(0, 10).map((content) => (
+                <div key={content.id} className="flex-shrink-0">
+                  <ContentCard content={content} />
+                </div>
+              ))}
+              {contents?.length === 0 && (
+                <div className="flex-1 text-center py-12 text-gray-400">
+                  محتوایی برای نمایش وجود ندارد
+                </div>
+              )}
+            </div>
+          )}
+        </div>
       </div>
     </section>
   );
 };
 
+// Featured content component with bigger display and more details
+const FeaturedContent: React.FC<{
+  contents: ContentType[];
+  isLoading: boolean;
+}> = ({ contents, isLoading }) => {
+  const [activeIndex, setActiveIndex] = useState(0);
+  
+  // Auto rotate featured content every 8 seconds
+  useEffect(() => {
+    if (!contents || contents.length <= 1) return;
+    
+    const interval = setInterval(() => {
+      setActiveIndex(prev => (prev + 1) % contents.length);
+    }, 8000);
+    
+    return () => clearInterval(interval);
+  }, [contents]);
+  
+  if (isLoading) {
+    return (
+      <div className="container mx-auto px-4">
+        <div className="relative bg-black/20 rounded-lg overflow-hidden">
+          <Skeleton className="w-full aspect-[21/9]" />
+          <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-black to-transparent">
+            <Skeleton className="h-7 w-1/3 mb-3" />
+            <Skeleton className="h-5 w-2/3 mb-4" />
+            <Skeleton className="h-4 w-full max-w-2xl mb-6" />
+            <div className="flex gap-3">
+              <Skeleton className="h-10 w-32" />
+              <Skeleton className="h-10 w-10" />
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+  
+  if (!contents || contents.length === 0) {
+    return (
+      <div className="container mx-auto px-4">
+        <div className="bg-black/30 rounded-lg p-12 text-center text-gray-400">
+          محتوای ویژه‌ای برای نمایش وجود ندارد
+        </div>
+      </div>
+    );
+  }
+  
+  const content = contents[activeIndex];
+  
+  return (
+    <div className="container mx-auto px-4">
+      <div className="relative rounded-xl overflow-hidden shadow-2xl bg-black/40">
+        <div 
+          className="w-full aspect-[21/9] bg-cover bg-center transition-transform duration-700 hover:scale-105"
+          style={{ backgroundImage: `url(${content.poster})` }}
+        >
+          <div className="absolute inset-0 bg-gradient-to-t from-black via-black/70 to-transparent"></div>
+          
+          <div className="absolute bottom-0 left-0 right-0 p-6 md:p-8 flex flex-col items-start">
+            <div className="flex items-center gap-3 mb-3">
+              <Badge variant="secondary" className="bg-primary text-white">
+                {content.type === "movie" ? "فیلم" : 
+                content.type === "series" ? "سریال" : 
+                content.type === "animation" ? "انیمیشن" : "مستند"}
+              </Badge>
+              
+              <Badge variant="outline" className="bg-yellow-600/20 text-yellow-500 border-yellow-500/30 flex items-center gap-1">
+                <Star className="h-3 w-3 fill-current" />
+                {content.imdbRating}
+              </Badge>
+              
+              <Badge variant="outline" className="bg-black/50">
+                {content.year}
+              </Badge>
+              
+              {content.duration && (
+                <Badge variant="outline" className="bg-black/50">
+                  {content.duration} دقیقه
+                </Badge>
+              )}
+            </div>
+            
+            <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-white mb-1">{content.title}</h1>
+            <h2 className="text-lg text-gray-300 mb-3">{content.englishTitle}</h2>
+            
+            <p className="text-gray-300 max-w-2xl mb-6 line-clamp-2 md:line-clamp-3">{content.description}</p>
+            
+            <div className="flex items-center gap-3">
+              <Link href={`/content/${content.englishTitle.replace(/[^a-zA-Z0-9]/g, '')}`}>
+                <Button className="bg-primary hover:bg-primary/90">
+                  <Play className="mr-2 h-4 w-4" />
+                  پخش
+                </Button>
+              </Link>
+              
+              <Button variant="outline" className="bg-white/10 backdrop-blur-sm hover:bg-white/20">
+                <Plus className="mr-2 h-4 w-4" />
+                لیست تماشا
+              </Button>
+            </div>
+          </div>
+        </div>
+        
+        {/* Pagination indicators */}
+        {contents.length > 1 && (
+          <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex items-center gap-1.5">
+            {contents.slice(0, 5).map((_, i) => (
+              <button
+                key={i}
+                className={`w-2 h-2 rounded-full transition-all ${i === activeIndex ? 'bg-primary w-4' : 'bg-white/50 hover:bg-white/80'}`}
+                onClick={() => setActiveIndex(i)}
+                aria-label={`Go to slide ${i + 1}`}
+              />
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
 const IndexPage: React.FC = () => {
   // Fetch movies (type: movie)
-  const { data: movies, isLoading: moviesLoading } = useQuery<Content[]>({
+  const { data: movies, isLoading: moviesLoading } = useQuery<ContentType[]>({
     queryKey: ['/api/content/type/movie'],
     retry: false,
+    staleTime: 1000 * 60 * 5, // 5 minutes
   });
 
   // Fetch series (type: series)
-  const { data: series, isLoading: seriesLoading } = useQuery<Content[]>({
+  const { data: series, isLoading: seriesLoading } = useQuery<ContentType[]>({
     queryKey: ['/api/content/type/series'],
     retry: false,
+    staleTime: 1000 * 60 * 5, // 5 minutes
   });
 
   // Fetch animations (type: animation)
-  const { data: animations, isLoading: animationsLoading } = useQuery<Content[]>({
+  const { data: animations, isLoading: animationsLoading } = useQuery<ContentType[]>({
     queryKey: ['/api/content/type/animation'],
     retry: false,
+    staleTime: 1000 * 60 * 5, // 5 minutes
   });
 
   // Fetch documentaries (type: documentary)
-  const { data: documentaries, isLoading: documentariesLoading } = useQuery<Content[]>({
+  const { data: documentaries, isLoading: documentariesLoading } = useQuery<ContentType[]>({
     queryKey: ['/api/content/type/documentary'],
     retry: false,
+    staleTime: 1000 * 60 * 5, // 5 minutes
+  });
+
+  // Fetch all content
+  const { data: allContent, isLoading: allContentLoading } = useQuery<ContentType[]>({
+    queryKey: ['/api/content'],
+    retry: false,
+    staleTime: 1000 * 60 * 5, // 5 minutes
   });
 
   // Fetch top rated content
-  const { data: topRated, isLoading: topRatedLoading } = useQuery<Content[]>({
+  const { data: topRated, isLoading: topRatedLoading } = useQuery<ContentType[]>({
     queryKey: ['/api/content/top-rated'],
     retry: false,
+    staleTime: 1000 * 60 * 5, // 5 minutes
   });
 
   return (
     <>
       <Header />
-      <main className="min-h-screen bg-[#111827] bg-gradient-to-b from-black/70 to-gray-900/70 pt-6">
-        {/* Hero section with top rated content */}
-        <section className="py-8">
+      <main className="min-h-screen bg-[#111827] bg-gradient-to-b from-black/70 to-gray-900/70 pb-12" dir="rtl">
+        {/* Search bar for mobile - only visible on small screens */}
+        <div className="md:hidden px-4 py-3 sticky top-16 z-10 bg-gray-900/95 backdrop-blur-md">
+          <div className="relative">
+            <Search className="h-4 w-4 absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+            <Input 
+              type="search" 
+              placeholder="جستجو در Xraynama..." 
+              className="pl-3 pr-9 bg-gray-800 border-gray-700 focus:border-primary text-white"
+            />
+          </div>
+        </div>
+
+        {/* Hero section with featured content */}
+        <section className="py-6 lg:py-10">
           <div className="container mx-auto px-4">
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-xl md:text-2xl font-bold text-white flex items-center gap-2">
@@ -112,56 +300,10 @@ const IndexPage: React.FC = () => {
               </h2>
             </div>
             
-            {topRatedLoading ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {[...Array(3)].map((_, i) => (
-                  <div key={i} className="relative bg-black/20 rounded-lg overflow-hidden">
-                    <Skeleton className="w-full aspect-video" />
-                    <div className="p-4">
-                      <Skeleton className="h-5 w-full mb-2" />
-                      <Skeleton className="h-4 w-3/4 mb-4" />
-                      <Skeleton className="h-3 w-full" />
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {topRated?.slice(0, 3).map((content) => (
-                  <div key={content.id} className="group relative bg-black/30 rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-all">
-                    <Link href={`/content/${content.englishTitle.replace(/\s+/g, '')}`}>
-                      <div className="aspect-video bg-cover bg-center" style={{ backgroundImage: `url(${content.poster})` }}>
-                        <div className="w-full h-full bg-gradient-to-t from-black/80 via-black/40 to-transparent p-4 flex flex-col justify-end">
-                          <div className="mt-auto">
-                            <div className="flex items-center gap-2 mb-2">
-                              <Badge variant="secondary" className="bg-primary/90 text-white hover:bg-primary">
-                                {content.type === "movie" ? "فیلم" : 
-                                content.type === "series" ? "سریال" : 
-                                content.type === "animation" ? "انیمیشن" : "مستند"}
-                              </Badge>
-                              
-                              <Badge variant="outline" className="bg-yellow-600/20 text-yellow-500 border-yellow-500/30 flex items-center gap-1">
-                                <Star className="h-3 w-3 fill-current" />
-                                {content.imdbRating}
-                              </Badge>
-                              
-                              <Badge variant="outline" className="bg-black/50">
-                                {content.year}
-                              </Badge>
-                            </div>
-                            
-                            <h3 className="text-xl font-bold text-white group-hover:text-primary transition-colors">{content.title}</h3>
-                            <h4 className="text-sm text-gray-300 mb-2">{content.englishTitle}</h4>
-                            
-                            <p className="text-xs text-gray-400 line-clamp-2">{content.description}</p>
-                          </div>
-                        </div>
-                      </div>
-                    </Link>
-                  </div>
-                ))}
-              </div>
-            )}
+            <FeaturedContent 
+              contents={topRated?.slice(0, 5) || []}
+              isLoading={topRatedLoading}
+            />
           </div>
         </section>
 
@@ -169,15 +311,16 @@ const IndexPage: React.FC = () => {
         <ContentSection
           title="فیلم‌ها"
           linkTo="/movies"
-          contents={movies?.slice(0, 6) || []}
+          contents={movies || []}
           isLoading={moviesLoading}
+          icon={<Play className="h-5 w-5" />}
         />
 
         {/* Series Section */}
         <ContentSection
           title="سریال‌ها"
           linkTo="/series"
-          contents={series?.slice(0, 6) || []}
+          contents={series || []}
           isLoading={seriesLoading}
         />
 
@@ -185,7 +328,7 @@ const IndexPage: React.FC = () => {
         <ContentSection
           title="انیمیشن‌ها"
           linkTo="/animations"
-          contents={animations?.slice(0, 6) || []}
+          contents={animations || []}
           isLoading={animationsLoading}
         />
 
@@ -193,10 +336,19 @@ const IndexPage: React.FC = () => {
         <ContentSection
           title="مستندها"
           linkTo="/documentaries"
-          contents={documentaries?.slice(0, 6) || []}
+          contents={documentaries || []}
           isLoading={documentariesLoading}
         />
+
+        {/* All Content Section */}
+        <ContentSection
+          title="تمام محتواها"
+          linkTo="/all-content"
+          contents={allContent || []}
+          isLoading={allContentLoading}
+        />
       </main>
+      <Footer />
     </>
   );
 };

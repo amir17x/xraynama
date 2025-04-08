@@ -102,21 +102,21 @@ export function Header() {
                     </Button>
                   </DropdownMenuTrigger>
                   
-                  <DropdownMenuContent align="end" className="w-48">
+                  <DropdownMenuContent align="start" side="bottom" className="w-48" style={{ right: 0, left: 'auto' }}>
                     <DropdownMenuItem onClick={() => setLocation('/profile')}>
-                      <User className="mr-2 h-4 w-4" />
+                      <User className="ml-2 h-4 w-4" />
                       <span>پروفایل</span>
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={() => setLocation('/profile?tab=favorites')}>
-                      <Heart className="mr-2 h-4 w-4" />
+                      <Heart className="ml-2 h-4 w-4" />
                       <span>علاقه‌مندی‌ها</span>
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={() => setLocation('/profile?tab=playlists')}>
-                      <ListVideo className="mr-2 h-4 w-4" />
+                      <ListVideo className="ml-2 h-4 w-4" />
                       <span>پلی‌لیست‌ها</span>
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={() => setLocation('/profile?tab=settings')}>
-                      <Settings className="mr-2 h-4 w-4" />
+                      <Settings className="ml-2 h-4 w-4" />
                       <span>تنظیمات</span>
                     </DropdownMenuItem>
                     
@@ -125,7 +125,7 @@ export function Header() {
                       <>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem onClick={() => setLocation('/admin/dashboard')} className="text-primary font-semibold">
-                          <ShieldAlert className="mr-2 h-4 w-4" />
+                          <ShieldAlert className="ml-2 h-4 w-4" />
                           <span>مدیر سیستم</span>
                         </DropdownMenuItem>
                       </>
@@ -133,9 +133,9 @@ export function Header() {
                     
                     <DropdownMenuSeparator />
                     <DropdownMenuItem onClick={handleLogout} disabled={logoutMutation.isPending}>
-                      <LogOut className="mr-2 h-4 w-4" />
+                      <LogOut className="ml-2 h-4 w-4" />
                       <span>خروج</span>
-                      {logoutMutation.isPending && <Loader2 className="ml-2 h-4 w-4 animate-spin" />}
+                      {logoutMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
