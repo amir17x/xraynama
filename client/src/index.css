@@ -20,8 +20,8 @@
 
 .blue-sphere {
   position: absolute;
-  width: 600px;
-  height: 600px;
+  width: 650px;
+  height: 650px;
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
@@ -32,26 +32,53 @@
     0 0 200px 50px rgba(0, 119, 255, 0.3),
     0 0 300px 100px rgba(0, 68, 170, 0.2);
   opacity: 0.85;
-  animation: rotate 80s linear infinite, pulse 10s ease-in-out infinite;
+  animation: rotate 80s linear infinite, pulse 10s ease-in-out infinite, breathing 15s ease-in-out infinite;
   display: flex;
   align-items: center;
   justify-content: center;
+  backdrop-filter: blur(2px);
+  will-change: transform;
 }
 
 /* استایل برای لوگوی X */
 .x-logo,
 .blue-sphere-logo-img {
-  width: 180px;
-  height: 180px;
+  width: 240px; /* افزایش اندازه حدود 30% */
+  height: 240px;
   position: relative;
   z-index: 2;
-  animation: float 6s ease-in-out infinite;
-  filter: drop-shadow(0 0 20px rgba(0, 119, 255, 0.8));
+  animation: float 6s ease-in-out infinite, spin-slow 30s linear infinite;
+  filter: drop-shadow(0 0 30px rgba(0, 119, 255, 0.9));
+  transform: rotate3d(1, 1, 0, 15deg); /* اضافه کردن تاثیر سه‌بعدی */
+  transition: all 0.3s ease-in-out;
+  will-change: transform;
+}
+
+.blue-sphere-logo-img:hover {
+  filter: drop-shadow(0 0 40px rgba(0, 153, 255, 1));
+  transform: rotate3d(1, 1, 0, 15deg) scale(1.1);
 }
 
 .blue-sphere-logo {
   position: relative;
   z-index: 2;
+  animation: pulseGlowLogo 6s ease-in-out infinite;
+  border-radius: 50%;
+}
+
+@keyframes spin-slow {
+  to { 
+    transform: rotate(360deg); 
+  }
+}
+
+@keyframes pulseGlowLogo {
+  0%, 100% { 
+    box-shadow: 0 0 0px rgba(0, 123, 255, 0.5); 
+  }
+  50% { 
+    box-shadow: 0 0 40px rgba(0, 123, 255, 0.6); 
+  }
 }
 
 @keyframes float {
@@ -158,6 +185,15 @@
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+@keyframes breathing {
+  0%, 100% { 
+    transform: scale(1) translate(-50%, -50%); 
+  }
+  50% { 
+    transform: scale(1.05) translate(-47.5%, -47.5%); 
   }
 }
 

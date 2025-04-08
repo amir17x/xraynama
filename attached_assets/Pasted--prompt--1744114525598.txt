@@ -1,0 +1,66 @@
+عالیه! طراحی تو جذاب و تمیزه، و لوگوی چرخان وسط صفحه جلوه خاصی داره. در ادامه یه **prompt دقیق، حرفه‌ای و پرجزئیات انگلیسی** بهت می‌دم برای بزرگ‌تر کردن لوگو و ایده‌هایی برای مدرن‌تر و جذاب‌تر کردن این بک‌گراند انیمیشنی که داری.
+
+---
+
+### ✅ **Prompt (Technical & Detailed in English)**
+
+```
+Enhance the central animated background of the homepage with the following improvements:
+
+1. **Enlarge the Spinning Logo**:
+   - Increase the size of the central logo by around 25–35% for greater emphasis.
+   - Keep it centered both vertically and horizontally using `absolute` positioning or Flexbox (`items-center justify-center`).
+   - Use `w-[Xrem] h-[Xrem]` or `scale-[1.3]` to control the size. Ensure responsiveness on smaller screens using `max-w-[XXpx]` and `aspect-square`.
+
+2. **Logo Animation (Rotation)**:
+   - Maintain the existing smooth infinite rotation effect.
+   - Use `animate-spin-slow` with a custom duration (e.g., `@keyframes spin { to { transform: rotate(360deg); } }`) set to `30s linear infinite` for a calm, elegant motion.
+   - Optionally add a **slight 3D tilt** (`transform: rotate3d(1, 1, 0, 15deg)`) or **hover scaling** (`hover:scale-105`) to give more depth and interactivity.
+
+3. **Glow & Gradient Enhancement**:
+   - Add a layered radial gradient behind the logo for depth:
+     - Example: `radial-gradient(circle, #0070f3 0%, #001f3f 80%)`
+   - Add a soft **pulsing glow** using Tailwind's animation system or a custom class:
+     ```css
+     @keyframes pulseGlow {
+       0%, 100% { box-shadow: 0 0 0px rgba(0, 123, 255, 0.5); }
+       50% { box-shadow: 0 0 40px rgba(0, 123, 255, 0.6); }
+     }
+     ```
+     Apply via Tailwind: `animate-[pulseGlow_6s_ease-in-out_infinite]`
+
+4. **Optional Enhancements for a Modern Look**:
+   - **Add particles or subtle animated shapes** behind the logo using canvas or libraries like `tsParticles` for a tech-futuristic style.
+   - Introduce **dark blur glassmorphism ring** around the logo:
+     - Use `backdrop-blur`, `bg-opacity-10`, and `border-[rgba(255,255,255,0.1)]` inside a circle.
+   - Animate the background circle’s scale slightly over time for a breathing effect:
+     ```css
+     @keyframes breathing {
+       0%, 100% { transform: scale(1); }
+       50% { transform: scale(1.05); }
+     }
+     ```
+     Add via Tailwind or inline styles.
+
+5. **Performance Considerations**:
+   - Ensure GPU acceleration is used (`transform: translateZ(0)` or `will-change: transform`).
+   - Keep animation frame rate below 60fps with minimal DOM changes for optimal performance.
+
+6. **Accessibility & Compatibility**:
+   - Set `aria-hidden="true"` on the animated logo to avoid screen readers catching irrelevant animation.
+   - Ensure contrast remains WCAG AA compliant by adjusting brightness of the gradient if needed.
+
+Make the animation visually clean and minimal, but elegant—fit for a modern cinema or entertainment web app. The whole design should feel immersive and premium without being overwhelming.
+```
+
+---
+
+### 💡 Optional Creative Add-ons:
+
+- **Add audio-reactive particles** (if background music or trailers are playing).
+- **Interactive parallax tilt** using mouse position to rotate the logo slightly (e.g., with `react-parallax-tilt` or vanilla JS).
+- **Seasonal visual variants** — snowflakes, neon glows, flame flickers, etc.
+
+---
+
+اگه خواستی می‌تونم کد کامل این بخش رو با Tailwind و React برات پیاده کنم. بگو لوگوت SVG هست یا تصویر PNG و اینکه توی پروژه React از چی استفاده می‌کنی (Framer Motion؟ Shadcn UI؟) تا دقیق برات در بیارم.

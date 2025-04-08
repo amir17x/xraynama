@@ -2,7 +2,10 @@ import { useState, useEffect, useRef } from 'react';
 import { Link, useLocation } from 'wouter';
 import { SearchBar, AdvancedSearchButton, NotificationsButton } from '@/components/common/SearchBar';
 import { useAuth } from '@/hooks/use-auth';
-import { Loader2, Menu, ChevronDown, User, Heart, ListVideo, Settings, LogOut, ShieldAlert } from 'lucide-react';
+import { 
+  Loader2, Menu, ChevronDown, User, Heart, ListVideo, Settings, LogOut, ShieldAlert,
+  Home, Film, Video, Theater, Smartphone, Users, FileVideo
+} from 'lucide-react';
 import { PortalOverride } from '@/components/common/PortalOverride';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -57,13 +60,48 @@ export function Header() {
   };
 
   const navItems = [
-    { label: 'صفحه اصلی', href: '/' },
-    { label: 'صفحه دسته‌بندی شده', href: '/index' },
-    { label: 'فیلم‌ها', href: '/movies' },
-    { label: 'سریال‌ها', href: '/series' },
-    { label: 'انیمیشن‌ها', href: '/animations' },
-    { label: 'مستندها', href: '/documentaries' },
-    { label: 'همه محتواها', href: '/all-content' },
+    { 
+      label: 'خانه', 
+      englishLabel: 'HOME',
+      href: '/', 
+      icon: <Home className="h-5 w-5 mb-1" />
+    },
+    { 
+      label: 'فیلم‌ها', 
+      englishLabel: 'MOVIES',
+      href: '/movies', 
+      icon: <Film className="h-5 w-5 mb-1" />
+    },
+    { 
+      label: 'سریال‌ها', 
+      englishLabel: 'SERIES',
+      href: '/series', 
+      icon: <Video className="h-5 w-5 mb-1" />
+    },
+    { 
+      label: 'انیمیشن‌ها', 
+      englishLabel: 'ANIMATIONS',
+      href: '/animations', 
+      icon: <FileVideo className="h-5 w-5 mb-1" />
+    },
+    { 
+      label: 'مستندها', 
+      englishLabel: 'DOCUMENTARIES',
+      href: '/documentaries', 
+      icon: <Theater className="h-5 w-5 mb-1" />
+    },
+    { 
+      label: 'هنرمندان', 
+      englishLabel: 'ARTISTS',
+      href: '/artists', 
+      icon: <Users className="h-5 w-5 mb-1" />
+    },
+    { 
+      label: 'اپلیکیشن', 
+      englishLabel: 'APP',
+      href: '/app', 
+      icon: <Smartphone className="h-5 w-5 mb-1 text-green-400" />
+    },
   ];
 
   return (
@@ -87,14 +125,20 @@ export function Header() {
             </Link>
           </div>
           
-          <nav className="hidden md:flex space-x-1 mr-6">
+          <nav className="hidden md:flex items-center space-x-2 rtl:space-x-reverse mr-6">
             {navItems.map((item) => (
               <Link 
                 key={item.href} 
                 href={item.href}
-                className="unified-button mx-1"
+                className="flex flex-col items-center px-4 py-2 rounded-md hover:bg-black/40 transition-all duration-300 group"
               >
-                {item.label}
+                <div className="group-hover:text-orange-400 transition-colors duration-300">
+                  {item.icon}
+                </div>
+                <span className="text-sm font-medium mb-0.5">{item.label}</span>
+                <span className="text-xs text-slate-400 group-hover:text-orange-400 transition-colors duration-300">
+                  {item.englishLabel}
+                </span>
               </Link>
             ))}
           </nav>

@@ -65,6 +65,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
+import { Breadcrumb } from "@/components/ui/breadcrumb";
 
 interface ContentDetailsPageProps {}
 
@@ -473,8 +474,18 @@ const ContentDetailsPage: React.FC<ContentDetailsPageProps> = () => {
     Array.isArray(content.genres) ? content.genres : []
   ) : [];
   
+  // Prepare breadcrumb items based on content type
+  const breadcrumbItems = [
+    { label: "خانه", href: "/" },
+    { label: contentType, href: `/browse/${content.type}` },
+    { label: content.title }
+  ];
+
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div>
+      <Breadcrumb items={breadcrumbItems} />
+      
+      <div className="container mx-auto px-4 py-8">
       {/* Backdrop image with gradient overlay */}
       {content.backdrop && (
         <div 

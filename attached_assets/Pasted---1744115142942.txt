@@ -1,0 +1,105 @@
+### تحلیل ساختار و نیاز
+
+تصویر یه بخش از سایتت رو نشون می‌ده که مربوط به سریال‌هاست. این بخش تو سمت راست صفحه قرار داره و شامل یه لیست عمودی از سریال‌ها با عنوان "سریال‌های تازه" و یه آیکون 📺 کنارش هست. هر سریال یه تصویر بندانگشتی (thumbnail) داره، یه عنوان (مثل "The Handmaid's Tale"، "Mobland"، "1923")، یه لوگوی شبکه (مثل Hulu)، و یه توضیح کوتاه (مثلاً "قسمت 1، فصل 5"). همچنین یه آیکون نارنجی کنار هر سریال هست که احتمالاً نشون‌دهنده قسمت جدیده.
+
+هدفت اینه که یه ساختار مشابه برای سمت چپ سایتت بسازی، با این ویژگی که سریال‌هایی که قسمت جدیدشون منتشر می‌شه، به‌صورت خودکار به بالای لیست برن (یعنی بر اساس تاریخ انتشار قسمت جدید مرتب بشن).
+
+---
+
+### توضیحات ساختار پیشنهادی
+
+برای ساخت این بخش تو سمت چپ سایتت، باید یه لیست عمودی از سریال‌ها بسازی که:
+1. **عنوان بخش:** یه عنوان مثل "سریال‌های تازه" با یه آیکون 📺.
+2. **لیست سریال‌ها:** هر سریال شامل:
+   - یه تصویر بندانگشتی (thumbnail).
+   - عنوان سریال (مثلاً "The Handmaid's Tale").
+   - لوگوی شبکه (مثلاً Hulu).
+   - توضیح کوتاه (مثلاً "قسمت 1، فصل 5").
+   - یه آیکون برای نشون دادن قسمت جدید (مثلاً یه دایره نارنجی).
+3. **مرتب‌سازی:** سریال‌ها باید بر اساس تاریخ انتشار قسمت جدید مرتب بشن (جدیدترین قسمت‌ها بالا).
+4. **ریسپانسیو:** باید تو موبایل و دسکتاپ درست نمایش داده بشه.
+5. **زبان فارسی:** چون سایتت فارسیه، باید از RTL (راست‌به‌چپ) پشتیبانی کنه.
+
+---
+
+### پرامپت انگلیسی برای ساخت این ساختار
+
+**Prompt:**
+
+I am building a movie and series website in Persian (Farsi), and I want to create a section for TV series on the left side of my page, similar to the structure shown in the attached image. The image shows a vertical list of series under a section titled "سریال‌های تازه" (meaning "Fresh Series" in Persian) with a TV icon (📺) next to it. Each series in the list has the following elements:
+- A thumbnail image of the series.
+- The series title (e.g., "The Handmaid's Tale", "Mobland", "1923").
+- A network logo (e.g., Hulu).
+- A short description (e.g., "قسمت 1، فصل 5" meaning "Episode 1, Season 5").
+- An orange dot icon indicating a new episode.
+
+I want to replicate this structure on the left side of my website with the following requirements:
+
+### Requirements:
+1. **Section Title:** The section should have a title "سریال‌های تازه" with a TV icon (📺) next to it, styled similarly to the image (white text, dark background, RTL direction).
+2. **Series List:** Create a vertical list of series, where each series includes:
+   - A thumbnail image (e.g., 300px wide, 150px tall).
+   - The series title in Persian (e.g., "داستان خدمتکار").
+   - A network logo (e.g., Hulu, Netflix) displayed as a small image.
+   - A short description in Persian (e.g., "قسمت 1، فصل 5").
+   - An orange dot icon to indicate a new episode.
+3. **Sorting by New Episodes:** The list should automatically sort series based on the release date of their latest episode (newest episodes at the top). Assume the data includes a `latestEpisodeDate` field (e.g., in ISO format like "2025-04-01T00:00:00Z").
+4. **Responsive Design:** The section must be responsive and look good on both mobile and desktop devices. On mobile, it should stack below other sections if needed.
+5. **RTL Support:** The design must support Persian (Farsi) text with right-to-left (RTL) direction.
+6. **Data Source:** Assume the series data is fetched from an API endpoint `/api/series` that returns a JSON array like this:
+   ```json
+   [
+       { "id": "1", "title": "داستان خدمتکار", "thumbnail": "url-to-thumbnail.jpg", "network": "hulu", "networkLogo": "url-to-hulu-logo.png", "description": "قسمت 1، فصل 5", "latestEpisodeDate": "2025-04-01T00:00:00Z", "hasNewEpisode": true, "url": "/series/handmaids-tale" },
+       { "id": "2", "title": "موبلند", "thumbnail": "url-to-thumbnail.jpg", "network": "netflix", "networkLogo": "url-to-netflix-logo.png", "description": "قسمت 3، فصل 2", "latestEpisodeDate": "2025-03-15T00:00:00Z", "hasNewEpisode": false, "url": "/series/mobland" }
+   ]
+7. **Styling:** The section should match the dark theme of the website (dark background, white text, rounded corners). The thumbnail should have a hover effect (e.g., slight zoom or border highlight).
+8. **Interactivity:** Each series item should be clickable, linking to the series page (e.g., `/series/handmaids-tale`).
+
+### Current HTML Structure:
+Here’s the current HTML structure of my page (simplified):
+
+```html
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+    <title>سایت فیلم و سریال</title>
+</head>
+<body>
+    <header>
+        <!-- Header content (search bar, navigation) -->
+    </header>
+    <main>
+        <div class="right-column">
+            <!-- Existing right column with series (as shown in the image) -->
+        </div>
+        <!-- I want the new series section on the left side -->
+    </main>
+</body>
+</html>
+```
+
+### Tasks:
+1. Create a new section on the left side of the page for the series list, with the title "سریال‌های تازه" and a TV icon.
+2. Fetch series data from the `/api/series` endpoint and sort the list by `latestEpisodeDate` (newest first).
+3. Display each series with a thumbnail, title, network logo, description, and an orange dot for new episodes.
+4. Style the section to match the dark theme of the website, with RTL support and responsive design.
+5. Add hover effects to the thumbnails and make each series item clickable to its respective page.
+6. Provide the complete updated HTML, CSS, and JavaScript code, along with explanations of the changes.
+
+### Additional Context:
+- The website is in Persian (Farsi), so all text (e.g., titles, descriptions) should be in Persian, and the design must support RTL.
+- The right column already exists (as shown in the image); I just need a similar section on the left side.
+- The API endpoint `/api/series` is already set up and returns the data in the format shown above.
+
+Please provide a detailed solution with the updated code and explanations.
+
+---
+
+### توضیحات پرامپت:
+- **هدف:** مشخص کردم که می‌خوای یه بخش مشابه برای سریال‌ها تو سمت چپ سایتت بسازی.
+- **ویژگی‌ها:** همه جزئیات لازم (عنوان، لیست سریال‌ها، مرتب‌سازی بر اساس قسمت جدید، ریسپانسیو بودن) رو توضیح دادم.
+- **داده‌ها:** یه نمونه JSON برای داده‌های API دادم تا هوش مصنوعی بتونه باهاش کار کنه.
+- **طراحی:** گفتم که باید با تم تیره سایتت هماهنگ باشه و از RTL پشتیبانی کنه.
+- **وظایف:** دقیق گفتم که چه کارهایی باید انجام بشه: ساخت بخش، گرفتن داده، مرتب‌سازی، استایل‌دهی، و اضافه کردن تعامل.
+
+این پرامپت باید به هوش مصنوعی کمک کنه که یه بخش کامل و حرفه‌ای برای سریال‌ها تو سمت چپ سایتت طراحی کنه. اگه بازم سوالی داری، بگو! 😊

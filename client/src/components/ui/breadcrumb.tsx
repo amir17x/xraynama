@@ -1,115 +1,58 @@
-import * as React from "react"
-import { Slot } from "@radix-ui/react-slot"
-import { ChevronRight, MoreHorizontal } from "lucide-react"
+import React from 'react';
+import { Link } from 'wouter';
+import { ChevronLeft } from 'lucide-react';
 
-import { cn } from "@/lib/utils"
-
-const Breadcrumb = React.forwardRef<
-  HTMLElement,
-  React.ComponentPropsWithoutRef<"nav"> & {
-    separator?: React.ReactNode
-  }
->(({ ...props }, ref) => <nav ref={ref} aria-label="breadcrumb" {...props} />)
-Breadcrumb.displayName = "Breadcrumb"
-
-const BreadcrumbList = React.forwardRef<
-  HTMLOListElement,
-  React.ComponentPropsWithoutRef<"ol">
->(({ className, ...props }, ref) => (
-  <ol
-    ref={ref}
-    className={cn(
-      "flex flex-wrap items-center gap-1.5 break-words text-sm text-muted-foreground sm:gap-2.5",
-      className
-    )}
-    {...props}
-  />
-))
-BreadcrumbList.displayName = "BreadcrumbList"
-
-const BreadcrumbItem = React.forwardRef<
-  HTMLLIElement,
-  React.ComponentPropsWithoutRef<"li">
->(({ className, ...props }, ref) => (
-  <li
-    ref={ref}
-    className={cn("inline-flex items-center gap-1.5", className)}
-    {...props}
-  />
-))
-BreadcrumbItem.displayName = "BreadcrumbItem"
-
-const BreadcrumbLink = React.forwardRef<
-  HTMLAnchorElement,
-  React.ComponentPropsWithoutRef<"a"> & {
-    asChild?: boolean
-  }
->(({ asChild, className, ...props }, ref) => {
-  const Comp = asChild ? Slot : "a"
-
-  return (
-    <Comp
-      ref={ref}
-      className={cn("transition-colors hover:text-foreground", className)}
-      {...props}
-    />
-  )
-})
-BreadcrumbLink.displayName = "BreadcrumbLink"
-
-const BreadcrumbPage = React.forwardRef<
-  HTMLSpanElement,
-  React.ComponentPropsWithoutRef<"span">
->(({ className, ...props }, ref) => (
-  <span
-    ref={ref}
-    role="link"
-    aria-disabled="true"
-    aria-current="page"
-    className={cn("font-normal text-foreground", className)}
-    {...props}
-  />
-))
-BreadcrumbPage.displayName = "BreadcrumbPage"
-
-const BreadcrumbSeparator = ({
-  children,
-  className,
-  ...props
-}: React.ComponentProps<"li">) => (
-  <li
-    role="presentation"
-    aria-hidden="true"
-    className={cn("[&>svg]:w-3.5 [&>svg]:h-3.5", className)}
-    {...props}
-  >
-    {children ?? <ChevronRight />}
-  </li>
-)
-BreadcrumbSeparator.displayName = "BreadcrumbSeparator"
-
-const BreadcrumbEllipsis = ({
-  className,
-  ...props
-}: React.ComponentProps<"span">) => (
-  <span
-    role="presentation"
-    aria-hidden="true"
-    className={cn("flex h-9 w-9 items-center justify-center", className)}
-    {...props}
-  >
-    <MoreHorizontal className="h-4 w-4" />
-    <span className="sr-only">More</span>
-  </span>
-)
-BreadcrumbEllipsis.displayName = "BreadcrumbElipssis"
-
-export {
-  Breadcrumb,
-  BreadcrumbList,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-  BreadcrumbEllipsis,
+interface BreadcrumbItem {
+  label: string;
+  href?: string;
 }
+
+interface BreadcrumbProps {
+  items: BreadcrumbItem[];
+  className?: string;
+}
+
+/**
+ * کامپوننت مسیریابی breadcrumb برای نمایش مسیر فعلی کاربر
+ * با پشتیبانی از RTL برای زبان فارسی
+ */
+export function Breadcrumb({ items, className = '' }: BreadcrumbProps) {
+  if (!items || items.length === 0) return null;
+  
+  return (
+    <nav 
+      className={`bg-gradient-to-r from-black/90 to-black/70 text-white px-4 py-2.5 text-sm border-b border-white/10 backdrop-blur-sm ${className}`}
+      aria-label="مسیریابی"
+    >
+      <ol className="flex items-center gap-1 rtl:flex-row-reverse animate-fade-in">
+        {items.map((item, index) => (
+          <li key={index} className="flex items-center gap-1 transition-opacity duration-300" style={{ animationDelay: `${index * 100}ms` }}>
+            {index > 0 && (
+              <span className="text-gray-400 text-xs flex items-center mx-1">
+                <ChevronLeft size={14} className="rtl:rotate-180" />
+              </span>
+            )}
+            
+            {item.href && index !== items.length - 1 ? (
+              <Link 
+                href={item.href}
+                className="text-white/80 hover:text-white transition-colors duration-200 hover:underline underline-offset-4 decoration-orange-400/50"
+              >
+                {item.label}
+              </Link>
+            ) : (
+              <span className={index === items.length - 1 
+                ? "text-orange-400 font-medium" 
+                : "text-white/80"
+              }>
+                {item.label}
+              </span>
+            )}
+          </li>
+        ))}
+      </ol>
+    </nav>
+  );
+}
+
+export default Breadcrumb;

@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Breadcrumb } from '@/components/ui/breadcrumb';
 import { ContentType } from '@/types';
 
 interface ContentListPageProps {
@@ -83,9 +84,23 @@ const ContentListPage: React.FC<ContentListPageProps> = ({ title, contentType, s
     setCurrentPage(1);
   }, [searchTerm, sortBy]);
   
+  // Prepare breadcrumb items based on content type
+  const contentTypeName = {
+    'movie': 'فیلم‌ها',
+    'series': 'سریال‌ها',
+    'animation': 'انیمیشن‌ها',
+    'documentary': 'مستندها'
+  }[contentType || 'movie'];
+  
+  const breadcrumbItems = [
+    { label: "خانه", href: "/" },
+    { label: contentTypeName || title }
+  ];
+
   return (
     <AppLayout>
-      <main className="min-h-screen bg-[#111827] bg-gradient-to-b from-black/70 to-gray-900/70 pt-6">
+      <Breadcrumb items={breadcrumbItems} />
+      <main className="min-h-screen bg-[#111827] bg-gradient-to-b from-black/70 to-gray-900/70">
         <div className="container mx-auto px-4 py-8">
           <h1 className="text-2xl md:text-3xl font-bold text-white mb-8">{title}</h1>
           

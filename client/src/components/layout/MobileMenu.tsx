@@ -4,10 +4,17 @@ import { Dialog, Transition } from '@headlessui/react';
 import { X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
+interface NavItem {
+  label: string;
+  englishLabel: string;
+  href: string;
+  icon: React.ReactNode;
+}
+
 interface MobileMenuProps {
   isOpen: boolean;
   onClose: () => void;
-  navItems: { label: string; href: string }[];
+  navItems: NavItem[];
 }
 
 export function MobileMenu({ isOpen, onClose, navItems }: MobileMenuProps) {
@@ -51,10 +58,18 @@ export function MobileMenu({ isOpen, onClose, navItems }: MobileMenuProps) {
                   <Link
                     key={item.href}
                     href={item.href}
-                    className="block px-3 py-2 rounded-md text-lg font-medium hover:bg-[#006bd6]/10 hover:text-[#006bd6] transition-all duration-300"
+                    className="flex items-center px-3 py-3 rounded-md hover:bg-black/40 transition-all duration-300 group"
                     onClick={onClose}
                   >
-                    {item.label}
+                    <div className="ml-3 group-hover:text-orange-400 transition-colors duration-300">
+                      {item.icon}
+                    </div>
+                    <div className="flex flex-col">
+                      <span className="text-base font-medium">{item.label}</span>
+                      <span className="text-xs text-slate-400 group-hover:text-orange-400 transition-colors duration-300">
+                        {item.englishLabel}
+                      </span>
+                    </div>
                   </Link>
                 ))}
               </nav>
