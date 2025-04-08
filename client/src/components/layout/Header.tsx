@@ -149,49 +149,54 @@ export function Header() {
                 
                 {isMenuOpen && (
                   <div style={{ right: '0', left: 'auto' }} className="profile-dropdown w-48 bg-popover border rounded-md shadow-md p-1 text-popover-foreground animate-fade-in z-50 absolute top-full mt-2">
-                    <button 
+                    <Link 
+                      href="/profile"
                       className="unified-button w-full flex items-center p-2 rounded text-sm"
-                      onClick={() => { setLocation('/profile'); setIsMenuOpen(false); }}
+                      onClick={() => setIsMenuOpen(false)}
                     >
                       <User className="ml-2 h-4 w-4" />
                       <span>پروفایل</span>
-                    </button>
+                    </Link>
                     
-                    <button 
+                    <Link 
+                      href="/profile?tab=favorites"
                       className="unified-button w-full flex items-center p-2 rounded text-sm"
-                      onClick={() => { setLocation('/profile?tab=favorites'); setIsMenuOpen(false); }}
+                      onClick={() => setIsMenuOpen(false)}
                     >
                       <Heart className="ml-2 h-4 w-4" />
                       <span>علاقه‌مندی‌ها</span>
-                    </button>
+                    </Link>
                     
-                    <button 
+                    <Link 
+                      href="/profile?tab=playlists"
                       className="unified-button w-full flex items-center p-2 rounded text-sm"
-                      onClick={() => { setLocation('/profile?tab=playlists'); setIsMenuOpen(false); }}
+                      onClick={() => setIsMenuOpen(false)}
                     >
                       <ListVideo className="ml-2 h-4 w-4" />
                       <span>پلی‌لیست‌ها</span>
-                    </button>
+                    </Link>
                     
-                    <button 
+                    <Link 
+                      href="/profile?tab=settings"
                       className="unified-button w-full flex items-center p-2 rounded text-sm"
-                      onClick={() => { setLocation('/profile?tab=settings'); setIsMenuOpen(false); }}
+                      onClick={() => setIsMenuOpen(false)}
                     >
                       <Settings className="ml-2 h-4 w-4" />
                       <span>تنظیمات</span>
-                    </button>
+                    </Link>
                     
                     {/* نمایش گزینه مدیر سیستم فقط برای کاربران ادمین */}
                     {user?.role === 'admin' && (
                       <>
                         <div className="h-px bg-muted my-1 -mx-1"></div>
-                        <button 
+                        <Link 
+                          href="/admin/dashboard"
                           className="w-full flex items-center p-2 rounded bg-[#006bd6]/10 text-[#006bd6] hover:bg-[#006bd6]/20 text-sm font-semibold transition-all duration-300"
-                          onClick={() => { setLocation('/admin/dashboard'); setIsMenuOpen(false); }}
+                          onClick={() => setIsMenuOpen(false)}
                         >
                           <ShieldAlert className="ml-2 h-4 w-4" />
                           <span>مدیر سیستم</span>
-                        </button>
+                        </Link>
                       </>
                     )}
                     
