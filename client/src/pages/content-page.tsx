@@ -291,10 +291,10 @@ export default function ContentPage() {
     return (
       <>
         <Header />
-        <div className="container mx-auto px-4 py-10">
-          <div className="p-8 text-center">
-            <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary mx-auto mb-4"></div>
-            <p className="text-white">در حال بارگذاری محتوا...</p>
+        <div className="page-container">
+          <div className="loading-container">
+            <div className="loading-spinner"></div>
+            <p className="loading-text">در حال بارگذاری محتوا...</p>
           </div>
         </div>
       </>
@@ -305,9 +305,10 @@ export default function ContentPage() {
     return (
       <>
         <Header />
-        <div className="container mx-auto px-4 py-10">
-          <div className="bg-red-500/20 border border-red-300 p-8 rounded-lg text-center">
-            <p className="text-white">خطا در بارگذاری محتوا. لطفاً مجدداً تلاش کنید.</p>
+        <div className="page-container">
+          <div className="error-container">
+            <AlertTriangle className="error-icon" />
+            <p className="error-text">خطا در بارگذاری محتوا. لطفاً مجدداً تلاش کنید.</p>
           </div>
         </div>
       </>
@@ -322,9 +323,10 @@ export default function ContentPage() {
     return (
       <>
         <Header />
-        <div className="container mx-auto px-4 py-10">
-          <div className="bg-red-500/20 border border-red-300 p-8 rounded-lg text-center">
-            <p className="text-white">خطا در بارگذاری محتوا. لطفاً مجدداً تلاش کنید.</p>
+        <div className="page-container">
+          <div className="error-container">
+            <AlertTriangle className="error-icon" />
+            <p className="error-text">خطا در بارگذاری محتوا. لطفاً مجدداً تلاش کنید.</p>
           </div>
         </div>
       </>
@@ -345,7 +347,7 @@ export default function ContentPage() {
             backgroundSize: "cover"
           }}
         >
-          <div className="container mx-auto px-4 pt-6 pb-10">
+          <div className="page-container pt-6 pb-10">
             {viewMode === "trailer" ? (
               // Video Player Section
               <div className="mt-6 mb-6">
@@ -478,8 +480,8 @@ export default function ContentPage() {
                     </Badge>
                   </div>
                   
-                  <h1 className="text-3xl md:text-4xl font-bold text-white mb-1">{displayContent && displayContent.title}</h1>
-                  <h2 className="text-lg text-gray-300 mb-6">{displayContent && displayContent.englishTitle}</h2>
+                  <h1 className="heading-1">{displayContent && displayContent.title}</h1>
+                  <h2 className="subtitle">{displayContent && displayContent.englishTitle}</h2>
                   
                   <div className="prose prose-invert max-w-none mb-8">
                     <p className="text-gray-300 leading-relaxed text-base">
@@ -658,8 +660,8 @@ export default function ContentPage() {
         </div>
         
         {/* Recommended Content Section */}
-        <div className="container mx-auto px-4 py-10 content-info-animate delay-300">
-          <h2 className="text-xl font-bold text-white mb-6 flex items-center">
+        <div className="page-container content-info-animate delay-300">
+          <h2 className="heading-2 flex items-center">
             <Users className="h-5 w-5 mr-2 text-primary" />
             فیلم‌های مشابه که ممکن است دوست داشته باشید
           </h2>

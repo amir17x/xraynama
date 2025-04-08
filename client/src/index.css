@@ -181,6 +181,43 @@
     @apply transition-all duration-300 transform hover:scale-110 hover:bg-primary/10 hover:text-primary hover:border-primary;
   }
   
+  /* کلاس‌های استایل مشترک برای تایپوگرافی */
+  .heading-1 {
+    @apply text-3xl font-bold text-foreground mb-4;
+  }
+  
+  .heading-2 {
+    @apply text-2xl font-bold text-foreground mb-3;
+  }
+  
+  .heading-3 {
+    @apply text-xl font-bold text-foreground mb-2;
+  }
+  
+  .heading-4 {
+    @apply text-lg font-semibold text-foreground mb-2;
+  }
+  
+  .subtitle {
+    @apply text-muted-foreground text-lg mb-4;
+  }
+  
+  .body-text {
+    @apply text-foreground text-base leading-relaxed;
+  }
+  
+  .body-text-sm {
+    @apply text-foreground text-sm leading-relaxed;
+  }
+  
+  .caption {
+    @apply text-muted-foreground text-sm;
+  }
+  
+  .meta-text {
+    @apply text-muted-foreground text-xs;
+  }
+  
   /* استایل یکپارچه برای همه دکمه‌ها و المان‌های هدر */
   .unified-button {
     @apply px-4 py-2 rounded-md bg-background/80 hover:bg-[#006bd6]/20 hover:text-[#006bd6] font-medium border border-border hover:border-[#006bd6]/30 transition-all duration-300;
@@ -261,6 +298,31 @@
   
   .glassmorphic-icon:hover::before {
     @apply opacity-100;
+  }
+  
+  /* استایل مشترک برای container صفحات */
+  .page-container {
+    @apply container mx-auto px-4 py-6 md:py-8;
+  }
+  
+  .section-container {
+    @apply my-6 md:my-8;
+  }
+  
+  .card-container {
+    @apply bg-card rounded-lg border border-border p-4 shadow-md;
+  }
+  
+  .card-container-glass {
+    @apply bg-card/70 backdrop-blur-md rounded-lg border border-white/5 p-4 shadow-md;
+  }
+  
+  .flex-center {
+    @apply flex items-center justify-center;
+  }
+  
+  .flex-between {
+    @apply flex items-center justify-between;
   }
   
   .animate-fade-in {
@@ -450,4 +512,88 @@ html[dir='rtl'] [data-radix-popper-content-wrapper] {
   top: 64px !important;
   position: fixed !important;
   width: auto !important;
+}
+
+/* کامپوننت‌های وضعیت برای نمایش لودینگ و خطا */
+.loading-container {
+  @apply p-8 text-center flex flex-col items-center justify-center min-h-[200px];
+}
+
+.loading-spinner {
+  @apply animate-spin rounded-full h-10 w-10 border-b-2 border-primary mx-auto mb-4;
+}
+
+.loading-text {
+  @apply text-white text-base;
+}
+
+.error-container {
+  @apply bg-red-500/20 border border-red-300 p-8 rounded-lg text-center min-h-[200px] flex flex-col items-center justify-center;
+}
+
+.error-icon {
+  @apply text-red-400 mb-4 h-10 w-10;
+}
+
+.error-text {
+  @apply text-white text-base mb-4;
+}
+
+.empty-container {
+  @apply bg-blue-500/10 border border-blue-300/20 p-8 rounded-lg text-center min-h-[200px] flex flex-col items-center justify-center;
+}
+
+.empty-icon {
+  @apply text-blue-400 mb-4 h-10 w-10;
+}
+
+.empty-text {
+  @apply text-white text-base mb-4;
+}
+
+/* استایل‌های استاندارد برای فرم‌ها */
+.form-container {
+  @apply space-y-6 p-4;
+}
+
+.form-section {
+  @apply space-y-4;
+}
+
+.form-group {
+  @apply space-y-2;
+}
+
+.form-label {
+  @apply text-sm font-medium text-foreground;
+}
+
+.form-input {
+  @apply flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2;
+}
+
+.form-error {
+  @apply text-xs text-red-500 mt-1;
+}
+
+.form-help-text {
+  @apply text-xs text-muted-foreground mt-1;
+}
+
+/* استایل‌های استاندارد برای منوی اصلی */
+.main-menu {
+  @apply flex items-center space-x-1 rtl:space-x-reverse;
+}
+
+.main-menu-item {
+  @apply px-3 py-2 rounded-md text-sm font-medium text-foreground hover:bg-[#006bd6]/10 hover:text-[#006bd6] transition-all duration-300;
+}
+
+.main-menu-item-active {
+  @apply bg-[#006bd6]/10 text-[#006bd6];
+}
+
+/* استایل‌های جانبی و مسکل */
+.divider {
+  @apply h-px w-full bg-border my-4;
 }
