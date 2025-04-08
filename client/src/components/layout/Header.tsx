@@ -1,8 +1,9 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link, useLocation } from 'wouter';
-import { SearchBar } from '@/components/common/SearchBar';
+import { SearchBar, AdvancedSearchButton, NotificationsButton } from '@/components/common/SearchBar';
 import { useAuth } from '@/hooks/use-auth';
 import { Loader2, Menu, ChevronDown, User, Heart, ListVideo, Settings, LogOut, ShieldAlert } from 'lucide-react';
+import { PortalOverride } from '@/components/common/PortalOverride';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import {
@@ -19,16 +20,44 @@ export function Header() {
   const [, setLocation] = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const triggerRef = useRef<HTMLButtonElement>(null);
   
-  // Handle scroll effect
+  // Handle scroll effect with enhanced animation
   useEffect(() => {
+    let lastScrollY = window.scrollY;
+    
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 10);
+      const currentScrollY = window.scrollY;
+      // اسکرول به پایین - هدر را کوچکتر و بالاتر می‌کند
+      if (currentScrollY > 50) {
+        setIsScrolled(true);
+      } 
+      // اسکرول به بالا یا در بالای صفحه - هدر به حالت عادی برمی‌گردد
+      else if (currentScrollY <= 50) {
+        setIsScrolled(false);
+      }
+      
+      lastScrollY = currentScrollY;
     };
     
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+  
+  // Close menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (triggerRef.current && !triggerRef.current.contains(event.target as Node) && isMenuOpen) {
+        setIsMenuOpen(false);
+      }
+    };
+    
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isMenuOpen]);
 
   const handleLogout = () => {
     logoutMutation.mutate();
@@ -46,7 +75,18 @@ export function Header() {
 
   return (
     <>
-      <header className={`glass-effect sticky top-0 z-50 px-4 py-3 flex items-center justify-between transition-shadow duration-300 ${isScrolled ? 'shadow-lg' : ''}`}>
+      <header className={`
+        sticky z-50 
+        px-6 py-4 
+        mx-4 my-2
+        flex items-center justify-between 
+        rounded-xl 
+        glass-header
+        ${isScrolled 
+          ? 'header-shadow top-2 header-scroll-transition' 
+          : 'top-3'
+        }
+      `}>
         <div className="flex items-center">
           <div className="mr-4">
             <Link href="/" className="flex items-center">
@@ -68,6 +108,16 @@ export function Header() {
         </div>
 
         <div className="flex items-center">
+          {/* قسمت قرمز - دکمه جستجوی پیشرفته */}
+          <div className="ml-4">
+            <AdvancedSearchButton />
+          </div>
+          
+          {/* قسمت بنفش - دکمه اعلانات */}
+          <div className="ml-4">
+            <NotificationsButton />
+          </div>
+          
           <SearchBar />
 
           <div className="flex items-center mr-2">
@@ -86,59 +136,86 @@ export function Header() {
             ) : (
               // Logged in
               <div className="relative">
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" className="flex items-center focus:outline-none">
-                      <Avatar className="w-8 h-8 border-2 border-primary">
-                        <AvatarImage src={user.avatar || undefined} />
-                        <AvatarFallback className="bg-muted text-primary font-semibold">
-                          {user.name?.charAt(0) || user.username.charAt(0)}
-                        </AvatarFallback>
-                      </Avatar>
-                      <span className="mr-2 text-foreground hidden md:block">
-                        {user.name || user.username}
-                      </span>
-                      <ChevronDown className="text-xs mr-1 text-muted-foreground h-4 w-4" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  
-                  <DropdownMenuContent align="start" side="bottom" className="w-48" style={{ right: 0, left: 'auto' }}>
-                    <DropdownMenuItem onClick={() => setLocation('/profile')}>
-                      <User className="ml-2 h-4 w-4" />
-                      <span>پروفایل</span>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => setLocation('/profile?tab=favorites')}>
-                      <Heart className="ml-2 h-4 w-4" />
-                      <span>علاقه‌مندی‌ها</span>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => setLocation('/profile?tab=playlists')}>
-                      <ListVideo className="ml-2 h-4 w-4" />
-                      <span>پلی‌لیست‌ها</span>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => setLocation('/profile?tab=settings')}>
-                      <Settings className="ml-2 h-4 w-4" />
-                      <span>تنظیمات</span>
-                    </DropdownMenuItem>
-                    
-                    {/* نمایش گزینه مدیر سیستم فقط برای کاربران ادمین */}
-                    {user?.role === 'admin' && (
-                      <>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem onClick={() => setLocation('/admin/dashboard')} className="text-primary font-semibold">
-                          <ShieldAlert className="ml-2 h-4 w-4" />
-                          <span>مدیر سیستم</span>
-                        </DropdownMenuItem>
-                      </>
-                    )}
-                    
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={handleLogout} disabled={logoutMutation.isPending}>
-                      <LogOut className="ml-2 h-4 w-4" />
-                      <span>خروج</span>
-                      {logoutMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
+                <Button 
+                  ref={triggerRef}
+                  variant="ghost" 
+                  className="flex items-center focus:outline-none"
+                  onClick={() => setIsMenuOpen(!isMenuOpen)}
+                >
+                  <Avatar className="w-8 h-8 border-2 border-primary">
+                    <AvatarImage src={user.avatar || undefined} />
+                    <AvatarFallback className="bg-muted text-primary font-semibold">
+                      {user.name?.charAt(0) || user.username.charAt(0)}
+                    </AvatarFallback>
+                  </Avatar>
+                  <span className="mr-2 text-foreground hidden md:block">
+                    {user.name || user.username}
+                  </span>
+                  <ChevronDown className="text-xs mr-1 text-muted-foreground h-4 w-4" />
+                </Button>
+                
+                {isMenuOpen && (
+                  <PortalOverride triggerRef={triggerRef}>
+                    <div className="w-48 bg-popover border rounded-md shadow-md p-1 text-popover-foreground animate-fade-in">
+                      <button 
+                        className="w-full flex items-center p-2 rounded hover:bg-accent hover:text-accent-foreground text-sm"
+                        onClick={() => { setLocation('/profile'); setIsMenuOpen(false); }}
+                      >
+                        <User className="ml-2 h-4 w-4" />
+                        <span>پروفایل</span>
+                      </button>
+                      
+                      <button 
+                        className="w-full flex items-center p-2 rounded hover:bg-accent hover:text-accent-foreground text-sm"
+                        onClick={() => { setLocation('/profile?tab=favorites'); setIsMenuOpen(false); }}
+                      >
+                        <Heart className="ml-2 h-4 w-4" />
+                        <span>علاقه‌مندی‌ها</span>
+                      </button>
+                      
+                      <button 
+                        className="w-full flex items-center p-2 rounded hover:bg-accent hover:text-accent-foreground text-sm"
+                        onClick={() => { setLocation('/profile?tab=playlists'); setIsMenuOpen(false); }}
+                      >
+                        <ListVideo className="ml-2 h-4 w-4" />
+                        <span>پلی‌لیست‌ها</span>
+                      </button>
+                      
+                      <button 
+                        className="w-full flex items-center p-2 rounded hover:bg-accent hover:text-accent-foreground text-sm"
+                        onClick={() => { setLocation('/profile?tab=settings'); setIsMenuOpen(false); }}
+                      >
+                        <Settings className="ml-2 h-4 w-4" />
+                        <span>تنظیمات</span>
+                      </button>
+                      
+                      {/* نمایش گزینه مدیر سیستم فقط برای کاربران ادمین */}
+                      {user?.role === 'admin' && (
+                        <>
+                          <div className="h-px bg-muted my-1 -mx-1"></div>
+                          <button 
+                            className="w-full flex items-center p-2 rounded hover:bg-accent hover:text-accent-foreground text-sm text-primary font-semibold"
+                            onClick={() => { setLocation('/admin/dashboard'); setIsMenuOpen(false); }}
+                          >
+                            <ShieldAlert className="ml-2 h-4 w-4" />
+                            <span>مدیر سیستم</span>
+                          </button>
+                        </>
+                      )}
+                      
+                      <div className="h-px bg-muted my-1 -mx-1"></div>
+                      <button 
+                        className="w-full flex items-center p-2 rounded hover:bg-accent hover:text-accent-foreground text-sm"
+                        onClick={() => { handleLogout(); setIsMenuOpen(false); }}
+                        disabled={logoutMutation.isPending}
+                      >
+                        <LogOut className="ml-2 h-4 w-4" />
+                        <span>خروج</span>
+                        {logoutMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                      </button>
+                    </div>
+                  </PortalOverride>
+                )}
               </div>
             )}
           </div>
