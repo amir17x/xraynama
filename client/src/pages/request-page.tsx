@@ -102,21 +102,28 @@ export default function RequestPage() {
     <>
       <Header />
       
-      <main className="container mx-auto px-4 py-12">
-        <div className="max-w-4xl mx-auto">
+      <main className="container mx-auto px-4 py-8 min-h-[calc(100vh-200px)] relative">
+        {/* Background glow effect */}
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute w-1/2 h-1/2 top-0 left-[20%] bg-[#00BFFF]/20 rounded-full blur-[120px] opacity-50"></div>
+          <div className="absolute w-1/3 h-1/3 bottom-[15%] right-[5%] bg-[#00BFFF]/20 rounded-full blur-[120px] opacity-50"></div>
+        </div>
+        
+        <div className="max-w-4xl mx-auto relative z-10">
           <h1 className="text-3xl font-bold text-foreground mb-6">درخواست محتوا</h1>
           <p className="text-muted-foreground mb-10">
             با استفاده از فرم زیر می‌توانید فیلم، سریال، انیمیشن یا مستند مورد نظر خود را درخواست دهید. تیم محتوایی ما تلاش می‌کند تا درخواست‌های پرتکرار را در اولویت قرار دهد.
           </p>
           
-          <div className="glass-effect p-4 rounded-lg mb-8">
+          <div className="border-[#00BFFF]/20 bg-[#00142c]/80 backdrop-blur-lg shadow-[0_0_25px_rgba(0,191,255,0.15)] rounded-xl overflow-hidden p-4 mb-8 relative">
+            <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[#00BFFF]/30 to-transparent"></div>
             <div className="flex items-center justify-between flex-wrap">
               <div className="flex items-center">
-                <Film className="h-5 w-5 text-primary mr-2" />
-                <span className="font-medium">تعداد درخواست‌های ثبت شده:</span>
-                <span className="text-primary font-bold mx-2">{requestCount}</span>
+                <Film className="h-5 w-5 text-[#00BFFF] mr-2" />
+                <span className="font-medium text-white">تعداد درخواست‌های ثبت شده:</span>
+                <span className="text-[#00BFFF] font-bold mx-2">{requestCount}</span>
               </div>
-              <div className="text-sm text-muted-foreground">
+              <div className="text-sm text-[#CCDDEE]">
                 آخرین بروزرسانی: امروز
               </div>
             </div>
@@ -124,47 +131,59 @@ export default function RequestPage() {
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div>
-              <Card className="glass-effect">
-                <CardHeader>
-                  <CardTitle className="flex items-center">
-                    <Film className="mr-2 h-5 w-5 text-primary" />
+              <Card className="border-[#00BFFF]/20 bg-[#00142c]/80 backdrop-blur-lg shadow-[0_0_25px_rgba(0,191,255,0.15)] rounded-xl overflow-hidden">
+                <CardHeader className="pb-4 relative">
+                  {/* نوار تزئینی بالای کارت */}
+                  <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-[#00BFFF]/30 to-transparent"></div>
+                  
+                  <CardTitle className="text-2xl font-bold text-center text-white">
+                    <Film className="inline-block mr-2 h-5 w-5 text-[#00BFFF]" />
                     فرم درخواست محتوا
                   </CardTitle>
-                  <CardDescription>
+                  <CardDescription className="text-center text-[#CCDDEE]">
                     مشخصات محتوای مورد نظر خود را دقیق وارد کنید
                   </CardDescription>
                 </CardHeader>
-                <CardContent>
+                
+                <CardContent className="relative">
+                  {/* افکت‌های پس‌زمینه */}
+                  <div className="absolute left-[15%] top-[10%] w-32 h-32 bg-[#00BFFF]/5 rounded-full blur-3xl pointer-events-none opacity-70"></div>
+                  <div className="absolute right-[5%] bottom-[10%] w-24 h-24 bg-[#00BFFF]/5 rounded-full blur-3xl pointer-events-none opacity-70"></div>
+                  
                   <Form {...form}>
-                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5 relative z-10">
                       <FormField
                         control={form.control}
                         name="title"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>عنوان محتوا</FormLabel>
+                            <FormLabel className="text-white">عنوان محتوا</FormLabel>
                             <FormControl>
-                              <Input placeholder="نام فیلم یا سریال مورد نظر" {...field} />
+                              <Input 
+                                className="bg-[#001c3d]/50 border-[#00BFFF]/30 focus:border-[#00BFFF] focus:ring-[#00BFFF]/20 transition-all duration-300" 
+                                placeholder="نام فیلم یا سریال مورد نظر" 
+                                {...field} 
+                              />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
                         )}
                       />
                       
-                      <div className="grid grid-cols-2 gap-4">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <FormField
                           control={form.control}
                           name="type"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>نوع محتوا</FormLabel>
+                              <FormLabel className="text-white">نوع محتوا</FormLabel>
                               <Select onValueChange={field.onChange} defaultValue={field.value}>
                                 <FormControl>
-                                  <SelectTrigger>
+                                  <SelectTrigger className="bg-[#001c3d]/50 border-[#00BFFF]/30 focus:border-[#00BFFF] focus:ring-[#00BFFF]/20 transition-all duration-300">
                                     <SelectValue placeholder="انتخاب کنید" />
                                   </SelectTrigger>
                                 </FormControl>
-                                <SelectContent>
+                                <SelectContent className="bg-[#001c3d] border-[#00BFFF]/30">
                                   <SelectItem value="movie">فیلم</SelectItem>
                                   <SelectItem value="series">سریال</SelectItem>
                                   <SelectItem value="animation">انیمیشن</SelectItem>
@@ -181,9 +200,13 @@ export default function RequestPage() {
                           name="year"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>سال انتشار</FormLabel>
+                              <FormLabel className="text-white">سال انتشار</FormLabel>
                               <FormControl>
-                                <Input placeholder="مثال: 2024" {...field} />
+                                <Input 
+                                  className="bg-[#001c3d]/50 border-[#00BFFF]/30 focus:border-[#00BFFF] focus:ring-[#00BFFF]/20 transition-all duration-300" 
+                                  placeholder="مثال: 2024" 
+                                  {...field} 
+                                />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
@@ -196,11 +219,15 @@ export default function RequestPage() {
                         name="imdbUrl"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>لینک IMDB (اختیاری)</FormLabel>
+                            <FormLabel className="text-white">لینک IMDB (اختیاری)</FormLabel>
                             <FormControl>
-                              <Input placeholder="https://www.imdb.com/title/..." {...field} />
+                              <Input 
+                                className="bg-[#001c3d]/50 border-[#00BFFF]/30 focus:border-[#00BFFF] focus:ring-[#00BFFF]/20 transition-all duration-300" 
+                                placeholder="https://www.imdb.com/title/..." 
+                                {...field} 
+                              />
                             </FormControl>
-                            <FormDescription>
+                            <FormDescription className="text-[#CCDDEE]/80 text-xs">
                               با وارد کردن لینک IMDB، فرآیند بررسی سریع‌تر انجام می‌شود
                             </FormDescription>
                             <FormMessage />
@@ -213,9 +240,10 @@ export default function RequestPage() {
                         name="description"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>توضیحات تکمیلی (اختیاری)</FormLabel>
+                            <FormLabel className="text-white">توضیحات تکمیلی (اختیاری)</FormLabel>
                             <FormControl>
                               <Textarea 
+                                className="bg-[#001c3d]/50 border-[#00BFFF]/30 focus:border-[#00BFFF] focus:ring-[#00BFFF]/20 transition-all duration-300 min-h-[120px]" 
                                 placeholder="هر گونه اطلاعات مفید دیگر مانند کارگردان، بازیگران یا توضیحات دیگر..." 
                                 rows={3}
                                 {...field} 
@@ -231,15 +259,16 @@ export default function RequestPage() {
                         name="email"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>ایمیل</FormLabel>
+                            <FormLabel className="text-white">ایمیل</FormLabel>
                             <FormControl>
                               <Input 
                                 type="email" 
+                                className="bg-[#001c3d]/50 border-[#00BFFF]/30 focus:border-[#00BFFF] focus:ring-[#00BFFF]/20 transition-all duration-300" 
                                 placeholder="برای اطلاع‌رسانی اضافه شدن محتوا" 
                                 {...field} 
                               />
                             </FormControl>
-                            <FormDescription>
+                            <FormDescription className="text-[#CCDDEE]/80 text-xs">
                               پس از اضافه شدن محتوای درخواستی، به شما اطلاع داده خواهد شد
                             </FormDescription>
                             <FormMessage />
@@ -249,7 +278,7 @@ export default function RequestPage() {
                       
                       <Button 
                         type="submit" 
-                        className="w-full"
+                        className="w-full bg-[#00BFFF] hover:bg-[#00BFFF]/90 text-white border border-[#00BFFF]/50 shadow-[0_0_15px_rgba(0,191,255,0.3)] transition-all duration-300 hover:shadow-[0_0_20px_rgba(0,191,255,0.5)] transform hover:scale-[1.02]"
                         disabled={isSubmitting}
                       >
                         {isSubmitting ? (
@@ -270,22 +299,25 @@ export default function RequestPage() {
               </Card>
             </div>
             
-            <div>
-              <Card className="glass-effect">
-                <CardHeader>
-                  <CardTitle>درخواست‌های پرتکرار</CardTitle>
-                  <CardDescription>
+            <div className="space-y-6">
+              <Card className="border-[#00BFFF]/20 bg-[#00142c]/80 backdrop-blur-lg shadow-[0_0_25px_rgba(0,191,255,0.15)] rounded-xl overflow-hidden">
+                <CardHeader className="pb-3 relative">
+                  <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-[#00BFFF]/30 to-transparent"></div>
+                  <CardTitle className="text-xl text-white">درخواست‌های پرتکرار</CardTitle>
+                  <CardDescription className="text-[#CCDDEE]">
                     محتواهایی که بیشترین درخواست را داشته‌اند و در اولویت اضافه شدن هستند
                   </CardDescription>
                 </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
+                <CardContent className="relative">
+                  <div className="absolute left-[20%] top-[30%] w-32 h-32 bg-[#00BFFF]/5 rounded-full blur-3xl pointer-events-none opacity-70"></div>
+                  
+                  <div className="space-y-4 relative z-10">
                     {popularRequests.map((request, index) => (
                       <div key={request.id}>
                         <div className="flex justify-between items-start">
                           <div>
-                            <h3 className="font-medium">{request.title}</h3>
-                            <div className="text-sm text-muted-foreground flex mt-1">
+                            <h3 className="font-medium text-white">{request.title}</h3>
+                            <div className="text-sm text-[#CCDDEE] flex mt-1">
                               <span className="ml-2">{request.year}</span>
                               <span>
                                 {request.type === 'movie' && 'فیلم'}
@@ -295,12 +327,12 @@ export default function RequestPage() {
                               </span>
                             </div>
                           </div>
-                          <div className="bg-primary/10 px-2 py-1 rounded text-xs font-bold text-primary">
+                          <div className="bg-[#00BFFF]/10 border border-[#00BFFF]/30 px-2 py-1 rounded text-xs font-bold text-[#00BFFF]">
                             {request.requests} درخواست
                           </div>
                         </div>
                         {index < popularRequests.length - 1 && (
-                          <Separator className="my-3" />
+                          <Separator className="my-3 bg-[#00BFFF]/20" />
                         )}
                       </div>
                     ))}
@@ -308,26 +340,27 @@ export default function RequestPage() {
                 </CardContent>
               </Card>
               
-              <Card className="glass-effect mt-6">
-                <CardHeader>
-                  <CardTitle>راهنمای درخواست محتوا</CardTitle>
+              <Card className="border-[#00BFFF]/20 bg-[#00142c]/80 backdrop-blur-lg shadow-[0_0_25px_rgba(0,191,255,0.15)] rounded-xl overflow-hidden">
+                <CardHeader className="pb-3 relative">
+                  <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-[#00BFFF]/30 to-transparent"></div>
+                  <CardTitle className="text-xl text-white">راهنمای درخواست محتوا</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <ul className="space-y-2 text-muted-foreground">
+                  <ul className="space-y-3 text-[#CCDDEE]">
                     <li className="flex">
-                      <span className="text-primary ml-2">•</span>
+                      <span className="text-[#00BFFF] ml-2 text-lg">•</span>
                       درخواست‌های تکراری از سوی کاربران مختلف در اولویت قرار می‌گیرند.
                     </li>
                     <li className="flex">
-                      <span className="text-primary ml-2">•</span>
+                      <span className="text-[#00BFFF] ml-2 text-lg">•</span>
                       محتواهای جدید که به تازگی منتشر شده‌اند، معمولاً زمان بیشتری برای اضافه شدن نیاز دارند.
                     </li>
                     <li className="flex">
-                      <span className="text-primary ml-2">•</span>
+                      <span className="text-[#00BFFF] ml-2 text-lg">•</span>
                       برای سریال‌ها، لطفاً مشخص کنید که کدام فصل مورد نظر شماست.
                     </li>
                     <li className="flex">
-                      <span className="text-primary ml-2">•</span>
+                      <span className="text-[#00BFFF] ml-2 text-lg">•</span>
                       لطفاً از درخواست‌های تکراری خودداری کنید.
                     </li>
                   </ul>

@@ -1,0 +1,105 @@
+حتماً! در ادامه پرامپت دقیق و حرفه‌ای برای **بخش "درخواست محتوا"** با طراحی گلاسمورفیسم مشابه بخش‌های دیگر سایت آورده شده است. این پرامپت می‌تواند به ابزار هوش مصنوعی یا توسعه‌دهنده کمک کند تا این بخش را بازطراحی کند:
+
+---
+
+### **Prompt برای بازطراحی بخش "درخواست محتوا" با طراحی گلاسمورفیسم:**
+
+> I need to redesign the **"Request Content"** section of my website using the **Glassmorphism** design style, similar to the **"Sign Up" and "Login"** sections I previously designed. The goal is to create a modern, sleek look with a semi-transparent background, soft blur effects, rounded corners, and smooth transitions, providing an interactive and visually appealing experience for users who want to request new content.
+> 
+> Here's what I need for the "Request Content" section:
+> 
+> 1. **Background Design**:
+>   - Apply a **semi-transparent background** with a **blurred effect** (`backdrop-filter: blur`). The background should be blurred subtly enough to keep the focus on the content form while maintaining legibility.
+>   - The overall section should have a **frosted glass effect**, offering a sleek, modern look that blends well with the rest of the website design.
+> 
+> 2. **Form Elements**:
+>   - The form fields (e.g., **Content Title**, **Description**, and **Category**) should have a **semi-transparent background** with a subtle blur effect behind them, ensuring the text is readable while giving a frosted glass appearance.
+>   - Use **rounded corners** for all input fields and dropdowns to match the Glassmorphism style. The input fields should have a **soft border** with a slight shadow effect, making them stand out from the background.
+>   - When a user interacts with the input fields (e.g., typing in the title or description), apply a **subtle glowing effect** or **border color change** to enhance user interaction.
+> 
+> 3. **Submit Button**:
+>   - The submit button should be designed with a **frosted glass effect**, having a subtle hover effect. When hovered over, the button should **scale slightly** or change background color smoothly.
+>   - Use **rounded corners** for the button to maintain consistency with the form fields. Ensure the button is easily distinguishable and visually appealing with sufficient padding.
+> 
+> 4. **Spacing and Layout**:
+>   - Proper **padding and margins** should be applied to the form fields and button to ensure they don’t feel cramped and to make the design look balanced and polished.
+>   - The layout should be **responsive**, ensuring the form looks great on mobile, tablet, and desktop devices. It should automatically adjust the form’s size and layout without breaking or causing horizontal scrolling.
+> 
+> 5. **Hover and Focus Effects**:
+>   - Apply smooth **hover transitions** for the input fields and button to create an interactive and polished experience. For example, the button can **slightly scale up** or change its background color when hovered over.
+>   - Use a **glow effect** or **subtle box-shadow** when focusing on input fields to make the form more interactive.
+> 
+> 6. **Error Handling and Validation**:
+>   - If the user fails to complete a field or submits the form incorrectly, display an **error message** next to the corresponding input. The error message should be in a **distinctive color** (e.g., red or orange) and have a **soft blur** behind it to match the overall style.
+>   - Use a **smooth fade-in effect** for error messages, ensuring they appear and disappear gracefully without disrupting the user experience.
+> 
+> 7. **Additional Styling**:
+>   - The section should maintain a **clean, minimalist design**, focusing on the content request form without excessive distractions. It should be visually appealing but still functionally simple.
+
+### **Suggested CSS Example for the "Request Content" Section**:
+
+```css
+.request-content-form {
+  background: rgba(255, 255, 255, 0.1); /* Semi-transparent background */
+  backdrop-filter: blur(10px); /* Frosted glass effect */
+  border-radius: 15px;
+  padding: 25px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.request-content-form input, .request-content-form select, .request-content-form textarea {
+  background: rgba(255, 255, 255, 0.2); /* Semi-transparent background for inputs */
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: 10px;
+  padding: 10px;
+  color: #fff;
+  transition: all 0.3s ease;
+}
+
+.request-content-form input:focus, .request-content-form select:focus, .request-content-form textarea:focus {
+  outline: none;
+  border-color: rgba(255, 255, 255, 0.8);
+  box-shadow: 0 0 10px rgba(0, 255, 255, 0.5); /* Subtle blue glow on focus */
+}
+
+.request-content-form button {
+  background: rgba(0, 255, 255, 0.2); /* Frosted effect for button */
+  color: #fff;
+  padding: 12px 20px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.2s ease, background-color 0.3s ease;
+}
+
+.request-content-form button:hover {
+  transform: scale(1.05);
+  background-color: rgba(0, 255, 255, 0.3);
+}
+
+.error-message {
+  color: red;
+  background: rgba(255, 0, 0, 0.1); /* Semi-transparent red background */
+  border-radius: 10px;
+  padding: 10px;
+  margin-top: 10px;
+  display: none; /* Hidden by default */
+  transition: opacity 0.3s ease;
+}
+
+.error-message.visible {
+  display: block;
+  opacity: 1;
+}
+```
+
+---
+
+### نکات مهم:
+- **گلاسمورفیسم (Glassmorphism):** طراحی باید به صورت شیشه‌ای و با پس‌زمینه مات و محو انجام بشه، و تمام المان‌ها باید با طراحی دیگر بخش‌های سایت هماهنگ باشن.
+- **تست در دستگاه‌های مختلف:** این طراحی باید بر روی انواع دستگاه‌ها، از جمله موبایل و دسکتاپ به خوبی نمایش داده بشه.
+- **عملکرد بهینه:** باید مطمئن بشی که این طراحی باعث کندی یا مشکلات در بارگذاری سایت نشه، به خصوص در موبایل‌ها.
+- **خوانایی و دسترسی:** فرم‌ها و پیام‌های خطا باید خوانا و قابل دسترسی برای همه کاربران باشند.
+
+این پرامپت می‌تونه به ابزار هوش مصنوعی یا توسعه‌دهنده کمک کنه تا بخش "درخواست محتوا" رو با طراحی گلاسمورفیسم مدرن و جذاب بازطراحی کنه.

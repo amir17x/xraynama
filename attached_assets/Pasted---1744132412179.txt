@@ -1,0 +1,120 @@
+حتماً! در ادامه پرامپت دقیق و حرفه‌ای برای **بخش "قوانین و مقررات"** با طراحی گلاسمورفیسم مشابه بخش‌های دیگر سایت آورده شده است. این پرامپت می‌تواند به ابزار هوش مصنوعی یا توسعه‌دهنده کمک کند تا این بخش را بازطراحی کند:
+
+---
+
+### **Prompt برای بازطراحی بخش "قوانین و مقررات" با طراحی گلاسمورفیسم:**
+
+> I need to redesign the **"Terms and Conditions"** (قوانین و مقررات) section of my website using the **Glassmorphism** design style, similar to the **"Sign Up" and "Login"** sections I previously designed. The goal is to provide users with a clean, modern, and visually appealing look while keeping the information accessible and easy to navigate. The **Glassmorphism** style should ensure the design feels smooth, polished, and consistent with the rest of the website.
+> 
+> Here's what I need for the "Terms and Conditions" section:
+> 
+> 1. **Background Design**:
+>   - The section should have a **semi-transparent background** with a **blurred effect** (`backdrop-filter: blur`). This should ensure the text remains legible while creating a frosted glass appearance.
+>   - The background should have a **soft blur effect** that provides depth but does not overpower the text, ensuring the focus stays on the content.
+>   - Add a **subtle background image** or gradient that blends well with the frosted glass effect, reinforcing the modern aesthetic.
+> 
+> 2. **Text and Content Layout**:
+>   - The text in the section should be **legible and easy to read**. Ensure sufficient contrast between the background and the text to avoid any visibility issues. This may include setting the text color to a high contrast shade like white or light gray.
+>   - Apply a **soft shadow** to the text if needed to increase readability against a busy or dark background.
+>   - Use **appropriate headings and subheadings** to structure the content. Headings should stand out with slightly larger font sizes and bold text to guide the user through the document.
+> 
+> 3. **Scrollable Content Area**:
+>   - For lengthy terms and conditions, the content area should be **scrollable** with a fixed header that remains visible at the top (if applicable). Ensure smooth scrolling animations for a polished user experience.
+>   - The scrollable content should have **ample padding** and **margins** to prevent the text from feeling cramped, especially in the mobile version.
+> 
+> 4. **Link and Button Design**:
+>   - Links to other parts of the website or external sources should have a **subtle highlight effect** when hovered over. This could include a slight **underline** or **glow** effect, staying within the minimalist and sleek design language.
+>   - The **Accept Terms and Conditions** button (if applicable) should follow the same **Glassmorphism** design, with a frosted glass effect and smooth hover transitions. When clicked, the button should smoothly change color or scale slightly to provide feedback to the user.
+> 
+> 5. **Spacing and Layout**:
+>   - Adequate **padding and margins** should be used around the text and buttons to ensure the content doesn’t feel overcrowded. The goal is to make the text easy to read and the interactive elements easy to use.
+>   - The design should be **responsive**, ensuring that the terms and conditions are displayed properly across all devices, including mobile, tablet, and desktop.
+> 
+> 6. **Hover and Focus Effects**:
+>   - Links and buttons should have smooth **hover effects**. When a user hovers over a link, there should be a **soft transition effect** like a color change or underline. Buttons should slightly **scale up** or change color upon hover to enhance interactivity.
+> 
+> 7. **Error Handling and Validation**:
+>   - If there are any issues with accepting the terms (for example, if a checkbox is not checked), use a **subtle error message**. The error message should appear with a **smooth fade-in effect** and have a **red or orange color** with a slight frosted background.
+> 
+> 8. **Additional Styling**:
+>   - Ensure the design remains **clean, minimalist**, and **easy to navigate**. Avoid excessive decorations and distractions while keeping the visual flow intact. The user should easily focus on the content without feeling overwhelmed by unnecessary elements.
+
+### **Suggested CSS Example for the "Terms and Conditions" Section**:
+
+```css
+.terms-conditions-section {
+  background: rgba(255, 255, 255, 0.1); /* Semi-transparent background */
+  backdrop-filter: blur(12px); /* Frosted glass effect */
+  border-radius: 15px;
+  padding: 25px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  max-height: 80vh;
+  overflow-y: auto; /* Allows scrolling */
+}
+
+.terms-conditions-section h1, .terms-conditions-section h2, .terms-conditions-section h3 {
+  color: #fff;
+  font-size: 1.5em;
+  margin-bottom: 10px;
+}
+
+.terms-conditions-section p {
+  color: #d1d1d1;
+  font-size: 1em;
+  line-height: 1.6;
+  margin-bottom: 20px;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3); /* Shadow for text for better readability */
+}
+
+.terms-conditions-section a {
+  color: #00bcd4; /* Soft blue color for links */
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.terms-conditions-section a:hover {
+  text-decoration: underline;
+  color: #ff4081; /* Highlighted hover color */
+}
+
+.terms-conditions-section button {
+  background: rgba(0, 255, 255, 0.2); /* Frosted effect for button */
+  color: #fff;
+  padding: 12px 20px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.2s ease, background-color 0.3s ease;
+}
+
+.terms-conditions-section button:hover {
+  transform: scale(1.05);
+  background-color: rgba(0, 255, 255, 0.3);
+}
+
+.error-message {
+  color: red;
+  background: rgba(255, 0, 0, 0.1); /* Semi-transparent red background */
+  border-radius: 10px;
+  padding: 10px;
+  margin-top: 10px;
+  display: none; /* Hidden by default */
+  transition: opacity 0.3s ease;
+}
+
+.error-message.visible {
+  display: block;
+  opacity: 1;
+}
+```
+
+---
+
+### نکات مهم:
+- **گلاسمورفیسم (Glassmorphism):** طراحی باید به صورت شیشه‌ای و با پس‌زمینه مات و محو انجام بشه، و تمام المان‌ها باید با طراحی دیگر بخش‌های سایت هماهنگ باشن.
+- **تست در دستگاه‌های مختلف:** این طراحی باید بر روی انواع دستگاه‌ها، از جمله موبایل و دسکتاپ به خوبی نمایش داده بشه.
+- **عملکرد بهینه:** باید مطمئن بشی که این طراحی باعث کندی یا مشکلات در بارگذاری سایت نشه، به خصوص در موبایل‌ها.
+- **خوانایی و دسترسی:** متن‌ها و لینک‌ها باید به راحتی قابل خواندن و دسترسی برای همه کاربران باشند.
+
+این پرامپت به ابزار هوش مصنوعی یا توسعه‌دهنده کمک می‌کنه تا بخش "قوانین و مقررات" رو با طراحی گلاسمورفیسم مدرن و جذاب بازطراحی کنه.

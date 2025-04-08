@@ -1,0 +1,87 @@
+برای این که هوش مصنوعی بتواند بخش‌هایی که ناقص هستند و نیاز به تکمیل و توسعه دارند را شناسایی کرده و به طور دقیق اصلاح کند، می‌توانید از پرامپتی مانند زیر استفاده کنید:
+
+---
+
+### **Prompt برای تکمیل و توسعه بخش‌های ناقص سایت با هوش مصنوعی:**
+
+> I need you to carefully review and analyze my website and identify any **sections or features** that are **incomplete, underdeveloped, or missing essential elements**. Based on the overall design, functionality, and structure, please provide **detailed recommendations** and corrections to ensure that every part of the site is fully functional, polished, and optimized. Your task is to go through each **section individually**, identify any issues or gaps, and then provide specific solutions to improve them.
+> 
+> Here’s how you should proceed:
+> 
+> 1. **Review Every Section**:
+>   - Break down the entire website into distinct **sections** (e.g., header, footer, main content, sidebar, etc.).
+>   - For each section, assess whether the design and content are fully realized and if there are any missing functionalities, design issues, or incomplete features.
+> 
+> 2. **Identify Missing Features or Design Gaps**:
+>   - Look for any elements that are **unfinished**, such as buttons that are not properly styled, forms that are incomplete, or missing animations.
+>   - Check for any sections where **interactivity is lacking**, such as hover effects, smooth transitions, or animated elements that aren’t functioning as expected.
+>   - Identify any **visual design issues**, such as inconsistent spacing, poor contrast, broken layouts, or sections that don't align with the overall design theme (e.g., Glassmorphism, Minimalism).
+> 
+> 3. **Provide Detailed Solutions**:
+>   - For each identified issue, offer **step-by-step instructions** on how to resolve it. These should include **design updates**, **animation enhancements**, or **interactive elements** that need to be added or improved.
+>   - For incomplete or missing features (e.g., incomplete forms, non-functional buttons), provide **detailed code snippets** or instructions on how to implement the missing functionalities, including form validation, API integration, etc.
+> 
+> 4. **Ensure Consistency Across Sections**:
+>   - Ensure that the **overall aesthetic** is consistent across the site, with a unified style for animations, transitions, buttons, and typography.
+>   - Address any inconsistencies in **responsive design** that might cause sections to break or look unpolished on mobile devices, tablets, or desktops.
+> 
+> 5. **Optimize Performance**:
+>   - Check if any sections are **causing performance issues** like slow loading times, excessive file sizes (e.g., large images, heavy scripts), or laggy animations. Provide **optimization tips** such as compressing images, lazy-loading content, or simplifying animations.
+> 
+> 6. **Review Navigation**:
+>   - Ensure that all **menus**, **links**, and **buttons** are fully functional, properly aligned, and easy to use. If any navigation element is confusing or not working as expected, provide corrections.
+>   - Double-check that **dynamic elements** like dropdowns or accordions are smoothly functioning and have the right design (e.g., soft hover effects, smooth animations).
+> 
+> 7. **Specific Areas to Focus On**:
+>   - **Forms**: Ensure that forms (e.g., sign-up, login, contact forms) are properly validated and styled according to the site’s theme. Include missing form fields, add input validation, or create functional buttons where necessary.
+>   - **Buttons**: Check if the buttons have **consistent hover effects**, transitions, and the correct size and spacing. If any button is missing functionality (e.g., "Submit" buttons not triggering actions), provide the necessary code.
+>   - **Content Sections**: Ensure that content sections like **FAQs**, **Terms & Conditions**, **Privacy Policy**, or **Contact Us** have **clear structure**, proper headings, and content formatting. Fix broken links or missing images.
+>   - **Animation and Interactivity**: Review **hover animations**, **transitions**, and **scroll effects** for smoothness and consistency. Any animation that is jittery or not triggered correctly should be addressed with new code or modifications.
+> 
+> 8. **Final Review**:
+>   - After implementing your solutions, provide a **final checklist** to ensure all sections are completed and all issues are resolved. This should include **functionality tests**, **design consistency checks**, and **performance optimization steps**.
+
+---
+
+### **Example of what the AI should deliver after completing the prompt:**
+
+- **Header Section:**
+  - Issue: The search bar is misaligned on mobile devices and doesn’t respond to input properly.
+  - Solution: Adjust the CSS to ensure the search bar is centered on all screen sizes, and add a smooth input animation when the user clicks inside the search bar. Example CSS:
+  
+  ```css
+  .search-bar {
+    width: 100%;
+    max-width: 400px;
+    transition: all 0.3s ease;
+  }
+  .search-bar:focus {
+    background-color: rgba(255, 255, 255, 0.3);
+  }
+  ```
+  
+- **Footer Section:**
+  - Issue: The footer has missing links to social media pages.
+  - Solution: Add a section for social media icons at the bottom of the footer and ensure that each icon links to the correct page. Example HTML:
+  
+  ```html
+  <div class="footer-social">
+    <a href="https://facebook.com" target="_blank"><i class="fab fa-facebook"></i></a>
+    <a href="https://twitter.com" target="_blank"><i class="fab fa-twitter"></i></a>
+  </div>
+  ```
+  
+- **Contact Form:**
+  - Issue: The "Send Message" button doesn't trigger any action when clicked.
+  - Solution: Add JavaScript to handle form submission and integrate with a back-end API to send the form data. Example JavaScript:
+  
+  ```javascript
+  document.querySelector('#contact-form').addEventListener('submit', function(event) {
+    event.preventDefault();
+    // Send the form data via API or email
+  });
+  ```
+
+---
+
+این پرامپت به هوش مصنوعی کمک می‌کند تا به طور دقیق و مفصل، بخش‌های ناقص یا نیازمند بهبود را شناسایی کند و راه‌حل‌های تخصصی و کامل برای رفع آن‌ها ارائه دهد.
