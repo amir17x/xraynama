@@ -32,6 +32,7 @@ import SeriesPage from "@/pages/series-page";
 import AnimationsPage from "@/pages/animations-page";
 import DocumentariesPage from "@/pages/documentaries-page";
 import AllContentPage from "@/pages/all-content-page";
+import AdvancedSearchPage from "@/pages/advanced-search-page";
 
 // Admin pages
 import AdminDashboard from "@/pages/admin/Dashboard";
@@ -61,6 +62,7 @@ function Router() {
       <Route path="/animations" component={AnimationsPage} />
       <Route path="/documentaries" component={DocumentariesPage} />
       <Route path="/all-content" component={AllContentPage} />
+      <Route path="/advanced-search" component={AdvancedSearchPage} />
       
       {/* Password reset pages */}
       <Route path="/forgot-password" component={ForgotPasswordPage} />
