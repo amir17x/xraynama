@@ -4,6 +4,7 @@ import { queryClient } from "./lib/queryClient";
 import { Toaster } from "@/components/ui/toaster";
 import { AuthProvider } from "@/hooks/use-auth";
 import { ProtectedRoute, AdminRoute } from "@/lib/protected-route";
+import { LoadingProvider } from "@/contexts/LoadingContext";
 
 import HomePage from "@/pages/home-page";
 import NotFound from "@/pages/not-found";
@@ -38,6 +39,7 @@ import AdminContent from "@/pages/admin/Content";
 import AdminComments from "@/pages/admin/Comments";
 import AdminCategories from "@/pages/admin/Categories";
 import AdminStatistics from "@/pages/admin/Statistics";
+import LoadingTestPage from "@/pages/loading-test-page";
 
 function Router() {
   return (
@@ -70,6 +72,7 @@ function Router() {
       <Route path="/request" component={RequestPage} />
       <Route path="/terms" component={TermsPage} />
       <Route path="/faq" component={FAQPage} />
+      <Route path="/loading-test" component={LoadingTestPage} />
       
       {/* Admin pages - protected with AdminRoute */}
       <AdminRoute path="/admin/dashboard" component={AdminDashboard} />
@@ -88,8 +91,10 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        <Router />
-        <Toaster />
+        <LoadingProvider>
+          <Router />
+          <Toaster />
+        </LoadingProvider>
       </AuthProvider>
     </QueryClientProvider>
   );
