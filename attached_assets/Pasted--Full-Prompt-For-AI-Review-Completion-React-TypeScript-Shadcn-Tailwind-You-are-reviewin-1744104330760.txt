@@ -1,0 +1,66 @@
+✅ Full Prompt — For AI Review & Completion (React + TypeScript + Shadcn + Tailwind)
+You are reviewing a monorepo-based web application built with:
+
+Frontend: React.js + TypeScript
+
+Component Library: Shadcn UI
+
+Styling: TailwindCSS
+
+Routing: wouter
+
+State/API management: @tanstack/react-query
+
+Backend: Node.js (Express) with MongoDB (via mongoose)
+
+Structure: /client (frontend), /server (backend), /shared (shared code)
+
+Vite is used to serve the frontend.
+
+Your tasks are:
+
+Audit and Visual Consistency Check
+
+Traverse all components, pages, and layouts in the /client directory.
+
+Detect inconsistencies in visual styles, layouts, component hierarchy, and spacing.
+
+Pay close attention to reusable UI elements (buttons, cards, forms, modals, navbars) that have visually different implementations.
+
+Ensure all these follow a unified style guide (based on Shadcn UI + TailwindCSS conventions).
+
+Component Normalization
+
+Refactor duplicated or inconsistent UI elements into shared components.
+
+Ensure styling is handled consistently via Tailwind classes or design tokens (if used).
+
+Avoid inline styles or fragmented logic unless justified.
+
+Functionality Completion
+
+Find unfinished or partially implemented components, layouts, or features (e.g., empty pages, broken routes, unhooked APIs).
+
+Complete them using the existing architecture (React Query for API, Shadcn components for UI).
+
+Implement missing responsive behavior where needed.
+
+Replace placeholders (e.g., "Lorem Ipsum", dummy buttons) with fully functional UI/UX logic.
+
+Cross-Component Integration
+
+Ensure proper integration between shared logic (/shared), frontend, and backend.
+
+All API-bound components must properly fetch data using React Query and respect loading, error, and success states.
+
+Validate that shared types/interfaces are correctly used across client and server.
+
+Final Objective
+
+Bring the project to a production-ready, polished state.
+
+Eliminate design mismatches, logic gaps, and placeholder content.
+
+Everything should be consistent, responsive, and well-structured.
+
+Optional: Generate a list of all components and pages that were inconsistent or incomplete and how you resolved them.
