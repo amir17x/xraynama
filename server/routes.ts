@@ -6,6 +6,11 @@ import { setupAdminRoutes } from "./admin";
 import { User } from '@shared/schema';
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Health check endpoint - fast response to verify server is alive
+  app.get("/api/health", (req, res) => {
+    res.status(200).json({ status: "ok", timestamp: Date.now() });
+  });
+  
   // Set up authentication routes
   setupAuth(app);
   

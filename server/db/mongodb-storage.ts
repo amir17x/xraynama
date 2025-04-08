@@ -39,15 +39,30 @@ import { Schema, Document } from 'mongoose';
 const MongoDBStore = connectMongoDBSession.default(session);
 
 export class MongoDBStorage implements IStorage {
-  public sessionStore: any; // Using any instead of session.SessionStore due to type issues
+  // Lazy-loaded session store
+  private _sessionStore: any = null;
+  
+  public get sessionStore(): any {
+    // Lazy initialize the session store only when needed
+    if (!this._sessionStore) {
+      this._sessionStore = new MongoDBStore({
+        uri: process.env.MONGODB_URI!,
+        collection: 'sessions',
+        expires: 1000 * 60 * 60 * 24 * 7, // 1 week
+        // Use a standard connection options format
+        // that's compatible with MongoDBStore
+      });
+
+      // Handle session store errors
+      this._sessionStore.on('error', (error: any) => {
+        console.error('Session store error:', error);
+      });
+    }
+    return this._sessionStore;
+  }
 
   constructor() {
-    // Create MongoDB session store
-    this.sessionStore = new MongoDBStore({
-      uri: process.env.MONGODB_URI!,
-      collection: 'sessions',
-      expires: 1000 * 60 * 60 * 24 * 7, // 1 week
-    });
+    // Defer session store creation until actually needed
   }
 
   // Initialize connection to MongoDB

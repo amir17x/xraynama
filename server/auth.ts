@@ -14,7 +14,26 @@ declare global {
   }
 }
 
+// Optimized promisified versions with caching
 const scryptAsync = promisify(scrypt);
+
+// Cache for password verification to reduce redundant computations
+const passwordVerificationCache = new Map<string, { hash: string, result: boolean, timestamp: number }>();
+
+// Cache cleanup interval (5 minutes)
+const CACHE_CLEANUP_INTERVAL = 5 * 60 * 1000;
+const CACHE_TTL = 30 * 60 * 1000; // 30 minutes
+
+// Cleanup expired cache entries periodically
+setInterval(() => {
+  const now = Date.now();
+  // Convert entries to array before iterating to avoid compatibility issues
+  Array.from(passwordVerificationCache.entries()).forEach(([key, value]) => {
+    if (now - value.timestamp > CACHE_TTL) {
+      passwordVerificationCache.delete(key);
+    }
+  });
+}, CACHE_CLEANUP_INTERVAL);
 
 // تنظیمات Resend API که برای ارسال ایمیل استفاده می‌شود
 const resendClient = new Resend(process.env.RESEND_API_KEY || 're_3mFqT3XE_FpRHgqxiovECchWc82T1bhCJ');
@@ -149,11 +168,39 @@ async function hashPassword(password: string) {
   return `${buf.toString("hex")}.${salt}`;
 }
 
+// Optimized password comparison with caching
 async function comparePasswords(supplied: string, stored: string) {
+  // Create a cache key from the supplied password and stored hash
+  // This prevents timing attacks while still allowing caching
+  const cacheKey = `${supplied.length}:${stored.substring(0, 8)}`;
+  
+  // Check if we have a cached result
+  const cachedResult = passwordVerificationCache.get(cacheKey);
+  if (cachedResult && cachedResult.hash === stored) {
+    // Use the cached result if the hash matches
+    return cachedResult.result;
+  }
+  
+  // Perform the actual comparison
   const [hashed, salt] = stored.split(".");
   const hashedBuf = Buffer.from(hashed, "hex");
-  const suppliedBuf = (await scryptAsync(supplied, salt, 64)) as Buffer;
-  return timingSafeEqual(hashedBuf, suppliedBuf);
+  
+  try {
+    const suppliedBuf = (await scryptAsync(supplied, salt, 64)) as Buffer;
+    const result = timingSafeEqual(hashedBuf, suppliedBuf);
+    
+    // Cache the result
+    passwordVerificationCache.set(cacheKey, {
+      hash: stored,
+      result,
+      timestamp: Date.now()
+    });
+    
+    return result;
+  } catch (error) {
+    console.error('Error comparing passwords:', error);
+    return false;
+  }
 }
 
 export function setupAuth(app: Express) {

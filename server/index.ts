@@ -40,67 +40,97 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-app.use((req, res, next) => {
+// Optimized logging middleware - only applied to API routes to reduce overhead
+app.use("/api", (req, res, next) => {
   const start = Date.now();
   const path = req.path;
+  
+  // Only capture response in development mode for debugging
   let capturedJsonResponse: Record<string, any> | undefined = undefined;
-
-  const originalResJson = res.json;
-  res.json = function (bodyJson, ...args) {
-    capturedJsonResponse = bodyJson;
-    return originalResJson.apply(res, [bodyJson, ...args]);
-  };
+  
+  if (process.env.NODE_ENV !== 'production') {
+    const originalResJson = res.json;
+    res.json = function (bodyJson, ...args) {
+      capturedJsonResponse = bodyJson;
+      return originalResJson.apply(res, [bodyJson, ...args]);
+    };
+  }
 
   res.on("finish", () => {
     const duration = Date.now() - start;
-    if (path.startsWith("/api")) {
-      let logLine = `${req.method} ${path} ${res.statusCode} in ${duration}ms`;
-      if (capturedJsonResponse) {
-        logLine += ` :: ${JSON.stringify(capturedJsonResponse)}`;
-      }
-
+    let logLine = `${req.method} ${path} ${res.statusCode} in ${duration}ms`;
+    
+    // Only include response body in development for debugging
+    if (process.env.NODE_ENV !== 'production' && capturedJsonResponse) {
+      logLine += ` :: ${JSON.stringify(capturedJsonResponse)}`;
+      
       if (logLine.length > 80) {
         logLine = logLine.slice(0, 79) + "…";
       }
-
-      log(logLine);
     }
+
+    log(logLine);
   });
 
   next();
 });
 
+/**
+ * Start the server with optimized startup
+ * - Connect to MongoDB asynchronously
+ * - Register routes in parallel where possible
+ * - Implement graceful error handling
+ */
 (async () => {
-  // Connect to MongoDB if available
-  if (useMongoDb && mongoDBStorage) {
-    try {
-      await mongoDBStorage.init();
-      log("Connected to MongoDB successfully", "mongodb");
-    } catch (error) {
-      log(`Failed to connect to MongoDB: ${error}`, "mongodb");
-      process.exit(1);
-    }
-  }
-  
-  const server = await registerRoutes(app);
-
+  // Setup error handler middleware
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
     const status = err.status || err.statusCode || 500;
     const message = err.message || "Internal Server Error";
-
+    
+    if (status >= 500) {
+      console.error('Server error:', err);
+    }
+    
     res.status(status).json({ message });
-    throw err;
+    // Don't throw after sending response - this is an anti-pattern
+    // that can cause unhandled promise rejections
   });
 
-  // importantly only setup vite in development and after
-  // setting up all the other routes so the catch-all route
-  // doesn't interfere with the other routes
+  // Start a parallel task for connecting to MongoDB
+  const mongoConnectionPromise = (useMongoDb && mongoDBStorage) ? 
+    mongoDBStorage.init().then(() => {
+      log("Connected to MongoDB successfully", "mongodb");
+    }).catch(error => {
+      log(`Failed to connect to MongoDB: ${error}`, "mongodb");
+      // Don't exit process on connection failure, allow reconnecting
+    }) : 
+    Promise.resolve();
+  
+  // Register health check route quickly without waiting for other tasks
+  app.get("/api/health", (req, res) => {
+    res.status(200).json({ 
+      status: "ok", 
+      timestamp: Date.now(),
+      server: "Xraynama API"
+    });
+  });
+  
+  // Create base server first
+  const server = await registerRoutes(app);
+  
+  // Setup Vite or static serving
   if (app.get("env") === "development") {
     await setupVite(app, server);
   } else {
     serveStatic(app);
   }
-
+  
+  // Wait for MongoDB connection to complete in parallel
+  await mongoConnectionPromise.catch(error => {
+    log(`MongoDB connection error: ${error}`, "mongodb");
+    // Continue anyway - application can still function
+  });
+  
   // ALWAYS serve the app on port 5000
   // this serves both the API and the client.
   // It is the only port that is not firewalled.
@@ -110,6 +140,20 @@ app.use((req, res, next) => {
     host: "0.0.0.0",
     reusePort: true,
   }, () => {
-    log(`serving on port ${port}`);
+    log(`Server listening on port ${port}`, "server");
+  });
+  
+  // Handle ungraceful shutdown
+  process.on('SIGTERM', () => {
+    log('SIGTERM received, shutting down gracefully', 'server');
+    server.close(() => {
+      log('Server closed', 'server');
+      process.exit(0);
+    });
+  });
+  
+  process.on('unhandledRejection', (reason, promise) => {
+    console.error('Unhandled Rejection at:', promise, 'reason:', reason);
+    // Don't crash the server
   });
 })();
