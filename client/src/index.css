@@ -62,41 +62,41 @@
   
   /* طرح شیشه‌ای و شفاف برای هدر */
   .glass-header {
-    @apply backdrop-blur-md shadow-sm border transition-all duration-500 ease-in-out;
-    background-color: rgba(13, 17, 23, 0.4);
-    background-image: 
-      linear-gradient(to bottom, 
-        rgba(255, 255, 255, 0.07) 0%, 
-        rgba(255, 255, 255, 0.02) 50%, 
-        rgba(0, 0, 0, 0.1) 100%);
-    background-size: 200% 200%;
-    border-color: rgba(255, 255, 255, 0.08);
-    box-shadow: 
-      0 10px 30px -10px rgba(0, 0, 0, 0.2),
-      0 1px 2px rgba(255, 255, 255, 0.05),
-      inset 0 1px 1px rgba(255, 255, 255, 0.03);
+    @apply transition-all duration-300 ease-in-out;
+    background-color: rgba(0, 0, 0, 0.5);
     backdrop-filter: blur(10px);
+    border-radius: 0 0 15px 15px;
+    margin-top: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    transform: translateY(0);
+    opacity: 1;
   }
   
   /* هدر در حالت اسکرول */
   .glass-header.header-shadow {
     background-color: rgba(13, 17, 23, 0.75);
-    border-color: rgba(255, 255, 255, 0.12);
-    box-shadow: 
-      0 10px 30px -5px rgba(0, 0, 0, 0.3),
-      0 4px 10px rgba(0, 0, 0, 0.1),
-      inset 0 1px 0 rgba(255, 255, 255, 0.05);
     backdrop-filter: blur(12px);
+    box-shadow: 
+      0 10px 30px rgba(0, 0, 0, 0.3),
+      inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  }
+
+  /* هدر مخفی در حالت اسکرول به پایین */
+  .header-hidden {
+    transform: translateY(-100%) !important;
+    opacity: 0 !important;
+    transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s ease !important;
   }
 
   /* انیمیشن نرم برای هدر */
   .header-scroll-transition {
-    animation: header-slide-in 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    animation: header-slide-in 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
   }
   
   @keyframes header-slide-in {
     0% {
-      transform: translateY(-15px);
+      transform: translateY(-100%);
       opacity: 0;
     }
     100% {
