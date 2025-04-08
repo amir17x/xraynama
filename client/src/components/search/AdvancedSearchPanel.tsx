@@ -126,6 +126,12 @@ const AdvancedSearchPanel: React.FC<AdvancedSearchPanelProps> = ({ className, on
   // انیمیشن اسکن تصادفی
   const [isScanning, setIsScanning] = useState<boolean>(false);
   
+  // منوهای بازشونده
+  const [genreMenuOpen, setGenreMenuOpen] = useState(false);
+  const [genreButtonRef, setGenreButtonRef] = useState<HTMLButtonElement | null>(null);
+  const [countryMenuOpen, setCountryMenuOpen] = useState(false);
+  const [countryButtonRef, setCountryButtonRef] = useState<HTMLButtonElement | null>(null);
+  
   // اجرای جستجو
   const handleSearch = () => {
     setIsScanning(true);
@@ -294,59 +300,52 @@ const AdvancedSearchPanel: React.FC<AdvancedSearchPanelProps> = ({ className, on
             <label className="text-sm font-medium text-white block mb-2">ژانر</label>
             <div>
               {/* استفاده از state برای کنترل نمایش منو */}
-              {(() => {
-                const [genreMenuOpen, setGenreMenuOpen] = useState(false);
-                const [genreButtonRef, setGenreButtonRef] = useState<HTMLButtonElement | null>(null);
-                
-                return (
-                  <>
-                    <Button 
-                      variant="outline" 
-                      className="w-full justify-between border-[#00BFFF]/20 bg-[#00142c]/80 text-white hover:bg-[#00142c]"
-                      onClick={() => setGenreMenuOpen(true)}
-                      ref={setGenreButtonRef}
-                    >
-                      <span>{selectedGenresDisplay()}</span>
-                      <Filter className="h-4 w-4 mr-2 text-[#00BFFF]/70" />
-                    </Button>
+              <>
+                <Button 
+                  variant="outline" 
+                  className="w-full justify-between border-[#00BFFF]/20 bg-[#00142c]/80 text-white hover:bg-[#00142c]"
+                  onClick={() => setGenreMenuOpen(true)}
+                  ref={setGenreButtonRef}
+                >
+                  <span>{selectedGenresDisplay()}</span>
+                  <Filter className="h-4 w-4 mr-2 text-[#00BFFF]/70" />
+                </Button>
 
-                    {/* استفاده از کامپوننت PortalContextMenu برای موقعیت‌دهی دقیق */}
-                    <PortalContextMenu
-                      open={genreMenuOpen}
-                      onClose={() => setGenreMenuOpen(false)}
-                      anchorElement={genreButtonRef}
-                      width="100%"
-                      maxHeight="320px"
-                      className="p-0"
-                    >
-                      <div className="grid grid-cols-2 p-2 gap-1">
-                        {genres.map((genre) => (
-                          <button
-                            key={genre.id}
-                            className={cn(
-                              "flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-all",
-                              selectedGenres.includes(genre.id)
-                                ? "bg-[#00BFFF]/20 text-[#00BFFF]"
-                                : "hover:bg-[#00142c]/80 text-gray-300"
-                            )}
-                            onClick={() => {
-                              toggleGenre(genre.id);
-                              // بستن منو با کلیک روی آیتم‌ها را می‌توان با توجه به نیاز تغییر داد
-                              // setGenreMenuOpen(false);
-                            }}
-                          >
-                            <span className="text-lg">{genre.icon}</span>
-                            <span>{genre.name}</span>
-                            {selectedGenres.includes(genre.id) && (
-                              <Check className="h-3 w-3 mr-auto text-[#00BFFF]" />
-                            )}
-                          </button>
-                        ))}
-                      </div>
-                    </PortalContextMenu>
-                  </>
-                );
-              })()}
+                {/* استفاده از کامپوننت PortalContextMenu برای موقعیت‌دهی دقیق */}
+                <PortalContextMenu
+                  open={genreMenuOpen}
+                  onClose={() => setGenreMenuOpen(false)}
+                  anchorElement={genreButtonRef}
+                  width="100%"
+                  maxHeight="320px"
+                  className="p-0"
+                >
+                  <div className="grid grid-cols-2 p-2 gap-1">
+                    {genres.map((genre) => (
+                      <button
+                        key={genre.id}
+                        className={cn(
+                          "flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-all",
+                          selectedGenres.includes(genre.id)
+                            ? "bg-[#00BFFF]/20 text-[#00BFFF]"
+                            : "hover:bg-[#00142c]/80 text-gray-300"
+                        )}
+                        onClick={() => {
+                          toggleGenre(genre.id);
+                          // بستن منو با کلیک روی آیتم‌ها را می‌توان با توجه به نیاز تغییر داد
+                          // setGenreMenuOpen(false);
+                        }}
+                      >
+                        <span className="text-lg">{genre.icon}</span>
+                        <span>{genre.name}</span>
+                        {selectedGenres.includes(genre.id) && (
+                          <Check className="h-3 w-3 mr-auto text-[#00BFFF]" />
+                        )}
+                      </button>
+                    ))}
+                  </div>
+                </PortalContextMenu>
+              </>
             </div>
           </div>
           
@@ -355,71 +354,59 @@ const AdvancedSearchPanel: React.FC<AdvancedSearchPanelProps> = ({ className, on
             <label className="text-sm font-medium text-white block mb-2">کشور</label>
             <div>
               {/* استفاده از state برای کنترل نمایش منو */}
-              {(() => {
-                const [countryMenuOpen, setCountryMenuOpen] = useState(false);
-                const [countryButtonRef, setCountryButtonRef] = useState<HTMLButtonElement | null>(null);
-                
-                // نمایش کشور انتخاب شده
-                const selectedCountryDisplay = () => {
-                  if (!selectedCountry) return "کشور سازنده";
-                  
-                  const country = countries.find(c => c.id === selectedCountry);
-                  return country ? `${country.flag} ${country.name}` : "کشور سازنده";
-                };
-                
-                return (
-                  <>
-                    <Button 
-                      variant="outline" 
-                      className="w-full justify-between border-[#00BFFF]/20 bg-[#00142c]/80 text-white hover:bg-[#00142c]"
-                      onClick={() => setCountryMenuOpen(true)}
-                      ref={setCountryButtonRef}
-                    >
-                      <span>{selectedCountryDisplay()}</span>
-                      <Flag className="h-4 w-4 mr-2 text-[#00BFFF]/70" />
-                    </Button>
+              <>
+                <Button 
+                  variant="outline" 
+                  className="w-full justify-between border-[#00BFFF]/20 bg-[#00142c]/80 text-white hover:bg-[#00142c]"
+                  onClick={() => setCountryMenuOpen(true)}
+                  ref={setCountryButtonRef}
+                >
+                  <span>{selectedCountry ? 
+                      `${countries.find(c => c.id === selectedCountry)?.flag} ${countries.find(c => c.id === selectedCountry)?.name}` : 
+                      "کشور سازنده"}
+                  </span>
+                  <Flag className="h-4 w-4 mr-2 text-[#00BFFF]/70" />
+                </Button>
 
-                    {/* استفاده از کامپوننت PortalContextMenu برای موقعیت‌دهی دقیق */}
-                    <PortalContextMenu
-                      open={countryMenuOpen}
-                      onClose={() => setCountryMenuOpen(false)}
-                      anchorElement={countryButtonRef}
-                      width="100%"
-                      maxHeight="320px"
-                      className="p-0"
-                    >
-                      <div className="p-2">
-                        <div className="mb-2 px-3 py-2">
-                          <h4 className="text-[#00BFFF] text-sm font-medium">کشورها</h4>
-                        </div>
-                        <div className="grid grid-cols-1 gap-1 max-h-[250px] overflow-y-auto">
-                          {countries.map((country) => (
-                            <button
-                              key={country.id}
-                              className={cn(
-                                "flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-all w-full text-right",
-                                selectedCountry === country.id
-                                  ? "bg-[#00BFFF]/20 text-[#00BFFF]"
-                                  : "hover:bg-[#00142c]/80 text-gray-300"
-                              )}
-                              onClick={() => {
-                                setSelectedCountry(country.id);
-                                setCountryMenuOpen(false);
-                              }}
-                            >
-                              <span className="text-lg">{country.flag}</span>
-                              <span>{country.name}</span>
-                              {selectedCountry === country.id && (
-                                <Check className="h-3 w-3 mr-auto text-[#00BFFF]" />
-                              )}
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-                    </PortalContextMenu>
-                  </>
-                );
-              })()}
+                {/* استفاده از کامپوننت PortalContextMenu برای موقعیت‌دهی دقیق */}
+                <PortalContextMenu
+                  open={countryMenuOpen}
+                  onClose={() => setCountryMenuOpen(false)}
+                  anchorElement={countryButtonRef}
+                  width="100%"
+                  maxHeight="320px"
+                  className="p-0"
+                >
+                  <div className="p-2">
+                    <div className="mb-2 px-3 py-2">
+                      <h4 className="text-[#00BFFF] text-sm font-medium">کشورها</h4>
+                    </div>
+                    <div className="grid grid-cols-1 gap-1 max-h-[250px] overflow-y-auto">
+                      {countries.map((country) => (
+                        <button
+                          key={country.id}
+                          className={cn(
+                            "flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-all w-full text-right",
+                            selectedCountry === country.id
+                              ? "bg-[#00BFFF]/20 text-[#00BFFF]"
+                              : "hover:bg-[#00142c]/80 text-gray-300"
+                          )}
+                          onClick={() => {
+                            setSelectedCountry(country.id);
+                            setCountryMenuOpen(false);
+                          }}
+                        >
+                          <span className="text-lg">{country.flag}</span>
+                          <span>{country.name}</span>
+                          {selectedCountry === country.id && (
+                            <Check className="h-3 w-3 mr-auto text-[#00BFFF]" />
+                          )}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </PortalContextMenu>
+              </>
             </div>
           </div>
         </div>
