@@ -13,7 +13,8 @@ const TestReviews: React.FC = () => {
     queryFn: () => fetch('/api/content?limit=1').then(res => res.json()),
   });
 
-  const contentId = contents && contents.length > 0 ? contents[0].id : null;
+  // استفاده از ObjectId اصلی که از API برگردانده می‌شود بدون تغییر
+  const contentId = contents && contents.length > 0 ? contents[0]._id : null;
 
   return (
     <div className="container mx-auto p-4 py-8 max-w-6xl">

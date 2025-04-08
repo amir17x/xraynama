@@ -243,7 +243,7 @@ const ReviewsAndComments: React.FC<ReviewsAndCommentsProps> = ({ contentId }) =>
           ) : reviews && reviews.length > 0 ? (
             <div className="space-y-4">
               {reviews.map((review: any) => (
-                <ReviewItem key={review.id} review={review} />
+                <ReviewItem key={review._id} review={review} />
               ))}
             </div>
           ) : (
@@ -293,7 +293,7 @@ const ReviewsAndComments: React.FC<ReviewsAndCommentsProps> = ({ contentId }) =>
           ) : comments && comments.length > 0 ? (
             <div className="space-y-3">
               {comments.map((comment: any) => (
-                <CommentItem key={comment.id} comment={comment} />
+                <CommentItem key={comment._id} comment={comment} />
               ))}
             </div>
           ) : (
