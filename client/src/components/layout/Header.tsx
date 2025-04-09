@@ -269,82 +269,107 @@ export const Header: React.FC = () => {
 
                       {/* منوی کاربر */}
                       {showUserMenu && (
-                        <div className="absolute left-0 sm:right-0 top-full mt-2 w-64 bg-gradient-to-b from-blue-900/95 to-blue-950/95 backdrop-blur-md rounded-lg overflow-hidden shadow-xl border border-blue-700/40 z-[100]">
+                        <div className="absolute left-0 sm:right-0 top-full mt-2 w-64 bg-[#00142c]/80 backdrop-blur-lg rounded-xl overflow-hidden shadow-[0_4px_25px_rgba(0,191,255,0.15)] border border-[#00BFFF]/20 z-[150] animate-in fade-in slide-in-from-top-5 duration-300">
                           {/* هدر منوی کاربر */}
-                          <div className="p-3 border-b border-blue-700/20">
+                          <div className="p-4 border-b border-[#00BFFF]/10 relative">
+                            {/* نوار تزئینی بالای کارت */}
+                            <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-[#00BFFF]/30 to-transparent"></div>
+                            
                             <div className="flex items-center gap-3">
-                              <Avatar className="w-10 h-10 border-2 border-blue-500/30 shadow-md">
+                              <Avatar className="w-12 h-12 border-2 border-[#00BFFF]/30 shadow-[0_0_10px_rgba(0,191,255,0.2)]">
                                 <AvatarImage src={user.avatar || undefined} />
-                                <AvatarFallback className="bg-blue-800 text-blue-100">
+                                <AvatarFallback className="bg-[#001c3d] text-[#00BFFF]">
                                   {user.name?.charAt(0) || user.username.charAt(0)}
                                 </AvatarFallback>
                               </Avatar>
                               <div>
-                                <div className="font-medium text-white">{user.name || user.username}</div>
-                                <div className="text-xs text-gray-400">@{user.username}</div>
+                                <div className="font-bold text-white text-base">{user.name || user.username}</div>
+                                <div className="text-xs text-[#AABBCC]">@{user.username}</div>
                               </div>
                             </div>
                           </div>
 
+                          {/* افکت‌های داخلی منو */}
+                          <div className="absolute left-[15%] top-[40%] w-24 h-24 bg-[#00BFFF]/5 rounded-full blur-3xl pointer-events-none opacity-70"></div>
+                          <div className="absolute right-[10%] bottom-[20%] w-20 h-20 bg-[#00BFFF]/5 rounded-full blur-3xl pointer-events-none opacity-70"></div>
+
                           {/* آیتم‌های منوی کاربر */}
-                          <div className="p-1.5">
-                            <div>
+                          <div className="p-2 relative z-10">
+                            <div className="mb-1">
                               <Link href="/profile">
-                                <div className="flex items-center gap-2 p-2 hover:bg-blue-800/30 rounded-md text-sm text-gray-200 hover:text-white cursor-pointer">
-                                  <User size={16} className="text-blue-400" />
+                                <div className="flex items-center gap-2.5 p-2.5 hover:bg-[#001c3d]/70 rounded-lg text-sm text-[#CCDDEE] hover:text-white cursor-pointer transition-all duration-300 group">
+                                  <div className="bg-[#001c3d] p-2 rounded-lg group-hover:bg-[#00BFFF]/20 transition-all duration-300">
+                                    <User size={18} className="text-[#00BFFF]" />
+                                  </div>
                                   <span>پروفایل</span>
                                 </div>
                               </Link>
                             </div>
-                            <div>
+
+                            <div className="mb-1">
                               <Link href="/profile?tab=favorites">
-                                <div className="flex items-center gap-2 p-2 hover:bg-blue-800/30 rounded-md text-sm text-gray-200 hover:text-white cursor-pointer">
-                                  <Heart size={16} className="text-blue-400" />
+                                <div className="flex items-center gap-2.5 p-2.5 hover:bg-[#001c3d]/70 rounded-lg text-sm text-[#CCDDEE] hover:text-white cursor-pointer transition-all duration-300 group">
+                                  <div className="bg-[#001c3d] p-2 rounded-lg group-hover:bg-[#00BFFF]/20 transition-all duration-300">
+                                    <Heart size={18} className="text-[#00BFFF]" />
+                                  </div>
                                   <span>علاقه‌مندی‌ها</span>
                                 </div>
                               </Link>
                             </div>
-                            <div>
+
+                            <div className="mb-1">
                               <Link href="/profile?tab=history">
-                                <div className="flex items-center gap-2 p-2 hover:bg-blue-800/30 rounded-md text-sm text-gray-200 hover:text-white cursor-pointer">
-                                  <Clock size={16} className="text-blue-400" />
+                                <div className="flex items-center gap-2.5 p-2.5 hover:bg-[#001c3d]/70 rounded-lg text-sm text-[#CCDDEE] hover:text-white cursor-pointer transition-all duration-300 group">
+                                  <div className="bg-[#001c3d] p-2 rounded-lg group-hover:bg-[#00BFFF]/20 transition-all duration-300">
+                                    <Clock size={18} className="text-[#00BFFF]" />
+                                  </div>
                                   <span>تاریخچه تماشا</span>
                                 </div>
                               </Link>
                             </div>
-                            <div>
+
+                            <div className="mb-1">
                               <Link href="/profile?tab=settings">
-                                <div className="flex items-center gap-2 p-2 hover:bg-blue-800/30 rounded-md text-sm text-gray-200 hover:text-white cursor-pointer">
-                                  <Settings size={16} className="text-blue-400" />
+                                <div className="flex items-center gap-2.5 p-2.5 hover:bg-[#001c3d]/70 rounded-lg text-sm text-[#CCDDEE] hover:text-white cursor-pointer transition-all duration-300 group">
+                                  <div className="bg-[#001c3d] p-2 rounded-lg group-hover:bg-[#00BFFF]/20 transition-all duration-300">
+                                    <Settings size={18} className="text-[#00BFFF]" />
+                                  </div>
                                   <span>تنظیمات</span>
                                 </div>
                               </Link>
                             </div>
 
-                            <div className="h-px my-1 bg-blue-700/20" />
+                            <div className="h-px my-2 bg-gradient-to-r from-transparent via-[#00BFFF]/20 to-transparent" />
 
                             {user.role === "admin" && (
                               <>
-                                <div>
+                                <div className="mb-1">
                                   <Link href="/admin">
-                                    <div className="flex items-center gap-2 p-2 hover:bg-blue-800/30 rounded-md text-sm text-green-400 hover:text-green-300 cursor-pointer">
-                                      <Shield size={16} className="text-green-400" />
+                                    <div className="flex items-center gap-2.5 p-2.5 hover:bg-[#001c3d]/70 rounded-lg text-sm text-[#4ADE80] hover:text-white cursor-pointer transition-all duration-300 group">
+                                      <div className="bg-[#001c3d] p-2 rounded-lg group-hover:bg-[#4ADE80]/20 transition-all duration-300">
+                                        <Shield size={18} className="text-[#4ADE80]" />
+                                      </div>
                                       <span>پنل مدیریت</span>
                                     </div>
                                   </Link>
                                 </div>
-                                <div className="h-px my-1 bg-blue-700/20" />
+                                <div className="h-px my-2 bg-gradient-to-r from-transparent via-[#00BFFF]/20 to-transparent" />
                               </>
                             )}
                             
                             <button 
                               onClick={handleLogout}
-                              className="w-full flex items-center gap-2 p-2 hover:bg-red-900/20 rounded-md text-sm text-red-400 hover:text-red-300"
+                              className="w-full flex items-center gap-2.5 p-2.5 hover:bg-[#300]/20 rounded-lg text-sm text-[#FF5757] hover:text-white cursor-pointer transition-all duration-300 group"
                             >
-                              <LogOut size={16} className="text-red-400" />
+                              <div className="bg-[#001c3d] p-2 rounded-lg group-hover:bg-[#FF5757]/20 transition-all duration-300">
+                                <LogOut size={18} className="text-[#FF5757]" />
+                              </div>
                               <span>خروج</span>
                             </button>
                           </div>
+                          
+                          {/* خط تزئینی پایین کارت */}
+                          <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[#00BFFF]/30 to-transparent"></div>
                         </div>
                       )}
                     </>
@@ -352,11 +377,14 @@ export const Header: React.FC = () => {
                     <div>
                       <Link href="/auth/login">
                         <Button 
-                          className="bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 
-                                    text-white border-0 shadow-md hover:shadow-lg transition-all"
+                          className="bg-gradient-to-r from-[#006BFF] to-[#00BFFF] hover:from-[#00BFFF] hover:to-[#006BFF] 
+                                   text-white border border-[#00BFFF]/20 shadow-[0_0_15px_rgba(0,191,255,0.2)] 
+                                   hover:shadow-[0_0_20px_rgba(0,191,255,0.4)] transform hover:scale-[1.02] 
+                                   transition-all duration-300 relative overflow-hidden group"
                           size="sm"
                         >
-                          ورود / ثبت‌نام
+                          <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-[#00BFFF]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
+                          <span className="relative z-10">ورود / ثبت‌نام</span>
                         </Button>
                       </Link>
                     </div>
@@ -409,45 +437,90 @@ export const Header: React.FC = () => {
 
       {/* منوی جستجوی موبایل */}
       {showSearchBar && (
-        <div className="absolute top-full left-0 right-0 p-4 bg-gradient-to-b from-blue-900/95 to-blue-950/95 backdrop-blur-md border-b border-blue-800/40 z-[100] md:hidden">
-          <form onSubmit={handleSearch} className="relative">
-            <Input
-              type="text"
-              placeholder="جستجو در فیلم‌ها و سریال‌ها..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full rounded-full border-[#00BFFF]/30 bg-[#001c3d]/50 placeholder-gray-400
-                        text-white pl-10 pr-10 py-2 text-sm focus:border-[#00BFFF] focus:ring-[#00BFFF]/20"
-              autoFocus
-            />
-            <button
-              type="submit"
-              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white transition-colors"
-            >
-              <Search className="h-4 w-4" />
-            </button>
-          </form>
+        <div className="absolute top-full left-0 right-0 p-4 bg-[#00142c]/90 backdrop-blur-lg border-b border-[#00BFFF]/20 shadow-[0_4px_25px_rgba(0,191,255,0.15)] z-[100] md:hidden animate-in fade-in slide-in-from-top-5 duration-200">
+          <div className="relative">
+            {/* افکت‌های داخلی منو */}
+            <div className="absolute left-1/4 top-1/2 w-24 h-24 bg-[#00BFFF]/5 rounded-full blur-3xl pointer-events-none opacity-70"></div>
+            <div className="absolute right-1/4 top-1/2 w-20 h-20 bg-[#00BFFF]/5 rounded-full blur-3xl pointer-events-none opacity-70"></div>
+            
+            {/* نوار تزئینی بالای منو */}
+            <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-[#00BFFF]/30 to-transparent"></div>
+            
+            <form onSubmit={handleSearch} className="relative z-10">
+              <Input
+                type="text"
+                placeholder="جستجو در فیلم‌ها و سریال‌ها..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full rounded-full border-[#00BFFF]/30 bg-[#001c3d]/50 placeholder-[#AABBCC]
+                          text-white pl-10 pr-10 py-2.5 text-sm focus:border-[#00BFFF] focus:ring-[#00BFFF]/20
+                          shadow-[0_0_15px_rgba(0,191,255,0.1)] transition-all duration-300 focus:shadow-[0_0_20px_rgba(0,191,255,0.2)]"
+                autoFocus
+              />
+              <button
+                type="submit"
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-[#AABBCC] hover:text-[#00BFFF] transition-colors duration-300"
+              >
+                <Search className="h-4 w-4" />
+              </button>
+              
+              <div className="absolute left-3 top-1/2 transform -translate-y-1/2 flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => setShowSearchBar(false)}
+                  className="p-1 rounded-full bg-[#001c3d]/70 text-[#AABBCC] hover:text-[#00BFFF] hover:bg-[#001c3d] transition-all duration-300"
+                >
+                  <X className="h-3.5 w-3.5" />
+                </button>
+              </div>
+            </form>
+            
+            {/* نوار تزئینی پایین منو */}
+            <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[#00BFFF]/30 to-transparent"></div>
+          </div>
         </div>
       )}
 
       {/* منوی موبایل */}
       {showMainMenu && (
-        <div className="absolute top-full left-0 right-0 z-40 bg-gradient-to-b from-blue-900/95 to-blue-950/95 backdrop-blur-sm border-b border-blue-800/40 shadow-lg md:hidden">
-          <div className="container mx-auto px-4 py-3 max-h-[calc(100vh-80px)] overflow-y-auto">
-            <nav className="flex flex-col space-y-1">
+        <div className="absolute top-full left-0 right-0 z-40 bg-[#00142c]/90 backdrop-blur-lg border-b border-[#00BFFF]/20 shadow-[0_4px_25px_rgba(0,191,255,0.15)] md:hidden animate-in fade-in slide-in-from-top-5 duration-200">
+          <div className="container mx-auto px-4 py-3 max-h-[calc(100vh-80px)] overflow-y-auto relative">
+            {/* افکت‌های داخلی منو */}
+            <div className="absolute left-[10%] top-[20%] w-32 h-32 bg-[#00BFFF]/5 rounded-full blur-3xl pointer-events-none opacity-70"></div>
+            <div className="absolute right-[15%] bottom-[15%] w-32 h-32 bg-[#00BFFF]/5 rounded-full blur-3xl pointer-events-none opacity-70"></div>
+            
+            {/* نوار تزئینی بالای منو */}
+            <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-[#00BFFF]/30 to-transparent"></div>
+            
+            <nav className="flex flex-col space-y-1.5 relative z-10">
               {menuItems.map((item, idx) => (
                 <div key={idx}>
                   <Link href={item.href}>
                     <div 
                       className={cn(
-                        "flex items-center gap-2 px-3 py-2.5 rounded-lg transition-colors cursor-pointer",
+                        "flex items-center gap-3 p-3 rounded-lg transition-all duration-300 cursor-pointer",
                         location === item.href 
-                          ? "bg-blue-800/50 text-white font-medium" 
-                          : "text-gray-200 hover:bg-blue-800/30 hover:text-white"
+                          ? "bg-[#001c3d]/70 text-[#00BFFF] font-medium shadow-[0_0_10px_rgba(0,191,255,0.1)]" 
+                          : "text-[#CCDDEE] hover:bg-[#001c3d]/50 hover:text-white"
                       )}
                       onClick={() => setShowMainMenu(false)}
                     >
-                      {item.icon}
+                      <div className={cn(
+                        "p-2 rounded-lg transition-all duration-300",
+                        location === item.href 
+                          ? "bg-[#00BFFF]/10" 
+                          : "bg-[#001c3d]"
+                      )}>
+                        {React.cloneElement(item.icon, { 
+                          size: 20,
+                          className: cn(
+                            "transition-colors duration-300",
+                            location === item.href 
+                              ? "text-[#00BFFF]" 
+                              : "text-[#00BFFF]/80"
+                          )
+                        })}
+                      </div>
                       <span>{item.text}</span>
                     </div>
                   </Link>
@@ -456,25 +529,30 @@ export const Header: React.FC = () => {
             </nav>
             
             {user && (
-              <div className="mt-4 pt-3 border-t border-blue-800/30 flex space-x-2 space-x-reverse">
-                <div>
+              <div className="mt-4 pt-4 relative z-10">
+                {/* خط تزئینی جداکننده */}
+                <div className="h-px mb-3 bg-gradient-to-r from-transparent via-[#00BFFF]/20 to-transparent"></div>
+                
+                <div className="grid grid-cols-2 gap-2">
                   <Link href="/profile?tab=favorites">
-                    <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm bg-blue-900/40 text-gray-200 hover:bg-blue-800/60 cursor-pointer">
-                      <Heart size={16} className="text-blue-400" />
+                    <div className="flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm bg-[#001c3d]/40 text-[#CCDDEE] hover:bg-[#001c3d]/70 hover:text-white cursor-pointer transition-all duration-300 border border-[#00BFFF]/10 shadow-[0_2px_10px_rgba(0,191,255,0.05)]">
+                      <Heart size={16} className="text-[#00BFFF]" />
                       <span>علاقه‌مندی‌ها</span>
                     </div>
                   </Link>
-                </div>
-                <div>
+                  
                   <Link href="/profile?tab=history">
-                    <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm bg-blue-900/40 text-gray-200 hover:bg-blue-800/60 cursor-pointer">
-                      <Clock size={16} className="text-blue-400" />
+                    <div className="flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm bg-[#001c3d]/40 text-[#CCDDEE] hover:bg-[#001c3d]/70 hover:text-white cursor-pointer transition-all duration-300 border border-[#00BFFF]/10 shadow-[0_2px_10px_rgba(0,191,255,0.05)]">
+                      <Clock size={16} className="text-[#00BFFF]" />
                       <span>تاریخچه تماشا</span>
                     </div>
                   </Link>
                 </div>
               </div>
             )}
+            
+            {/* نوار تزئینی پایین منو */}
+            <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[#00BFFF]/30 to-transparent"></div>
           </div>
         </div>
       )}

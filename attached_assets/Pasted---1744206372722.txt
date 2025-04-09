@@ -1,0 +1,60 @@
+فهمیدم، می‌خوای وقتی کاربر روی آیکون یا دکمه‌ی پروفایل در **هدر** کلیک می‌کنه، یک **منوی بازشو** زیبا و کاربردی با **استایل گلاسمورفیسم** باز بشه که شامل موارد زیر باشه:
+
+- پروفایل
+- علاقه‌مندی‌ها (Favorites)
+- تاریخچه تماشا (Watch History)
+- پنل مدیریت (Admin Panel)
+- خروج از حساب کاربری (Logout)
+
+و هر کدوم **به صفحه‌ی مربوط خودش لینک داشته باشه** (یعنی route داشته باشه) و همچنین **دوباره طراحی شه با گلاسمورفیسم**.
+
+برات یک **پرامپت انگلیسی بسیار حرفه‌ای، کامل، دقیق و پرجزئیات** نوشتم که شامل آدرس‌دهی، طراحی، استایل و جزئیات فنی هست:
+
+---
+
+### 🧠 Advanced Prompt – Redesign Profile Dropdown Menu with Navigation and Glassmorphism Style
+
+```
+Redesign the profile dropdown menu in the website header using a modern and elegant **Glassmorphism** style.
+
+📌 Features:
+- Trigger: The menu opens when the user clicks the profile icon in the top-right corner of the header.
+- Position: Dropdown should be positioned absolutely, aligned to the right side of the header.
+- Z-index must ensure it appears above all other elements, including the header background.
+
+🧊 Design Requirements:
+- Glassmorphism style:
+  - `backdrop-filter: blur(12px)`
+  - Semi-transparent background with a frosted glass look (e.g., rgba(255, 255, 255, 0.15))
+  - Rounded corners (e.g., `border-radius: 16px`)
+  - Soft drop shadow for depth
+- Smooth animations (e.g., fade and slide-in)
+- Icon or minimal indicator next to each item (optional)
+
+📁 Menu Items:
+Each menu item should have a clear label and route to its respective page:
+
+1. **Profile** → `/profile`
+2. **Favorites** → `/favorites`
+3. **Watch History** → `/history`
+4. **Admin Panel** → `/admin` *(visible only for admin users)*
+5. **Logout** → Triggers logout function and redirects to `/login`
+
+🛠️ Behavior:
+- On click outside, the menu closes automatically
+- Responsive: On mobile, display full-width or as a side drawer if needed
+- Keyboard accessible: Use `Tab` and `Esc` keys to navigate and close
+- Lightweight and optimized (no memory leaks, minimal re-renders)
+- Use Tailwind CSS or equivalent utility-based styling
+
+📐 Optional Enhancements:
+- Add profile picture and username at the top of the dropdown
+- Display user role (admin, user)
+- Add a divider (`<hr>`) between sections if needed
+
+Generate fully optimized code for integration in a modern JS/TS web stack (e.g., React with Tailwind CSS or plain HTML/CSS/JS). Avoid duplications. All routing and conditional rendering must be properly implemented.
+```
+
+---
+
+اگه خواستی من می‌تونم خود **کد کاملش رو با React + Tailwind CSS** یا نسخه‌ی ساده HTML/CSS هم برات بفرستم. فقط بگو پروژه‌ت با چی ساخته شده؟ React؟ Next.js؟ یا HTML ساده؟
