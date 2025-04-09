@@ -5,7 +5,7 @@ import { setupAuth } from "./auth";
 import { setupAdminRoutes } from "./admin";
 import { User } from '@shared/schema';
 import { TMDBService } from "./tmdb-service";
-import { omdbPGCacheService } from "./omdb-pg-cache-service"; // Updated to use PostgreSQL cache
+// omdbPGCacheService has been removed
 import { mergedContentService } from "./merged-content-service";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -1097,98 +1097,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  // آمار کش OMDb در PostgreSQL
-  app.get("/api/omdb/pg-cache/stats", async (req, res, next) => {
-    try {
-      const { omdbPGCacheService } = await import('./omdb-pg-cache-service');
-      const stats = await omdbPGCacheService.getCacheStats();
-      res.json(stats);
-    } catch (error) {
-      console.error("Error getting OMDb PG cache stats:", error);
-      res.status(500).json({ 
-        error: "خطا در دریافت آمار کش OMDb", 
-        message: "متأسفانه در حال حاضر امکان دریافت آمار کش OMDb وجود ندارد. لطفاً بعداً دوباره تلاش کنید."
-      });
-    }
-  });
-
   // ===================================
-  // OMDb API ها
+  // Merged API ها (فقط TMDB)
   // ===================================
 
-  // دریافت اطلاعات فیلم با IMDb ID
-  app.get("/api/omdb/id/:imdbId", async (req, res, next) => {
-    try {
-      const imdbId = req.params.imdbId;
-      
-      if (!imdbId) {
-        return res.status(400).json({ message: "IMDb ID الزامی است" });
-      }
-      
-      const content = await omdbPGCacheService.getContentByImdbId(imdbId);
-      
-      if (!content) {
-        return res.status(404).json({ message: "محتوا با این IMDb ID یافت نشد" });
-      }
-      
-      res.json(content);
-    } catch (error) {
-      console.error(`Error fetching OMDb content for IMDb ID ${req.params.imdbId}:`, error);
-      res.status(500).json({ 
-        error: "خطا در دریافت اطلاعات از OMDb", 
-        message: "متأسفانه در حال حاضر امکان دریافت اطلاعات از OMDb وجود ندارد. لطفاً بعداً دوباره تلاش کنید."
-      });
-    }
-  });
-
-  // جستجوی فیلم در OMDb با عنوان
-  app.get("/api/omdb/search", async (req, res, next) => {
-    try {
-      const title = req.query.title as string;
-      
-      if (!title || title.trim().length === 0) {
-        return res.status(400).json({ message: "عنوان فیلم الزامی است" });
-      }
-      
-      const content = await omdbPGCacheService.searchByTitle(title);
-      
-      if (!content) {
-        return res.status(404).json({ message: "محتوایی با این عنوان یافت نشد" });
-      }
-      
-      res.json(content);
-    } catch (error) {
-      console.error(`Error searching OMDb content for title ${req.query.title}:`, error);
-      res.status(500).json({ 
-        error: "خطا در جستجوی اطلاعات از OMDb", 
-        message: "متأسفانه در حال حاضر امکان جستجوی اطلاعات از OMDb وجود ندارد. لطفاً بعداً دوباره تلاش کنید."
-      });
-    }
-  });
-
-  // ===================================
-  // API های مدیریت کش
-  // ===================================
-  
-  // دریافت آمار کش PostgreSQL برای OMDb API
-  app.get("/api/omdb/cache-stats", async (req, res, next) => {
-    try {
-      const stats = await omdbPGCacheService.getCacheStats();
-      res.json(stats);
-    } catch (error) {
-      console.error('Error getting cache stats:', error);
-      res.status(500).json({ 
-        error: "خطا در دریافت آمار کش", 
-        message: "متأسفانه در حال حاضر امکان دریافت آمار کش وجود ندارد. لطفاً بعداً دوباره تلاش کنید."
-      });
-    }
-  });
-
-  // ===================================
-  // Merged API ها (ترکیب TMDB و OMDb)
-  // ===================================
-
-  // دریافت اطلاعات کامل فیلم (ترکیب TMDB و OMDb)
+  // دریافت اطلاعات کامل فیلم (از TMDB)
   app.get("/api/merged/movies/:tmdbId", async (req, res, next) => {
     try {
       const tmdbId = parseInt(req.params.tmdbId);
@@ -1214,7 +1127,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // دریافت اطلاعات کامل سریال (ترکیب TMDB و OMDb)
+  // دریافت اطلاعات کامل سریال (از TMDB)
   app.get("/api/merged/tv/:tmdbId", async (req, res, next) => {
     try {
       const tmdbId = parseInt(req.params.tmdbId);
@@ -1240,72 +1153,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // جستجوی ساده با استفاده از کش PostgreSQL برای OMDb API
+  // جستجوی ساده با استفاده از TMDB API
   app.get("/api/merged/search", async (req, res, next) => {
     try {
       const query = req.query.query as string;
-      // No need to import omdbPGCacheService again, it's already imported at the top of the file
+      const language = req.query.language as string || 'fa-IR';
       
       if (!query || query.trim().length === 0) {
         return res.status(400).json({ message: "عبارت جستجو الزامی است" });
       }
       
-      // استفاده از کش PostgreSQL برای OMDb API
-      try {
-        // جستجو در OMDb با کش PostgreSQL
-        const omdbResult = await omdbPGCacheService.searchByTitle(query);
-        
-        if (!omdbResult) {
-          return res.json({
-            query,
-            results: [],
-            total: 0
-          });
-        }
-        
-        // تبدیل به فرمت مورد نظر ما
-        const transformed = {
-          id: `omdb-${omdbResult.imdbID}`,
-          imdbId: omdbResult.imdbID,
-          title: omdbResult.title,
-          englishTitle: omdbResult.englishTitle || omdbResult.title,
-          year: omdbResult.year,
-          poster: omdbResult.poster,
-          type: omdbResult.type,
-          genres: omdbResult.genre,
-          rated: omdbResult.language,
-          released: omdbResult.released,
-          runtime: omdbResult.runtime,
-          director: omdbResult.director,
-          writer: omdbResult.writer,
-          actors: omdbResult.actors,
-          plot: omdbResult.plot,
-          language: omdbResult.language,
-          country: omdbResult.country,
-          awards: omdbResult.awards,
-          imdbRating: omdbResult.imdbRating,
-          boxOffice: omdbResult.boxOffice,
-          production: omdbResult.production,
-          duration: omdbResult.runtime,
-          description: omdbResult.plot
-        };
-        
-        return res.json({
-          query,
-          results: [transformed],
-          total: 1
-        });
-      } catch (omdbError) {
-        console.error(`Error in OMDb search with PG cache:`, omdbError);
-        // در صورت خطا در OMDb، نتیجه خالی برگردان
-        return res.json({
-          query,
-          results: [],
-          total: 0
-        });
-      }
+      // جستجو در TMDB API
+      const results = await mergedContentService.searchContent(query, language);
+      
+      return res.json({
+        query,
+        results,
+        total: results.length
+      });
     } catch (error) {
-      console.error(`Error in unified search for query ${req.query.query}:`, error);
+      console.error(`Error in search for query ${req.query.query}:`, error);
       res.status(500).json({ 
         error: "خطا در جستجو", 
         message: "متأسفانه در حال حاضر امکان جستجو وجود ندارد. لطفاً بعداً دوباره تلاش کنید."

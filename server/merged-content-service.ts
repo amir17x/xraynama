@@ -1,8 +1,6 @@
-// merged-content-service.ts - سرویس ادغام اطلاعات از TMDB و OMDb
+// merged-content-service.ts - سرویس دریافت اطلاعات از TMDB
 
 import { TMDBService } from './tmdb-service';
-import { omdbPGCacheService } from './omdb-pg-cache-service'; // Updated to use PostgreSQL cache
-import { NormalizedOMDbContent } from './omdb-service';
 
 // کلاس tmdbService را از فایل tmdb-service وارد می‌کنیم
 const tmdbService = new TMDBService();
@@ -23,6 +21,20 @@ interface TMDbMovie {
   runtime?: number;
   genres?: Array<{id: number, name: string}>;
   imdb_id?: string;
+  credits?: {
+    cast?: Array<{
+      id: number;
+      name: string;
+      character: string;
+      profile_path?: string;
+    }>;
+    crew?: Array<{
+      id: number;
+      name: string;
+      job: string;
+      department: string;
+    }>;
+  };
 }
 
 interface TMDbSeries {
@@ -39,6 +51,20 @@ interface TMDbSeries {
   original_language: string;
   genres?: Array<{id: number, name: string}>;
   episode_run_time?: number[];
+  credits?: {
+    cast?: Array<{
+      id: number;
+      name: string;
+      character: string;
+      profile_path?: string;
+    }>;
+    crew?: Array<{
+      id: number;
+      name: string;
+      job: string;
+      department: string;
+    }>;
+  };
 }
 
 interface TMDbExternalIds {
@@ -49,9 +75,9 @@ interface TMDbExternalIds {
   twitter_id?: string;
 }
 
-// Define a merged content type that combines data from both APIs
+// Define a content type based on TMDB data
 export interface MergedContent {
-  // Base content info (available in both APIs)
+  // Base content info 
   id: string;
   imdbId?: string;
   title: string;
@@ -71,45 +97,45 @@ export interface MergedContent {
   originalLanguage?: string;
   releaseDate?: string;
   
-  // OMDb specific fields
-  rated?: string;
-  released?: string;
+  // Additional content metadata
   runtime?: string;
   director?: string;
   writer?: string;
   actors?: string[];
-  plot?: string;
   language?: string;
   country?: string;
-  awards?: string;
   imdbRating?: string;
-  metascore?: string;
-  boxOffice?: string;
-  production?: string;
-  ratings?: Array<{
-    source: string;
-    value: string;
-  }>;
   
   // Additional fields for UI/UX
   isFavorite?: boolean;
   isInWatchlist?: boolean;
   duration?: number | string;
   description?: string;
+  subtitleOptions?: string[]; // 'persian', 'english', 'both'
+  hasPersianDubbing?: boolean;
+  hasPersianSubtitle?: boolean;
 }
 
 class MergedContentService {
   /**
-   * This method merges movie data from TMDB with enhanced details from OMDb
+   * This method gets movie data from TMDB
    */
   async getMergedMovie(tmdbId: number, language: string = 'en-US'): Promise<MergedContent | null> {
     try {
-      // Step 1: Fetch movie details from TMDB
+      // Fetch movie details from TMDB
       const movieData = await tmdbService.getMovieDetails(tmdbId, language);
       
       if (!movieData) {
         console.log(`[merged-service] Could not find movie with TMDb ID: ${tmdbId}`);
         return null;
+      }
+      
+      // Get credits (cast & crew) for the movie if available
+      let credits = undefined;
+      try {
+        credits = await tmdbService.getMovieCredits(tmdbId, language);
+      } catch (creditsError) {
+        console.error(`[merged-service] Error fetching credits for movie ${tmdbId}:`, creditsError);
       }
       
       // Create TMDbMovie object
@@ -127,101 +153,52 @@ class MergedContentService {
         original_language: movieData.original_language || 'en',
         runtime: movieData.runtime,
         genres: movieData.genres || [],
-        imdb_id: undefined // Initialize as undefined
+        imdb_id: movieData.imdb_id,
+        credits: credits
       };
       
-      // Check if movie has IMDb ID directly in the response
-      let imdbId: string | undefined = undefined;
-      if (movieData.imdb_id) {
-        imdbId = movieData.imdb_id;
-      } else if (movieData.external_ids && movieData.external_ids.imdb_id) {
-        imdbId = movieData.external_ids.imdb_id;
-      } else {
-        // Try to get external IDs if they were not included in the initial response
-        try {
-          const external = await tmdbService.findByExternalId(
-            tmdbId.toString(), 
-            'tmdb_id',
-            language
-          );
-          
-          if (external && external.movie_results && external.movie_results.length > 0) {
-            const externalMovie = external.movie_results[0];
-            if (externalMovie.imdb_id) {
-              imdbId = externalMovie.imdb_id;
-            }
-          }
-        } catch (extError) {
-          console.error(`[merged-service] Error fetching external IDs for movie ${tmdbId}:`, extError);
-        }
-      }
-      
-      // Update the movie's IMDb ID
-      tmdbMovie.imdb_id = imdbId;
-      
-      // Step 2: If no IMDb ID found, return TMDB data only
-      if (!imdbId) {
-        console.log(`[merged-service] Movie with TMDb ID ${tmdbId} has no IMDb ID, returning TMDB data only`);
-        return this.transformTMDbMovie(tmdbMovie);
-      }
-      
-      console.log(`[merged-service] Fetching OMDb data for IMDb ID: ${imdbId}`);
-      
-      // Step 3: Fetch enhanced details from OMDb
-      const omdbData = await omdbPGCacheService.getContentByImdbId(imdbId);
-      
-      // Step 4: Merge the data and return
-      return this.mergeMovieData(tmdbMovie, omdbData);
+      // Transform and return the data
+      return this.transformTMDbMovie(tmdbMovie);
     } catch (error) {
-      console.error('[merged-service] Error merging movie data:', error);
+      console.error('[merged-service] Error getting movie data:', error);
       return null;
     }
   }
   
   /**
-   * This method merges TV series data from TMDB with enhanced details from OMDb
+   * Get TV series data from TMDB
    */
   async getMergedTVSeries(tmdbId: number, language: string = 'en-US'): Promise<MergedContent | null> {
     try {
-      // Step 1: Fetch TV details from TMDB
-      // استفاده از findByExternalId با external_source=tmdb_id برای یافتن سریال
-      const searchResult = await tmdbService.findByExternalId(
-        tmdbId.toString(), 
-        'tmdb_id', 
-        language
-      );
+      // Fetch TV details from TMDB
+      const tvData = await tmdbService.getTVSeriesDetails(tmdbId, language);
       
-      if (!searchResult || !searchResult.tv_results || searchResult.tv_results.length === 0) {
+      if (!tvData) {
         console.log(`[merged-service] Could not find TV series with TMDb ID: ${tmdbId}`);
         return null;
       }
       
-      const tvData = searchResult.tv_results[0];
-      
-      // Use TMDb API to find external IDs (including IMDb ID)
-      const externalData = await tmdbService.findByExternalId(
-        tmdbId.toString(),
-        "tmdb_id", 
-        language
-      );
-      
-      // Extract IMDb ID
-      let imdbId: string | undefined = undefined;
-      if (externalData && externalData.tv_results && externalData.tv_results.length > 0) {
-        // Search if there's any IMDb ID in the response
-        for (const source of ["imdb_id", "external_ids"]) {
-          if (externalData.tv_results[0][source]) {
-            imdbId = externalData.tv_results[0][source];
-            break;
-          }
-        }
+      // Get credits for the TV series if available
+      let credits = undefined;
+      try {
+        credits = await tmdbService.getTVSeriesCredits(tmdbId, language);
+      } catch (creditsError) {
+        console.error(`[merged-service] Error fetching credits for TV series ${tmdbId}:`, creditsError);
       }
       
-      // Create a TMDbSeries object from the data
+      // Get external IDs for the TV series
+      let externalIds: TMDbExternalIds | undefined = undefined;
+      try {
+        externalIds = await tmdbService.getTVSeriesExternalIds(tmdbId, language);
+      } catch (externalError) {
+        console.error(`[merged-service] Error fetching external IDs for TV series ${tmdbId}:`, externalError);
+      }
+      
+      // Create TMDbSeries object
       const tmdbSeries: TMDbSeries = {
         id: tvData.id,
         name: tvData.name,
-        original_name: tvData.original_name,
+        original_name: tvData.original_name || tvData.name,
         overview: tvData.overview,
         poster_path: tvData.poster_path,
         backdrop_path: tvData.backdrop_path,
@@ -229,48 +206,85 @@ class MergedContentService {
         popularity: tvData.popularity,
         vote_average: tvData.vote_average,
         vote_count: tvData.vote_count,
-        original_language: tvData.original_language,
+        original_language: tvData.original_language || 'en',
         genres: tvData.genres || [],
-        episode_run_time: tvData.episode_run_time || []
+        episode_run_time: tvData.episode_run_time || [],
+        credits: credits
       };
       
-      // If no IMDb ID, return TMDB data only
-      if (!imdbId) {
-        console.log(`[merged-service] TV series with TMDb ID ${tmdbId} has no IMDb ID, returning TMDB data only`);
-        return this.transformTMDbSeries(tmdbSeries);
+      // Transform and return the data
+      const content = this.transformTMDbSeries(tmdbSeries);
+      
+      // Add IMDb ID if available
+      if (externalIds && externalIds.imdb_id) {
+        content.imdbId = externalIds.imdb_id;
       }
       
-      console.log(`[merged-service] Fetching OMDb data for IMDb ID: ${imdbId}`);
-      
-      // Step 3: Fetch enhanced details from OMDb
-      const omdbData = await omdbPGCacheService.getContentByImdbId(imdbId);
-      
-      // Step 4: Merge the data and return
-      return this.mergeTVSeriesData(tmdbSeries, omdbData, imdbId);
+      return content;
     } catch (error) {
-      console.error('[merged-service] Error merging TV series data:', error);
+      console.error('[merged-service] Error getting TV series data:', error);
       return null;
     }
   }
   
   /**
-   * Ultra simple search that only uses OMDb - best for performance
+   * Search for content in TMDB
    */
   async searchContent(query: string, language: string = 'en-US'): Promise<MergedContent[]> {
     try {
-      // Just search in OMDb - it's the most reliable and fastest
-      try {
-        const omdbResult = await omdbPGCacheService.searchByTitle(query);
-        if (omdbResult) {
-          console.log(`[merged-service] Found content in OMDb for query: ${query}`);
-          return [this.transformOMDbContent(omdbResult)];
-        }
-      } catch (omdbError) {
-        console.error('[merged-service] Error in OMDb search:', omdbError);
+      // Search in TMDB
+      const searchResults = await tmdbService.searchMulti(query, language);
+      
+      if (!searchResults || !searchResults.results || searchResults.results.length === 0) {
+        console.log(`[merged-service] No results found in TMDB for query: ${query}`);
+        return [];
       }
       
-      // If we reach here, we couldn't find anything in OMDb
-      return [];
+      console.log(`[merged-service] Found ${searchResults.results.length} results in TMDB for query: ${query}`);
+      
+      // Transform results
+      const transformedResults: MergedContent[] = [];
+      
+      for (const result of searchResults.results) {
+        if (result.media_type === 'movie') {
+          transformedResults.push({
+            id: `tmdb-movie-${result.id}`,
+            tmdbId: result.id,
+            title: result.title,
+            englishTitle: result.original_title || result.title,
+            year: result.release_date ? new Date(result.release_date).getFullYear() : 'Unknown',
+            poster: result.poster_path || undefined,
+            backdrop: result.backdrop_path || undefined,
+            type: 'movie',
+            genres: [],
+            popularity: result.popularity,
+            voteAverage: result.vote_average,
+            voteCount: result.vote_count,
+            overview: result.overview,
+            description: result.overview
+          });
+        } else if (result.media_type === 'tv') {
+          transformedResults.push({
+            id: `tmdb-tv-${result.id}`,
+            tmdbId: result.id,
+            title: result.name,
+            englishTitle: result.original_name || result.name,
+            year: result.first_air_date ? new Date(result.first_air_date).getFullYear() : 'Unknown',
+            poster: result.poster_path || undefined,
+            backdrop: result.backdrop_path || undefined,
+            type: 'series',
+            genres: [],
+            popularity: result.popularity,
+            voteAverage: result.vote_average,
+            voteCount: result.vote_count,
+            overview: result.overview,
+            description: result.overview
+          });
+        }
+      }
+      
+      return transformedResults;
+      
     } catch (error) {
       console.error('[merged-service] Error searching content:', error);
       return [];
@@ -283,6 +297,29 @@ class MergedContentService {
   private transformTMDbMovie(movie: TMDbMovie): MergedContent {
     const genreNames = movie.genres ? movie.genres.map(g => g.name) : [];
     
+    // Extract directors, writers, and actors from credits if available
+    let directors: string[] = [];
+    let writers: string[] = [];
+    let actors: string[] = [];
+    
+    if (movie.credits) {
+      if (movie.credits.crew) {
+        directors = movie.credits.crew
+          .filter(crew => crew.job === 'Director')
+          .map(director => director.name);
+          
+        writers = movie.credits.crew
+          .filter(crew => ['Writer', 'Screenplay', 'Story'].includes(crew.job))
+          .map(writer => writer.name);
+      }
+      
+      if (movie.credits.cast) {
+        actors = movie.credits.cast
+          .slice(0, 10) // Limit to top 10 actors
+          .map(actor => actor.name);
+      }
+    }
+    
     return {
       id: `tmdb-movie-${movie.id}`,
       tmdbId: movie.id,
@@ -290,8 +327,8 @@ class MergedContentService {
       title: movie.title,
       englishTitle: movie.original_title || movie.title,
       year: movie.release_date ? new Date(movie.release_date).getFullYear() : 'Unknown',
-      poster: movie.poster_path || undefined,
-      backdrop: movie.backdrop_path || undefined,
+      poster: movie.poster_path ? `https://image.tmdb.org/t/p/w500${movie.poster_path}` : undefined,
+      backdrop: movie.backdrop_path ? `https://image.tmdb.org/t/p/original${movie.backdrop_path}` : undefined,
       type: 'movie',
       genres: genreNames,
       popularity: movie.popularity,
@@ -301,7 +338,15 @@ class MergedContentService {
       originalLanguage: movie.original_language,
       releaseDate: movie.release_date,
       duration: movie.runtime,
-      description: movie.overview
+      description: movie.overview,
+      director: directors.join(', '),
+      writer: writers.join(', '),
+      actors: actors,
+      imdbRating: movie.vote_average ? (movie.vote_average / 2).toFixed(1) : undefined, // Convert to scale of 10
+      runtime: movie.runtime ? `${movie.runtime} دقیقه` : undefined,
+      subtitleOptions: [], // Will be set by admin
+      hasPersianDubbing: false, // Will be set by admin
+      hasPersianSubtitle: false, // Will be set by admin
     };
   }
   
@@ -311,14 +356,37 @@ class MergedContentService {
   private transformTMDbSeries(series: TMDbSeries): MergedContent {
     const genreNames = series.genres ? series.genres.map(g => g.name) : [];
     
+    // Extract creators, writers, and actors from credits if available
+    let directors: string[] = [];
+    let writers: string[] = [];
+    let actors: string[] = [];
+    
+    if (series.credits) {
+      if (series.credits.crew) {
+        directors = series.credits.crew
+          .filter(crew => ['Director', 'Executive Producer', 'Creator'].includes(crew.job))
+          .map(director => director.name);
+          
+        writers = series.credits.crew
+          .filter(crew => ['Writer', 'Story Editor', 'Creator'].includes(crew.job))
+          .map(writer => writer.name);
+      }
+      
+      if (series.credits.cast) {
+        actors = series.credits.cast
+          .slice(0, 10) // Limit to top 10 actors
+          .map(actor => actor.name);
+      }
+    }
+    
     return {
       id: `tmdb-tv-${series.id}`,
       tmdbId: series.id,
       title: series.name,
       englishTitle: series.original_name || series.name,
       year: series.first_air_date ? new Date(series.first_air_date).getFullYear() : 'Unknown',
-      poster: series.poster_path || undefined,
-      backdrop: series.backdrop_path || undefined,
+      poster: series.poster_path ? `https://image.tmdb.org/t/p/w500${series.poster_path}` : undefined,
+      backdrop: series.backdrop_path ? `https://image.tmdb.org/t/p/original${series.backdrop_path}` : undefined,
       type: 'series',
       genres: genreNames,
       popularity: series.popularity,
@@ -328,107 +396,15 @@ class MergedContentService {
       originalLanguage: series.original_language,
       releaseDate: series.first_air_date,
       duration: series.episode_run_time && series.episode_run_time.length > 0 ? series.episode_run_time[0] : 0,
-      description: series.overview
-    };
-  }
-  
-  /**
-   * Transform OMDb content to our unified format
-   */
-  private transformOMDbContent(content: NormalizedOMDbContent): MergedContent {
-    return {
-      id: `omdb-${content.imdbID}`,
-      imdbId: content.imdbID,
-      title: content.title,
-      englishTitle: content.englishTitle,
-      year: content.year,
-      poster: content.poster,
-      type: content.type,
-      genres: content.genre,
-      rated: content.language,
-      released: content.released,
-      runtime: content.runtime,
-      director: content.director,
-      writer: content.writer,
-      actors: content.actors,
-      plot: content.plot,
-      language: content.language,
-      country: content.country,
-      awards: content.awards,
-      imdbRating: content.imdbRating,
-      boxOffice: content.boxOffice,
-      production: content.production,
-      duration: content.runtime,
-      description: content.plot
-    };
-  }
-  
-  /**
-   * Merge TMDB movie data with OMDb data
-   */
-  private mergeMovieData(tmdbMovie: TMDbMovie, omdbData: NormalizedOMDbContent | null): MergedContent {
-    // First get the base TMDB transformation
-    const baseContent = this.transformTMDbMovie(tmdbMovie);
-    
-    // If no OMDb data, return TMDB data only
-    if (!omdbData) {
-      return baseContent;
-    }
-    
-    // Merge with OMDb data, giving priority to TMDB for overlapping fields
-    return {
-      ...baseContent,
-      // Add OMDb-specific fields
-      rated: omdbData.language,
-      released: omdbData.released, 
-      runtime: omdbData.runtime,
-      director: omdbData.director,
-      writer: omdbData.writer,
-      actors: omdbData.actors,
-      plot: omdbData.plot,
-      language: omdbData.language,
-      country: omdbData.country,
-      awards: omdbData.awards,
-      imdbRating: omdbData.imdbRating,
-      boxOffice: omdbData.boxOffice,
-      production: omdbData.production,
-      // For description, prefer OMDb's plot as it's often more detailed
-      description: omdbData.plot || baseContent.description
-    };
-  }
-  
-  /**
-   * Merge TMDB TV series data with OMDb data
-   */
-  private mergeTVSeriesData(tmdbSeries: TMDbSeries, omdbData: NormalizedOMDbContent | null, imdbId: string): MergedContent {
-    // First get the base TMDB transformation
-    const baseContent = this.transformTMDbSeries(tmdbSeries);
-    
-    // Add the IMDb ID which comes from external IDs
-    baseContent.imdbId = imdbId;
-    
-    // If no OMDb data, return TMDB data only
-    if (!omdbData) {
-      return baseContent;
-    }
-    
-    // Merge with OMDb data, giving priority to TMDB for overlapping fields
-    return {
-      ...baseContent,
-      // Add OMDb-specific fields
-      rated: omdbData.language,
-      released: omdbData.released,
-      runtime: omdbData.runtime,
-      director: omdbData.director,
-      writer: omdbData.writer,
-      actors: omdbData.actors,
-      plot: omdbData.plot,
-      language: omdbData.language,
-      country: omdbData.country,
-      awards: omdbData.awards,
-      imdbRating: omdbData.imdbRating,
-      // For description, prefer OMDb's plot as it's often more detailed
-      description: omdbData.plot || baseContent.description
+      description: series.overview,
+      director: directors.join(', '),
+      writer: writers.join(', '),
+      actors: actors,
+      imdbRating: series.vote_average ? (series.vote_average / 2).toFixed(1) : undefined, // Convert to scale of 10
+      runtime: series.episode_run_time && series.episode_run_time.length > 0 ? `${series.episode_run_time[0]} دقیقه` : undefined,
+      subtitleOptions: [], // Will be set by admin
+      hasPersianDubbing: false, // Will be set by admin
+      hasPersianSubtitle: false, // Will be set by admin
     };
   }
 }

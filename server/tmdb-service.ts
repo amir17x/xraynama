@@ -616,6 +616,385 @@ export class TMDBService {
    * @param language کد زبان (مثال: fa-IR، en-US)
    * @returns جزئیات فیلم به همراه اطلاعات تکمیلی
    */
+  /**
+   * جستجوی چند منظوره محتوا (فیلم، سریال، افراد)
+   * @param query متن جستجو
+   * @param language کد زبان
+   * @param page شماره صفحه
+   * @returns نتایج جستجو
+   */
+  async searchMulti(query: string, language?: string, page: number = 1) {
+    try {
+      if (!this.apiKey || !this.accessToken) {
+        throw new Error("TMDB API key or access token is not available");
+      }
+
+      // تنظیم کد زبان معتبر
+      const validatedLanguage = this.validateLanguage(language);
+      
+      console.log(`[TMDB] Multi search for query: "${query}", language ${validatedLanguage}, page ${page}`);
+
+      let response;
+      
+      // استفاده از کش برای بهبود عملکرد و کاهش درخواست‌ها به API خارجی
+      if (this.useCache) {
+        try {
+          const params = {
+            language: validatedLanguage,
+            query,
+            page,
+            include_adult: false
+          };
+          
+          // دریافت اطلاعات از کش یا TMDB API
+          const data = await tmdbCacheService.getOrFetch(
+            `/search/multi`,
+            params,
+            this.apiKey,
+            this.accessToken
+          );
+          
+          response = { data };
+        } catch (cacheError) {
+          console.error(`[TMDB] Cache error for multi search "${query}", falling back to direct API call:`, cacheError);
+          
+          // در صورت خطا در کش، مستقیم از TMDB درخواست کن
+          response = await axios.get(`${this.baseUrl}/search/multi`, {
+            headers: {
+              'Authorization': `Bearer ${this.accessToken}`,
+              'Content-Type': 'application/json'
+            },
+            params: {
+              api_key: this.apiKey,
+              language: validatedLanguage,
+              query,
+              page,
+              include_adult: false
+            }
+          });
+        }
+      } else {
+        // حالت بدون کش
+        response = await axios.get(`${this.baseUrl}/search/multi`, {
+          headers: {
+            'Authorization': `Bearer ${this.accessToken}`,
+            'Content-Type': 'application/json'
+          },
+          params: {
+            api_key: this.apiKey,
+            language: validatedLanguage,
+            query,
+            page,
+            include_adult: false
+          }
+        });
+      }
+
+      console.log(`[TMDB] Multi search found ${response.data?.results?.length || 0} results for query "${query}"`);
+      return response.data;
+    } catch (error) {
+      console.error(`Error in multi search for "${query}":`, error);
+      throw error;
+    }
+  }
+  
+  /**
+   * دریافت کردیت‌های فیلم (بازیگران و تیم تولید)
+   * @param movieId شناسه فیلم
+   * @param language کد زبان
+   * @returns کردیت‌های فیلم
+   */
+  async getMovieCredits(movieId: number, language?: string) {
+    try {
+      if (!this.apiKey || !this.accessToken) {
+        throw new Error("TMDB API key or access token is not available");
+      }
+
+      // تنظیم کد زبان معتبر
+      const validatedLanguage = this.validateLanguage(language);
+      
+      console.log(`[TMDB] Fetching credits for movie ID ${movieId}, language ${validatedLanguage}`);
+      
+      let response;
+      
+      // استفاده از کش برای بهبود عملکرد و کاهش درخواست‌ها به API خارجی
+      if (this.useCache) {
+        try {
+          const params = {
+            language: validatedLanguage
+          };
+          
+          // دریافت اطلاعات از کش یا TMDB API
+          const data = await tmdbCacheService.getOrFetch(
+            `/movie/${movieId}/credits`,
+            params,
+            this.apiKey,
+            this.accessToken
+          );
+          
+          response = { data };
+        } catch (cacheError) {
+          console.error(`[TMDB] Cache error for movie credits ${movieId}, falling back to direct API call:`, cacheError);
+          
+          // در صورت خطا در کش، مستقیم از TMDB درخواست کن
+          response = await axios.get(`${this.baseUrl}/movie/${movieId}/credits`, {
+            headers: {
+              'Authorization': `Bearer ${this.accessToken}`,
+              'Content-Type': 'application/json'
+            },
+            params: {
+              api_key: this.apiKey,
+              language: validatedLanguage
+            }
+          });
+        }
+      } else {
+        // حالت بدون کش
+        response = await axios.get(`${this.baseUrl}/movie/${movieId}/credits`, {
+          headers: {
+            'Authorization': `Bearer ${this.accessToken}`,
+            'Content-Type': 'application/json'
+          },
+          params: {
+            api_key: this.apiKey,
+            language: validatedLanguage
+          }
+        });
+      }
+
+      console.log(`[TMDB] Successfully fetched credits for movie ID ${movieId}`);
+      return response.data;
+    } catch (error) {
+      console.error(`Error fetching credits for movie ${movieId}:`, error);
+      throw error;
+    }
+  }
+  
+  /**
+   * دریافت اطلاعات کامل سریال تلویزیونی
+   * @param tvId شناسه سریال
+   * @param language کد زبان
+   * @returns اطلاعات کامل سریال
+   */
+  async getTVSeriesDetails(tvId: number, language?: string) {
+    try {
+      if (!this.apiKey || !this.accessToken) {
+        throw new Error("TMDB API key or access token is not available");
+      }
+
+      // تنظیم کد زبان معتبر
+      const validatedLanguage = this.validateLanguage(language);
+      
+      console.log(`[TMDB] Fetching details for TV series ID ${tvId}, language ${validatedLanguage}`);
+      
+      let response;
+      
+      // استفاده از کش برای بهبود عملکرد و کاهش درخواست‌ها به API خارجی
+      if (this.useCache) {
+        try {
+          const params = {
+            language: validatedLanguage,
+            append_to_response: 'videos,images,credits,similar,recommendations,external_ids,content_ratings'
+          };
+          
+          // دریافت اطلاعات از کش یا TMDB API
+          const data = await tmdbCacheService.getOrFetch(
+            `/tv/${tvId}`,
+            params,
+            this.apiKey,
+            this.accessToken
+          );
+          
+          response = { data };
+        } catch (cacheError) {
+          console.error(`[TMDB] Cache error for TV series ${tvId}, falling back to direct API call:`, cacheError);
+          
+          // در صورت خطا در کش، مستقیم از TMDB درخواست کن
+          response = await axios.get(`${this.baseUrl}/tv/${tvId}`, {
+            headers: {
+              'Authorization': `Bearer ${this.accessToken}`,
+              'Content-Type': 'application/json'
+            },
+            params: {
+              api_key: this.apiKey,
+              language: validatedLanguage,
+              append_to_response: 'videos,images,credits,similar,recommendations,external_ids,content_ratings'
+            }
+          });
+        }
+      } else {
+        // حالت بدون کش
+        response = await axios.get(`${this.baseUrl}/tv/${tvId}`, {
+          headers: {
+            'Authorization': `Bearer ${this.accessToken}`,
+            'Content-Type': 'application/json'
+          },
+          params: {
+            api_key: this.apiKey,
+            language: validatedLanguage,
+            append_to_response: 'videos,images,credits,similar,recommendations,external_ids,content_ratings'
+          }
+        });
+      }
+
+      console.log(`[TMDB] Successfully fetched details for TV series ID ${tvId}`);
+      return response.data;
+    } catch (error) {
+      console.error(`Error fetching TV series details for ${tvId}:`, error);
+      throw error;
+    }
+  }
+  
+  /**
+   * دریافت کردیت‌های سریال تلویزیونی (بازیگران و تیم تولید)
+   * @param tvId شناسه سریال
+   * @param language کد زبان
+   * @returns کردیت‌های سریال
+   */
+  async getTVSeriesCredits(tvId: number, language?: string) {
+    try {
+      if (!this.apiKey || !this.accessToken) {
+        throw new Error("TMDB API key or access token is not available");
+      }
+
+      // تنظیم کد زبان معتبر
+      const validatedLanguage = this.validateLanguage(language);
+      
+      console.log(`[TMDB] Fetching credits for TV series ID ${tvId}, language ${validatedLanguage}`);
+      
+      let response;
+      
+      // استفاده از کش برای بهبود عملکرد و کاهش درخواست‌ها به API خارجی
+      if (this.useCache) {
+        try {
+          const params = {
+            language: validatedLanguage
+          };
+          
+          // دریافت اطلاعات از کش یا TMDB API
+          const data = await tmdbCacheService.getOrFetch(
+            `/tv/${tvId}/credits`,
+            params,
+            this.apiKey,
+            this.accessToken
+          );
+          
+          response = { data };
+        } catch (cacheError) {
+          console.error(`[TMDB] Cache error for TV series credits ${tvId}, falling back to direct API call:`, cacheError);
+          
+          // در صورت خطا در کش، مستقیم از TMDB درخواست کن
+          response = await axios.get(`${this.baseUrl}/tv/${tvId}/credits`, {
+            headers: {
+              'Authorization': `Bearer ${this.accessToken}`,
+              'Content-Type': 'application/json'
+            },
+            params: {
+              api_key: this.apiKey,
+              language: validatedLanguage
+            }
+          });
+        }
+      } else {
+        // حالت بدون کش
+        response = await axios.get(`${this.baseUrl}/tv/${tvId}/credits`, {
+          headers: {
+            'Authorization': `Bearer ${this.accessToken}`,
+            'Content-Type': 'application/json'
+          },
+          params: {
+            api_key: this.apiKey,
+            language: validatedLanguage
+          }
+        });
+      }
+
+      console.log(`[TMDB] Successfully fetched credits for TV series ID ${tvId}`);
+      return response.data;
+    } catch (error) {
+      console.error(`Error fetching TV series credits for ${tvId}:`, error);
+      throw error;
+    }
+  }
+  
+  /**
+   * دریافت شناسه‌های خارجی سریال تلویزیونی (IMDb، TVDb و غیره)
+   * @param tvId شناسه سریال
+   * @param language کد زبان
+   * @returns شناسه‌های خارجی سریال
+   */
+  async getTVSeriesExternalIds(tvId: number, language?: string) {
+    try {
+      if (!this.apiKey || !this.accessToken) {
+        throw new Error("TMDB API key or access token is not available");
+      }
+
+      // تنظیم کد زبان معتبر
+      const validatedLanguage = this.validateLanguage(language);
+      
+      console.log(`[TMDB] Fetching external IDs for TV series ID ${tvId}, language ${validatedLanguage}`);
+      
+      let response;
+      
+      // استفاده از کش برای بهبود عملکرد و کاهش درخواست‌ها به API خارجی
+      if (this.useCache) {
+        try {
+          const params = {
+            language: validatedLanguage
+          };
+          
+          // دریافت اطلاعات از کش یا TMDB API
+          const data = await tmdbCacheService.getOrFetch(
+            `/tv/${tvId}/external_ids`,
+            params,
+            this.apiKey,
+            this.accessToken
+          );
+          
+          response = { data };
+        } catch (cacheError) {
+          console.error(`[TMDB] Cache error for TV series external IDs ${tvId}, falling back to direct API call:`, cacheError);
+          
+          // در صورت خطا در کش، مستقیم از TMDB درخواست کن
+          response = await axios.get(`${this.baseUrl}/tv/${tvId}/external_ids`, {
+            headers: {
+              'Authorization': `Bearer ${this.accessToken}`,
+              'Content-Type': 'application/json'
+            },
+            params: {
+              api_key: this.apiKey,
+              language: validatedLanguage
+            }
+          });
+        }
+      } else {
+        // حالت بدون کش
+        response = await axios.get(`${this.baseUrl}/tv/${tvId}/external_ids`, {
+          headers: {
+            'Authorization': `Bearer ${this.accessToken}`,
+            'Content-Type': 'application/json'
+          },
+          params: {
+            api_key: this.apiKey,
+            language: validatedLanguage
+          }
+        });
+      }
+
+      console.log(`[TMDB] Successfully fetched external IDs for TV series ID ${tvId}`);
+      return response.data;
+    } catch (error) {
+      console.error(`Error fetching TV series external IDs for ${tvId}:`, error);
+      throw error;
+    }
+  }
+  
+  /**
+   * دریافت اطلاعات کامل فیلم
+   * @param movieId شناسه فیلم
+   * @param language کد زبان
+   * @returns اطلاعات کامل فیلم
+   */
   async getMovieDetails(movieId: number, language?: string) {
     try {
       if (!this.apiKey || !this.accessToken) {

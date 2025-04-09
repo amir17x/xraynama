@@ -117,6 +117,7 @@ function Router() {
       <ProtectedRoute path="/account/settings" component={ProfilePage} />
       
       {/* Authentication pages */}
+      <Route path="/auth" component={AuthPage} />
       <Route path="/auth/login" component={AuthPage} />
       <Route path="/auth/register" component={AuthPage} />
       <Route path="/auth/forgot-password" component={ForgotPasswordPage} />

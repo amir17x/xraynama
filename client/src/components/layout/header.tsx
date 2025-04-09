@@ -222,7 +222,7 @@ const Header = () => {
               </div>
             ) : (
               <Button asChild variant="default" size="sm" className="bg-blue-700 hover:bg-blue-600 text-white">
-                <Link href="/auth">ورود / ثبت‌نام</Link>
+                <Link href="/auth/login">ورود / ثبت‌نام</Link>
               </Button>
             )}
 

@@ -87,7 +87,7 @@ const CategoriesPage = () => {
   }, [currentCategory, toast]);
 
   const handleCategoryChange = (category: string) => {
-    setLocation(`/categories/${category}`);
+    setLocation(`/genres/${category}`);
   };
 
   const toggleFilter = (filterName: string) => {
@@ -348,7 +348,7 @@ const CategoriesPage = () => {
           <h2 className="text-2xl md:text-3xl font-bold mb-8 text-center text-foreground/90">همه دسته‌بندی‌ها</h2>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {categories.map((category) => (
-              <Link key={category.id} href={`/categories/${category.id}`}>
+              <Link key={category.id} href={`/genres/${category.id}`}>
                 <div className={cn(
                   "glassmorphic-category-card group p-6 rounded-xl cursor-pointer transition-all duration-300 transform hover:-translate-y-1 hover:shadow-xl border-2",
                   category.borderColor,
