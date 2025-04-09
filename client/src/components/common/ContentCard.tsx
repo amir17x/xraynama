@@ -3,11 +3,16 @@ import { Link } from 'wouter';
 import { ContentType, GenreType } from '@/types';
 import { Heart, Plus, Play, Download, Image } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { apiRequest, queryClient } from '@/lib/queryClient';
 import { useAuth } from '@/hooks/use-auth';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import { useInView } from '@/hooks/use-in-view';
+import { 
+  useAddToFavorites, 
+  useRemoveFromFavorites, 
+  useAddToWatchlist, 
+  useRemoveFromWatchlist 
+} from '@/hooks/use-api-mutation';
 
 interface ContentCardProps {
   content: ContentType;
@@ -46,6 +51,14 @@ export function ContentCard({
     setImageLoaded(false);
   }, [content.id]);
 
+  // هوک‌های mutation برای مدیریت محتوای علاقه‌مندی‌ها
+  const addToFavoritesMutation = useAddToFavorites();
+  const removeFromFavoritesMutation = useRemoveFromFavorites();
+  
+  // هوک‌های mutation برای مدیریت محتوای لیست تماشا
+  const addToWatchlistMutation = useAddToWatchlist();
+  const removeFromWatchlistMutation = useRemoveFromWatchlist();
+
   const handleAddToFavorites = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -63,31 +76,28 @@ export function ContentCard({
       setIsAddingToFavorites(true);
       
       if (isFavorite) {
-        await apiRequest({ method: "DELETE", url: `/api/content/${content.id}/favorites` });
-        setIsFavorite(false);
-        toast({
-          title: "حذف از علاقه‌مندی‌ها",
-          description: `${content.title} از لیست علاقه‌مندی‌های شما حذف شد`,
+        // حذف از علاقه‌مندی‌ها با استفاده از هوک mutation
+        await removeFromFavoritesMutation.mutateAsync(Number(content.id), {
+          onSuccess: () => {
+            setIsFavorite(false);
+          },
+          onSettled: () => {
+            setIsAddingToFavorites(false);
+          }
         });
       } else {
-        await apiRequest({ method: "POST", url: `/api/content/${content.id}/favorites` });
-        setIsFavorite(true);
-        toast({
-          title: "افزودن به علاقه‌مندی‌ها",
-          description: `${content.title} به لیست علاقه‌مندی‌های شما اضافه شد`,
+        // افزودن به علاقه‌مندی‌ها با استفاده از هوک mutation
+        await addToFavoritesMutation.mutateAsync(Number(content.id), {
+          onSuccess: () => {
+            setIsFavorite(true);
+          },
+          onSettled: () => {
+            setIsAddingToFavorites(false);
+          }
         });
       }
-      
-      // Invalidate favorites query
-      queryClient.invalidateQueries({ queryKey: ["/api/user/favorites"] });
-      
     } catch (error) {
-      toast({
-        title: "خطا",
-        description: "عملیات با خطا مواجه شد، لطفا دوباره تلاش کنید",
-        variant: "destructive",
-      });
-    } finally {
+      // خطا در هوک mutation به صورت خودکار مدیریت می‌شود
       setIsAddingToFavorites(false);
     }
   };
@@ -109,29 +119,28 @@ export function ContentCard({
       setIsAddingToWatchlist(true);
       
       if (isInWatchlist) {
-        await apiRequest({ method: "DELETE", url: `/api/content/${content.id}/watchlist` });
-        toast({
-          title: "حذف از لیست تماشا",
-          description: `${content.title} از لیست تماشای شما حذف شد`,
+        // حذف از لیست تماشا با استفاده از هوک mutation
+        await removeFromWatchlistMutation.mutateAsync(Number(content.id), {
+          onSuccess: () => {
+            // بروزرسانی وضعیت محلی - مقدار isInWatchlist از prop می‌آید و فقط در رندر بعدی به‌روز می‌شود
+          },
+          onSettled: () => {
+            setIsAddingToWatchlist(false);
+          }
         });
       } else {
-        await apiRequest({ method: "POST", url: `/api/content/${content.id}/watchlist` });
-        toast({
-          title: "افزودن به لیست تماشا",
-          description: `${content.title} به لیست تماشای شما اضافه شد`,
+        // افزودن به لیست تماشا با استفاده از هوک mutation
+        await addToWatchlistMutation.mutateAsync(Number(content.id), {
+          onSuccess: () => {
+            // بروزرسانی وضعیت محلی
+          },
+          onSettled: () => {
+            setIsAddingToWatchlist(false);
+          }
         });
       }
-      
-      // Invalidate watchlist query
-      queryClient.invalidateQueries({ queryKey: ["/api/user/watchlist"] });
-      
     } catch (error) {
-      toast({
-        title: "خطا",
-        description: "عملیات با خطا مواجه شد، لطفا دوباره تلاش کنید",
-        variant: "destructive",
-      });
-    } finally {
+      // خطا در هوک mutation به صورت خودکار مدیریت می‌شود
       setIsAddingToWatchlist(false);
     }
   };
