@@ -1647,9 +1647,6 @@ export class MongoDBStorage implements IStorage {
   // AI recommendation methods
   async getRecommendedContent(userId: number | null, limit: number = 5): Promise<Content[]> {
     try {
-      // استفاده از سرویس هوش مصنوعی برای توصیه محتوا
-      const { aiRecommendationService } = await import('../ai-service');
-      
       // دریافت کاربر
       const user = userId ? await this.getUser(userId) : null;
       
@@ -1703,21 +1700,47 @@ export class MongoDBStorage implements IStorage {
         } as unknown as Tag;
       });
       
-      // دریافت توصیه‌ها از سرویس هوش مصنوعی
-      const recommendedContent = await aiRecommendationService.getContentRecommendations(
-        user,
-        watchHistory,
-        favorites,
-        convertedContent,
-        convertedGenres,
-        convertedTags,
-        limit
-      );
-      
-      // بازگرداندن نتایج
-      return recommendedContent;
+      // استفاده از سرویس TMDB برای توصیه محتوا
+      try {
+        const { tmdbService } = await import('../tmdb-service');
+        
+        // دریافت توصیه‌ها از سرویس TMDB
+        const recommendedContent = await tmdbService.getRecommendedContent(
+          userId,
+          watchHistory,
+          favorites,
+          convertedContent,
+          convertedGenres,
+          convertedTags,
+          limit
+        );
+        
+        // بازگرداندن نتایج
+        return recommendedContent;
+      } catch (tmdbError) {
+        console.error("Error getting TMDB recommended content:", tmdbError);
+        
+        // اگر سرویس TMDB با خطا مواجه شد، از سرویس Anthropic استفاده کن
+        try {
+          const { aiRecommendationService } = await import('../ai-service');
+          
+          // دریافت توصیه‌ها از سرویس هوش مصنوعی
+          return await aiRecommendationService.getContentRecommendations(
+            user,
+            watchHistory,
+            favorites,
+            convertedContent,
+            convertedGenres,
+            convertedTags,
+            limit
+          );
+        } catch (aiError) {
+          console.error("Error getting AI recommended content:", aiError);
+          throw aiError; // انتقال خطا به بلوک catch بیرونی
+        }
+      }
     } catch (error) {
-      console.error("Error getting AI recommended content:", error);
+      console.error("Error getting recommended content:", error);
       // در صورت خطا، محتواهای جدید را برگردان
       return this.getLatestContent(limit);
     }
@@ -1756,9 +1779,6 @@ export class MongoDBStorage implements IStorage {
       if (!contentItem) {
         throw new Error(`Content with ID ${contentId} not found`);
       }
-      
-      // استفاده از سرویس هوش مصنوعی برای یافتن محتواهای مشابه
-      const { aiRecommendationService } = await import('../ai-service');
       
       // دریافت ژانرها و تگ‌ها
       const allGenres = await GenreModel.find().lean();
@@ -1810,19 +1830,43 @@ export class MongoDBStorage implements IStorage {
         } as unknown as Tag;
       });
       
-      // دریافت محتواهای مشابه از سرویس هوش مصنوعی
-      const similarContent = await aiRecommendationService.getSimilarContent(
-        convertedContentItem,
-        convertedContent,
-        convertedGenres,
-        convertedTags,
-        limit
-      );
-      
-      // بازگرداندن نتایج
-      return similarContent;
+      // استفاده از سرویس TMDB برای یافتن محتواهای مشابه
+      try {
+        const { tmdbService } = await import('../tmdb-service');
+        
+        // دریافت محتواهای مشابه از سرویس TMDB
+        const similarContent = await tmdbService.getSimilarContent(
+          convertedContentItem,
+          convertedContent,
+          convertedGenres,
+          convertedTags,
+          limit
+        );
+        
+        // بازگرداندن نتایج
+        return similarContent;
+      } catch (tmdbError) {
+        console.error("Error getting TMDB similar content:", tmdbError);
+        
+        // اگر سرویس TMDB با خطا مواجه شد، از سرویس Anthropic استفاده کن
+        try {
+          const { aiRecommendationService } = await import('../ai-service');
+          
+          // دریافت محتواهای مشابه از سرویس هوش مصنوعی
+          return await aiRecommendationService.getSimilarContent(
+            convertedContentItem,
+            convertedContent,
+            convertedGenres,
+            convertedTags,
+            limit
+          );
+        } catch (aiError) {
+          console.error("Error getting AI similar content:", aiError);
+          throw aiError; // انتقال خطا به بلوک catch بیرونی
+        }
+      }
     } catch (error) {
-      console.error("Error getting AI similar content:", error);
+      console.error("Error getting similar content:", error);
       
       // در صورت خطا، محتواهای جدید هم‌نوع را برگردان
       if (typeof contentId === 'number') {

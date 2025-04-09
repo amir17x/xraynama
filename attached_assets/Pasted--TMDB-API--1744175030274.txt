@@ -1,0 +1,72 @@
+حتماً! در ادامه یک پرامپت حرفه‌ای، فنی و کامل برای استفاده از **TMDB API** در سایت فیلمت آماده کردم. این پرامپت به هوش مصنوعی (مثل GPT یا Gemini) داده میشه تا کدنویسی لازم رو انجام بده یا ادغام در پروژه رو کامل کنه:
+
+---
+
+### 🎯 Prompt: Integrate TMDB API in Movie Web Application
+
+**Context:**
+
+I have a movie web application called **Xray Nama**, built with a modern UI based on **Glassmorphism design**. The site includes sections for movies, series, animations, documentaries, artists, and categories like Action, Comedy, Drama, Sci-Fi, and Horror. I want to fetch and display real-time data using the **TMDB API**.
+
+---
+
+**Goal:**  
+Integrate the TMDB API using the following credentials to fetch, cache, and display movie-related data throughout the application. The integration should be optimized for performance, with fallback handling for API failures.
+
+---
+
+**API Credentials:**
+
+- **API Read Access Token:**
+  ```
+  eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI4NDgwMD... (token truncated for brevity)
+  ```
+- **API Key (v3):**
+  ```
+  848004d0aefe15fa0b43db4071e98d68
+  ```
+
+---
+
+### ✅ Requirements:
+
+1. **Setup:**
+   - Use `axios` or `fetch` to make HTTP requests.
+   - Base URL: `https://api.themoviedb.org/3`
+   - Use the Bearer token in the header for authentication:
+     ```http
+     Authorization: Bearer <API_READ_ACCESS_TOKEN>
+     ```
+
+2. **Fetch Data From TMDB:**
+   - Trending movies and series
+   - Popular content by category
+   - Movie details: title, poster, rating, release date, runtime, genres, overview, cast, similar movies, etc.
+   - Actor profiles and filmography
+   - Multi-search: movies, series, and people
+   - Trailers and streaming links (if available)
+
+3. **UI Display:**
+   - Design cards for search results, trending, and category pages with title, rating, image, and genre badges.
+   - For detail pages, use a large backdrop, main poster, and full metadata section (styled with **Glassmorphism**).
+   - Add lazy loading and skeleton loaders for smooth UX.
+
+4. **Performance & UX:**
+   - Add loading states and error handling for all fetch calls.
+   - Cache frequently requested data (e.g. home page trending movies).
+   - Use smooth transitions for loading content and avoid layout shift.
+
+5. **Fail-Safe Mechanism:**
+   - If API fails or rate limits, fallback to a cached version or display a custom error state (don’t break the page).
+
+6. **Code Structure:**
+   - Create a centralized API handler (e.g. `tmdbClient.js`)
+   - Modularize functions: `getTrendingMovies()`, `getMovieDetails(id)`, `searchContent(query)`, etc.
+
+7. **Future-Proofing:**
+   - Easily extendable for premium features (e.g. Gemini-powered recommendations).
+   - Add toggle in admin panel to disable TMDB live-fetching if rate limit is reached.
+
+---
+
+Let me know if you want me to generate the **actual code** for this or a sample integration setup.
