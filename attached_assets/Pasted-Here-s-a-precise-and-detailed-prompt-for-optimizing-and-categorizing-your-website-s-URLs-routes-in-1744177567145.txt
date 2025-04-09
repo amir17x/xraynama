@@ -1,0 +1,45 @@
+Here's a precise and detailed prompt for optimizing and categorizing your website's URLs (routes) in a structured and organized way using AI:
+
+---
+
+**Prompt:**
+
+I want to optimize and categorize the URLs (routes) of my website to ensure better structure, readability, and organization. My goal is for the AI to analyze and categorize these routes based on their purpose, context, and content to create an efficient, well-structured URL hierarchy. 
+
+Consider the following aspects when categorizing and optimizing:
+
+1. **Logical Grouping:**
+   - Categorize similar routes under appropriate groups (e.g., "Actors" and "Directors" can be grouped under a general category like "/people").
+   - Ensure related pages are placed under intuitive groupings to improve user experience and navigation.
+
+2. **Descriptive and SEO-Friendly:**
+   - Ensure that URLs are descriptive and contain meaningful keywords that align with the page's content (e.g., "/movies/popular" or "/actors/[actor_name]").
+   - Optimize URLs for SEO by ensuring they are easy to read, and contain relevant keywords, without excessive parameters.
+
+3. **Hierarchical Structure:**
+   - Create a clean, logical hierarchy for your website's structure. Higher-level categories should be at the root level (e.g., "/movies"), and more specific pages or subcategories should follow (e.g., "/movies/[genre]" or "/movies/[movie_id]").
+   - Use slashes to indicate relationships (e.g., "/blog/category/[category_name]" or "/products/category/[product_type]").
+
+4. **Consistency:**
+   - Ensure that the URL naming convention is consistent across all routes (e.g., all movie pages should follow "/movies/[movie_id]" format, not mixing "/films/[id]" with "/movies/[id]").
+   - Use consistent patterns for things like pluralization (e.g., "/actors" vs. "/actor") and URL structures across similar types of content.
+
+5. **Optimize for User Experience (UX):**
+   - Consider whether the URL is easy to remember and navigate.
+   - Ensure that URLs are short and do not contain unnecessary parameters or confusing strings.
+   - Use hyphens to separate words in URLs (e.g., "/best-action-movies" instead of "/bestactionmovies").
+
+6. **URL Encoding:**
+   - Make sure that URLs are properly encoded to handle special characters (e.g., spaces, accents, etc.) to ensure consistent behavior across platforms.
+
+7. **Future-proofing:**
+   - Anticipate the potential for scaling and adding more content to your site, ensuring that your URL structure remains adaptable as new categories and routes are added.
+
+8. **Performance Considerations:**
+   - Avoid overly complex or lengthy URLs that could slow down the site or be more difficult for search engines to crawl efficiently.
+
+After AI has processed these considerations, generate a comprehensive list of routes with optimized structures, and provide suggestions for improving any existing paths. The AI should also highlight any potential redundancies or unnecessary complexities in the current URL setup and offer actionable suggestions for simplification.
+
+---
+
+This prompt will instruct the AI to analyze and optimize your URLs for better performance, user navigation, and SEO, ensuring a clean, structured, and scalable URL system for your website.

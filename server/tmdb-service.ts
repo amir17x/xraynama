@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { Content, Genre, Tag, User } from '@shared/schema';
+import { tmdbCacheService } from './tmdb-cache-service';
 
 // سیستم توصیه محتوا با استفاده از API TMDB
 export class TMDBService {
@@ -7,6 +8,7 @@ export class TMDBService {
   private accessToken: string;
   private baseUrl: string = 'https://api.themoviedb.org/3';
   private defaultLanguage: string = 'fa-IR'; // زبان پیش‌فرض: فارسی ایران
+  private useCache: boolean = true; // استفاده از کش برای کاهش تعداد درخواست‌ها
   
   // کدهای زبان پشتیبانی شده بر اساس استاندارد ISO 639-1 + ISO 3166-1
   private supportedLanguages: Record<string, string> = {
@@ -86,18 +88,58 @@ export class TMDBService {
       
       console.log(`[TMDB] Fetching popular movies page ${page}, limit ${limit}, language ${validatedLanguage}`);
 
-      const response = await axios.get(`${this.baseUrl}/movie/popular`, {
-        headers: {
-          'Authorization': `Bearer ${this.accessToken}`,
-          'Content-Type': 'application/json'
-        },
-        params: {
-          api_key: this.apiKey,
-          language: validatedLanguage,
-          page,
-          include_adult: false
+      let response;
+      
+      // استفاده از کش برای بهبود عملکرد و کاهش درخواست‌ها به API خارجی
+      if (this.useCache) {
+        try {
+          const params = {
+            language: validatedLanguage,
+            page,
+            include_adult: false
+          };
+          
+          // دریافت اطلاعات از کش یا TMDB API
+          const data = await tmdbCacheService.getOrFetch(
+            `/movie/popular`,
+            params,
+            this.apiKey,
+            this.accessToken
+          );
+          
+          response = { data };
+        } catch (cacheError) {
+          console.error(`[TMDB] Cache error for popular movies, falling back to direct API call:`, cacheError);
+          
+          // در صورت خطا در کش، مستقیم از TMDB درخواست کن
+          response = await axios.get(`${this.baseUrl}/movie/popular`, {
+            headers: {
+              'Authorization': `Bearer ${this.accessToken}`,
+              'Content-Type': 'application/json'
+            },
+            params: {
+              api_key: this.apiKey,
+              language: validatedLanguage,
+              page,
+              include_adult: false
+            }
+          });
         }
-      });
+      } else {
+        // حالت بدون کش
+        response = await axios.get(`${this.baseUrl}/movie/popular`, {
+          headers: {
+            'Authorization': `Bearer ${this.accessToken}`,
+            'Content-Type': 'application/json'
+          },
+          params: {
+            api_key: this.apiKey,
+            language: validatedLanguage,
+            page,
+            include_adult: false
+          }
+        });
+      }
 
       if (response.data && response.data.results) {
         // پردازش و بهبود نتایج
@@ -159,19 +201,61 @@ export class TMDBService {
       
       console.log(`[TMDB] Searching movies with query: "${query}", page ${page}, language ${validatedLanguage}`);
 
-      const response = await axios.get(`${this.baseUrl}/search/movie`, {
-        headers: {
-          'Authorization': `Bearer ${this.accessToken}`,
-          'Content-Type': 'application/json'
-        },
-        params: {
-          api_key: this.apiKey,
-          language: validatedLanguage,
-          query,
-          page,
-          include_adult: false
+      let response;
+      
+      // استفاده از کش برای بهبود عملکرد و کاهش درخواست‌ها به API خارجی
+      if (this.useCache) {
+        try {
+          const params = {
+            language: validatedLanguage,
+            query,
+            page,
+            include_adult: false
+          };
+          
+          // دریافت اطلاعات از کش یا TMDB API
+          const data = await tmdbCacheService.getOrFetch(
+            `/search/movie`,
+            params,
+            this.apiKey,
+            this.accessToken
+          );
+          
+          response = { data };
+        } catch (cacheError) {
+          console.error(`[TMDB] Cache error for search query "${query}", falling back to direct API call:`, cacheError);
+          
+          // در صورت خطا در کش، مستقیم از TMDB درخواست کن
+          response = await axios.get(`${this.baseUrl}/search/movie`, {
+            headers: {
+              'Authorization': `Bearer ${this.accessToken}`,
+              'Content-Type': 'application/json'
+            },
+            params: {
+              api_key: this.apiKey,
+              language: validatedLanguage,
+              query,
+              page,
+              include_adult: false
+            }
+          });
         }
-      });
+      } else {
+        // حالت بدون کش
+        response = await axios.get(`${this.baseUrl}/search/movie`, {
+          headers: {
+            'Authorization': `Bearer ${this.accessToken}`,
+            'Content-Type': 'application/json'
+          },
+          params: {
+            api_key: this.apiKey,
+            language: validatedLanguage,
+            query,
+            page,
+            include_adult: false
+          }
+        });
+      }
 
       if (response.data && response.data.results) {
         // پردازش و بهبود نتایج
@@ -242,32 +326,72 @@ export class TMDBService {
       console.log(`[TMDB] Discovering movies with filters, page ${page}, language ${validatedLanguage}`);
 
       // تبدیل آرایه‌ها به رشته با جداکننده کاما
-      const params: any = {
-        api_key: this.apiKey,
-        language: validatedLanguage,
-        page,
-        include_adult: false,
-        ...options
+      const prepareParams = () => {
+        const params: any = {
+          language: validatedLanguage,
+          page,
+          include_adult: false,
+          ...options
+        };
+  
+        // تبدیل آرایه‌ها به رشته
+        if (Array.isArray(params.with_genres)) {
+          params.with_genres = params.with_genres.join(',');
+        }
+        if (Array.isArray(params.with_people)) {
+          params.with_people = params.with_people.join(',');
+        }
+        if (Array.isArray(params.with_keywords)) {
+          params.with_keywords = params.with_keywords.join(',');
+        }
+        
+        return params;
       };
-
-      // تبدیل آرایه‌ها به رشته
-      if (Array.isArray(params.with_genres)) {
-        params.with_genres = params.with_genres.join(',');
+      
+      let response;
+      
+      // استفاده از کش برای بهبود عملکرد و کاهش درخواست‌ها به API خارجی
+      if (this.useCache) {
+        try {
+          const params = prepareParams();
+          
+          // دریافت اطلاعات از کش یا TMDB API
+          const data = await tmdbCacheService.getOrFetch(
+            `/discover/movie`,
+            params,
+            this.apiKey,
+            this.accessToken
+          );
+          
+          response = { data };
+        } catch (cacheError) {
+          console.error(`[TMDB] Cache error for discover movies, falling back to direct API call:`, cacheError);
+          
+          // در صورت خطا در کش، مستقیم از TMDB درخواست کن
+          const params = prepareParams();
+          params.api_key = this.apiKey;
+          
+          response = await axios.get(`${this.baseUrl}/discover/movie`, {
+            headers: {
+              'Authorization': `Bearer ${this.accessToken}`,
+              'Content-Type': 'application/json'
+            },
+            params
+          });
+        }
+      } else {
+        // حالت بدون کش
+        const params = prepareParams();
+        params.api_key = this.apiKey;
+        
+        response = await axios.get(`${this.baseUrl}/discover/movie`, {
+          headers: {
+            'Authorization': `Bearer ${this.accessToken}`,
+            'Content-Type': 'application/json'
+          },
+          params
+        });
       }
-      if (Array.isArray(params.with_people)) {
-        params.with_people = params.with_people.join(',');
-      }
-      if (Array.isArray(params.with_keywords)) {
-        params.with_keywords = params.with_keywords.join(',');
-      }
-
-      const response = await axios.get(`${this.baseUrl}/discover/movie`, {
-        headers: {
-          'Authorization': `Bearer ${this.accessToken}`,
-          'Content-Type': 'application/json'
-        },
-        params
-      });
 
       if (response.data && response.data.results) {
         // پردازش و بهبود نتایج
@@ -387,18 +511,56 @@ export class TMDBService {
       const validatedLanguage = this.validateLanguage(language);
       
       console.log(`[TMDB] Finding content with external ID: ${externalId} (source: ${externalSource}, language: ${validatedLanguage})`);
-
-      const response = await axios.get(`${this.baseUrl}/find/${externalId}`, {
-        headers: {
-          'Authorization': `Bearer ${this.accessToken}`,
-          'Content-Type': 'application/json'
-        },
-        params: {
-          api_key: this.apiKey,
-          language: validatedLanguage,
-          external_source: externalSource
+      
+      let response;
+      
+      // استفاده از کش برای بهبود عملکرد و کاهش درخواست‌ها به API خارجی
+      if (this.useCache) {
+        try {
+          const params = {
+            language: validatedLanguage,
+            external_source: externalSource
+          };
+          
+          // دریافت اطلاعات از کش یا TMDB API
+          const data = await tmdbCacheService.getOrFetch(
+            `/find/${externalId}`,
+            params,
+            this.apiKey,
+            this.accessToken
+          );
+          
+          response = { data };
+        } catch (cacheError) {
+          console.error(`[TMDB] Cache error for external ID ${externalId}, falling back to direct API call:`, cacheError);
+          
+          // در صورت خطا در کش، مستقیم از TMDB درخواست کن
+          response = await axios.get(`${this.baseUrl}/find/${externalId}`, {
+            headers: {
+              'Authorization': `Bearer ${this.accessToken}`,
+              'Content-Type': 'application/json'
+            },
+            params: {
+              api_key: this.apiKey,
+              language: validatedLanguage,
+              external_source: externalSource
+            }
+          });
         }
-      });
+      } else {
+        // حالت بدون کش
+        response = await axios.get(`${this.baseUrl}/find/${externalId}`, {
+          headers: {
+            'Authorization': `Bearer ${this.accessToken}`,
+            'Content-Type': 'application/json'
+          },
+          params: {
+            api_key: this.apiKey,
+            language: validatedLanguage,
+            external_source: externalSource
+          }
+        });
+      }
 
       if (response.data) {
         console.log(`[TMDB] Find results for external ID ${externalId}: ` +
@@ -464,18 +626,56 @@ export class TMDBService {
       const validatedLanguage = this.validateLanguage(language);
       
       console.log(`[TMDB] Fetching details for movie ID ${movieId}, language ${validatedLanguage}`);
-
-      const response = await axios.get(`${this.baseUrl}/movie/${movieId}`, {
-        headers: {
-          'Authorization': `Bearer ${this.accessToken}`,
-          'Content-Type': 'application/json'
-        },
-        params: {
-          api_key: this.apiKey,
-          language: validatedLanguage,
-          append_to_response: 'videos,images,credits,similar,recommendations'
+      
+      let response;
+      
+      // استفاده از کش برای بهبود عملکرد و کاهش درخواست‌ها به API خارجی
+      if (this.useCache) {
+        try {
+          const params = {
+            language: validatedLanguage,
+            append_to_response: 'videos,images,credits,similar,recommendations'
+          };
+          
+          // دریافت اطلاعات از کش یا TMDB API
+          const data = await tmdbCacheService.getOrFetch(
+            `/movie/${movieId}`,
+            params,
+            this.apiKey,
+            this.accessToken
+          );
+          
+          response = { data };
+        } catch (cacheError) {
+          console.error(`[TMDB] Cache error for movie ${movieId}, falling back to direct API call:`, cacheError);
+          
+          // در صورت خطا در کش، مستقیم از TMDB درخواست کن
+          response = await axios.get(`${this.baseUrl}/movie/${movieId}`, {
+            headers: {
+              'Authorization': `Bearer ${this.accessToken}`,
+              'Content-Type': 'application/json'
+            },
+            params: {
+              api_key: this.apiKey,
+              language: validatedLanguage,
+              append_to_response: 'videos,images,credits,similar,recommendations'
+            }
+          });
         }
-      });
+      } else {
+        // حالت بدون کش
+        response = await axios.get(`${this.baseUrl}/movie/${movieId}`, {
+          headers: {
+            'Authorization': `Bearer ${this.accessToken}`,
+            'Content-Type': 'application/json'
+          },
+          params: {
+            api_key: this.apiKey,
+            language: validatedLanguage,
+            append_to_response: 'videos,images,credits,similar,recommendations'
+          }
+        });
+      }
 
       if (response.data) {
         // پردازش و بهبود نتایج

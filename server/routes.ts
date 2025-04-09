@@ -254,6 +254,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     }
   });
+  
+  // آمار کش TMDB
+  app.get("/api/tmdb/cache-stats", async (req, res, next) => {
+    try {
+      const { tmdbService } = await import('./tmdb-service');
+      const { tmdbCacheService } = await import('./tmdb-cache-service');
+      const stats = await tmdbCacheService.getCacheStats();
+      res.json(stats);
+    } catch (error) {
+      console.error("Error getting TMDB cache stats:", error);
+      res.status(500).json({ 
+        error: "خطا در دریافت آمار کش TMDB", 
+        message: "متأسفانه در حال حاضر امکان دریافت آمار کش TMDB وجود ندارد. لطفاً بعداً دوباره تلاش کنید."
+      });
+    }
+  });
 
   // Content recommendation routes with AI
   app.get("/api/content/recommended", async (req, res, next) => {

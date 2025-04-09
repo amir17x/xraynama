@@ -16,6 +16,7 @@ export default function APITestPage() {
   const [loading, setLoading] = useState(false);
   const [response, setResponse] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
+  const [showCacheStats, setShowCacheStats] = useState(false);
   const { toast } = useToast();
 
   const handleSearch = async () => {
@@ -43,6 +44,9 @@ export default function APITestPage() {
           break;
         case 'popular':
           url = `/api/tmdb/movies/popular`;
+          break;
+        case 'cache-stats':
+          url = `/api/tmdb/cache-stats`;
           break;
         default:
           url = `/api/tmdb/unified-search?query=${encodeURIComponent(query)}`;
@@ -108,6 +112,7 @@ export default function APITestPage() {
                     <SelectItem value="find">یافتن با IMDB ID</SelectItem>
                     <SelectItem value="details">جزئیات فیلم</SelectItem>
                     <SelectItem value="popular">فیلم‌های محبوب</SelectItem>
+                    <SelectItem value="cache-stats">آمار کش TMDB</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -143,18 +148,168 @@ export default function APITestPage() {
         )}
         
         {response && (
-          <Card>
-            <CardHeader>
-              <CardTitle>نتیجه جستجو</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ScrollArea className="h-[400px] w-full p-4 border rounded-md">
-                <pre className="text-wrap">
-                  {JSON.stringify(response, null, 2)}
-                </pre>
-              </ScrollArea>
-            </CardContent>
-          </Card>
+          <>
+            {testType === 'cache-stats' ? (
+              <Card className="mb-8 border-blue-500 container-glass">
+                <CardHeader className="bg-blue-50/5 backdrop-blur-sm border-b border-blue-200/20 dark:border-blue-800/20">
+                  <CardTitle className="text-blue-500 flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                      <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                      <line x1="12" y1="22.08" x2="12" y2="12"></line>
+                    </svg>
+                    آمار کش TMDB
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="pt-6">
+                  {response.error ? (
+                    <div className="p-4 mb-4 text-red-700 bg-red-100 border border-red-400 rounded-md dark:bg-red-900/30 dark:text-red-300 dark:border-red-800">
+                      <p className="font-semibold">خطا در دریافت آمار کش:</p>
+                      <p>{response.error}</p>
+                    </div>
+                  ) : (
+                    <div className="grid gap-6 md:grid-cols-2">
+                      <Card className="border-blue-200/20 dark:border-blue-900/30 bg-blue-50/5 backdrop-blur-sm shadow-sm">
+                        <CardHeader className="pb-2">
+                          <CardTitle className="text-lg">خلاصه آمار کش</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <div className="grid grid-cols-2 gap-4">
+                            <div className="space-y-1">
+                              <p className="text-sm text-muted-foreground">تعداد کل داده‌ها</p>
+                              <p className="text-2xl font-bold">{response.summary.total}</p>
+                            </div>
+                            <div className="space-y-1">
+                              <p className="text-sm text-muted-foreground">داده‌های معتبر</p>
+                              <div className="flex items-center">
+                                <p className="text-2xl font-bold text-green-600 dark:text-green-400">{response.summary.valid}</p>
+                                <p className="mr-2 text-sm text-green-600 dark:text-green-400">
+                                  ({response.summary.validPercentage}%)
+                                </p>
+                              </div>
+                            </div>
+                            <div className="space-y-1">
+                              <p className="text-sm text-muted-foreground">داده‌های منقضی شده</p>
+                              <p className="text-2xl font-bold text-yellow-600 dark:text-yellow-400">{response.summary.expired}</p>
+                            </div>
+                            <div className="space-y-1">
+                              <p className="text-sm text-muted-foreground">حافظه مصرفی</p>
+                              <p className="text-2xl font-bold">{response.summary.storageSizeKB} KB</p>
+                            </div>
+                            <div className="space-y-1">
+                              <p className="text-sm text-muted-foreground">مدت اعتبار کش</p>
+                              <p className="text-2xl font-bold">{response.summary.ttlHours} ساعت</p>
+                            </div>
+                            <div className="space-y-1">
+                              <p className="text-sm text-muted-foreground">بانک داده</p>
+                              <p className="text-base font-medium truncate">{response.summary.databaseName}</p>
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+
+                      <Card className="border-blue-200/20 dark:border-blue-900/30 bg-blue-50/5 backdrop-blur-sm shadow-sm">
+                        <CardHeader className="pb-2">
+                          <CardTitle className="text-lg">زمان‌بندی کش</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <div className="space-y-4">
+                            <div className="space-y-1">
+                              <p className="text-sm text-muted-foreground">زمان سرور</p>
+                              <p className="text-base font-medium">
+                                {new Date(response.timestamps.serverTime).toLocaleString('fa-IR')}
+                              </p>
+                            </div>
+                            {response.timestamps.oldestCacheCreated && (
+                              <div className="space-y-1">
+                                <p className="text-sm text-muted-foreground">قدیمی‌ترین داده کش</p>
+                                <p className="text-base font-medium">
+                                  {new Date(response.timestamps.oldestCacheCreated).toLocaleString('fa-IR')}
+                                </p>
+                              </div>
+                            )}
+                            {response.timestamps.newestCacheCreated && (
+                              <div className="space-y-1">
+                                <p className="text-sm text-muted-foreground">جدیدترین داده کش</p>
+                                <p className="text-base font-medium">
+                                  {new Date(response.timestamps.newestCacheCreated).toLocaleString('fa-IR')}
+                                </p>
+                              </div>
+                            )}
+                            {response.timestamps.nextExpiry && (
+                              <div className="space-y-1">
+                                <p className="text-sm text-muted-foreground">زمان انقضای بعدی</p>
+                                <p className="text-base font-medium">
+                                  {new Date(response.timestamps.nextExpiry).toLocaleString('fa-IR')}
+                                </p>
+                              </div>
+                            )}
+                          </div>
+                        </CardContent>
+                      </Card>
+
+                      {response.endpointDistribution && response.endpointDistribution.length > 0 && (
+                        <Card className="md:col-span-2 border-blue-200/20 dark:border-blue-900/30 bg-blue-50/5 backdrop-blur-sm shadow-sm">
+                          <CardHeader className="pb-2">
+                            <CardTitle className="text-lg">توزیع داده‌های کش</CardTitle>
+                          </CardHeader>
+                          <CardContent>
+                            <div className="overflow-x-auto">
+                              <table className="w-full">
+                                <thead>
+                                  <tr className="bg-blue-50/10 text-right">
+                                    <th className="p-2 text-blue-700 dark:text-blue-300 font-medium rounded-r-md">نقطه پایانی API</th>
+                                    <th className="p-2 text-blue-700 dark:text-blue-300 font-medium">تعداد</th>
+                                    <th className="p-2 text-blue-700 dark:text-blue-300 font-medium rounded-l-md">درصد</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  {response.endpointDistribution.map((item: any, index: number) => (
+                                    <tr key={index} className="border-b border-blue-100/10 last:border-0 hover:bg-blue-50/5">
+                                      <td className="p-2 font-mono text-sm">{item.endpoint}</td>
+                                      <td className="p-2">{item.count}</td>
+                                      <td className="p-2">
+                                        {Math.round((item.count / response.summary.total) * 100)}%
+                                        <div className="w-full bg-blue-100/20 h-2 mt-1 rounded-full overflow-hidden">
+                                          <div 
+                                            className="bg-blue-500 h-full rounded-full" 
+                                            style={{ width: `${Math.round((item.count / response.summary.total) * 100)}%` }}
+                                          ></div>
+                                        </div>
+                                      </td>
+                                    </tr>
+                                  ))}
+                                </tbody>
+                              </table>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      )}
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            ) : (
+              <Card>
+                <CardHeader>
+                  <CardTitle>
+                    {testType === 'popular' ? 'فیلم‌های محبوب' : 
+                    testType === 'details' ? 'جزئیات فیلم' : 
+                    testType === 'find' ? 'نتیجه جستجو با IMDB ID' : 
+                    testType === 'discover' ? 'نتایج کشف فیلم‌ها' : 
+                    'نتیجه جستجو'}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <ScrollArea className="h-[400px] w-full p-4 border rounded-md">
+                    <pre className="text-wrap">
+                      {JSON.stringify(response, null, 2)}
+                    </pre>
+                  </ScrollArea>
+                </CardContent>
+              </Card>
+            )}
+          </>
         )}
       </main>
       <Footer />
