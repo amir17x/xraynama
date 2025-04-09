@@ -1,0 +1,48 @@
+عالیه، این جزییات خیلی مهم و حرفه‌ای‌ان! بر اساس چیزایی که گفتی، یک **prompt انگلیسی خیلی قوی، جامع و فنی** برات نوشتم که موارد زیر رو دقیقاً پوشش می‌ده:
+
+1. **استایل Glassmorphism** حرفه‌ای
+2. **کناره‌های خمیده (curved edges)** در دو طرف هدر
+3. **جلوگیری از افتادن محتوا زیر هدر** (یعنی فاصله مناسب بین ابتدای صفحه و پایین هدر)
+4. **هماهنگی کامل با صفحات دیگه و ساختار سایت**
+
+---
+
+### 🧠 Advanced Prompt – Glassmorphism Header with Curved Edges and Layout Fix
+
+```
+Redesign the website header using an elegant, futuristic **Glassmorphism** style, including **curved/rounded sides** on both the left and right edges. The header should remain fixed at the top of the page and must not overlap with the page content below. Ensure content always starts just below the header by applying appropriate padding or margin.
+
+🧊 Glassmorphism Header Design:
+- Semi-transparent frosted glass effect using `backdrop-filter: blur(12px)`
+- Smooth linear gradients and slight noise texture
+- Rounded corners on both left and right ends (e.g. `border-top-left-radius` and `border-top-right-radius` to create a pill-like shape)
+- Drop shadows or inner glows for elevation
+- Transition and hover animations for interactivity
+
+📐 Header Layout:
+- Fixed to top with `position: fixed; top: 0; width: 100%; z-index: 50`
+- Prevent page content from hiding under the header:
+  - Add `margin-top` or padding to main content equal to header height
+  - Ensure layout is fully responsive
+
+📱 Responsive Behavior:
+- On smaller screens, the curved corners remain visible (use CSS `clip-path` or `border-radius`)
+- Navigation collapses into a hamburger menu with a frosted glass side drawer
+
+🎨 Visual Style:
+- Apply **Glassmorphism** styling consistent with the rest of the site (same blur radius, transparency, and lighting)
+- Colors: translucent white or black with gradients and accent highlights
+- Consistent UI/UX with the rest of the website
+
+🛠️ Technical Notes:
+- Prevent content shift on page load or scroll
+- Ensure header does not duplicate or recreate on scroll
+- All dropdown menus (profile, notifications, language) should be displayed *above* the header and not hidden behind it
+- Use clean, scalable code (preferably JSX + Tailwind CSS if using React or Next.js)
+
+Provide complete and optimized code for the header with the above specifications. Ensure it's easy to integrate, does not break existing components, and performs well across all modern browsers.
+```
+
+---
+
+اگه بخوای من همین طراحی رو با کد آماده‌ی Tailwind CSS یا React هم برات بفرستم، فقط بگو کدوم فریم‌ورک استفاده می‌کنی. حتی می‌تونم مستقیم اون فایل‌هارو واست آماده کنم برای تست توی پروژه‌ت.

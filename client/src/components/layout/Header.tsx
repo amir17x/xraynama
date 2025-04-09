@@ -117,18 +117,19 @@ export const Header: React.FC = () => {
   return (
     <header 
       className={cn(
-        "fixed top-0 inset-x-0 z-50 transition-all duration-300",
-        isScrolled ? "py-1 bg-opacity-90" : "py-0"
+        "fixed top-0 inset-x-0 z-50 transition-all duration-300 px-4",
+        isScrolled ? "bg-opacity-90" : ""
       )}
     >
       {/* هدر اصلی */}
-      <div className="w-full mx-auto">
+      <div className="w-full mx-auto flex flex-col max-w-[1600px]">
         <div 
           className={cn(
             "w-full py-2",
-            "bg-gradient-to-r from-blue-950 to-indigo-950 backdrop-blur-md",
-            "border-b border-blue-800/30 shadow-lg",
-            "transition-all duration-300 ease-in-out"
+            "bg-[#00142c]/80 backdrop-blur-lg",
+            "border-[#00BFFF]/20 border-b-0 shadow-[0_0_25px_rgba(0,191,255,0.15)]",
+            "transition-all duration-300 ease-in-out",
+            "rounded-t-xl"
           )}
         >
           <div className="w-full max-w-7xl mx-auto px-4 md:px-6">
@@ -150,8 +151,8 @@ export const Header: React.FC = () => {
                       placeholder="جستجو در فیلم‌ها و سریال‌ها..."
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      className="w-64 rounded-full border-blue-700/50 bg-blue-950 placeholder-gray-400 
-                              text-white pl-10 pr-10 py-1 text-sm focus:border-blue-500"
+                      className="w-64 rounded-full border-[#00BFFF]/30 bg-[#001c3d]/50 placeholder-gray-400
+                              text-white pl-10 pr-10 py-1 text-sm focus:border-[#00BFFF] focus:ring-[#00BFFF]/20"
                     />
                     <button
                       type="submit"
@@ -379,7 +380,7 @@ export const Header: React.FC = () => {
         </div>
 
         {/* منوی ناوبری ثابت */}
-        <div className="w-full bg-gradient-to-r from-blue-900 to-indigo-900 shadow-md border-b border-blue-800/30 py-1 hidden md:block">
+        <div className="w-full bg-[#00142c]/80 backdrop-blur-lg shadow-[0_4px_25px_rgba(0,191,255,0.15)] border-b border-[#00BFFF]/20 py-1 hidden md:block -mt-[1px] rounded-b-xl">
           <div className="max-w-7xl mx-auto px-4 md:px-6">
             <nav className="flex justify-center">
               <ul className="flex items-center justify-between space-x-2 space-x-reverse">
@@ -415,8 +416,8 @@ export const Header: React.FC = () => {
               placeholder="جستجو در فیلم‌ها و سریال‌ها..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full rounded-full border-blue-700/50 bg-blue-950/70 placeholder-gray-400 
-                        text-white pl-10 pr-10 py-2 text-sm focus:border-blue-500"
+              className="w-full rounded-full border-[#00BFFF]/30 bg-[#001c3d]/50 placeholder-gray-400
+                        text-white pl-10 pr-10 py-2 text-sm focus:border-[#00BFFF] focus:ring-[#00BFFF]/20"
               autoFocus
             />
             <button
