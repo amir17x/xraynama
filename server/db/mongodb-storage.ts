@@ -1720,23 +1720,15 @@ export class MongoDBStorage implements IStorage {
       } catch (tmdbError) {
         console.error("Error getting TMDB recommended content:", tmdbError);
         
-        // اگر سرویس TMDB با خطا مواجه شد، از سرویس Anthropic استفاده کن
+        // اگر سرویس TMDB با خطا مواجه شد، توصیه‌های ساده برگشت بده
         try {
-          const { aiRecommendationService } = await import('../ai-service');
-          
-          // دریافت توصیه‌ها از سرویس هوش مصنوعی
-          return await aiRecommendationService.getContentRecommendations(
-            user,
-            watchHistory,
-            favorites,
-            convertedContent,
-            convertedGenres,
-            convertedTags,
-            limit
-          );
-        } catch (aiError) {
-          console.error("Error getting AI recommended content:", aiError);
-          throw aiError; // انتقال خطا به بلوک catch بیرونی
+          // برگرداندن محبوب‌ترین محتوا به عنوان پیشنهاد
+          return convertedContent
+            .sort((a, b) => (b.popularity || 0) - (a.popularity || 0))
+            .slice(0, limit);
+        } catch (fallbackError) {
+          console.error("Error getting fallback recommended content:", fallbackError);
+          throw fallbackError; // انتقال خطا به بلوک catch بیرونی
         }
       }
     } catch (error) {
@@ -1848,21 +1840,24 @@ export class MongoDBStorage implements IStorage {
       } catch (tmdbError) {
         console.error("Error getting TMDB similar content:", tmdbError);
         
-        // اگر سرویس TMDB با خطا مواجه شد، از سرویس Anthropic استفاده کن
+        // اگر سرویس TMDB با خطا مواجه شد، محتوای مشابه براساس ژانر برگردان
         try {
-          const { aiRecommendationService } = await import('../ai-service');
+          // یافتن ژانرهای محتوای فعلی
+          const contentGenreIds = (convertedContentItem.genres || [])
+            .map(g => typeof g === 'object' ? g.id : g);
           
-          // دریافت محتواهای مشابه از سرویس هوش مصنوعی
-          return await aiRecommendationService.getSimilarContent(
-            convertedContentItem,
-            convertedContent,
-            convertedGenres,
-            convertedTags,
-            limit
-          );
-        } catch (aiError) {
-          console.error("Error getting AI similar content:", aiError);
-          throw aiError; // انتقال خطا به بلوک catch بیرونی
+          // محتوای با ژانرهای مشابه را پیدا کن
+          return convertedContent
+            .filter(c => c.id !== convertedContentItem.id) // حذف خود محتوا
+            .filter(c => {
+              const cGenres = (c.genres || []).map(g => typeof g === 'object' ? g.id : g);
+              return contentGenreIds.some(id => cGenres.includes(id)); // حداقل یک ژانر مشترک
+            })
+            .sort((a, b) => (b.popularity || 0) - (a.popularity || 0))
+            .slice(0, limit);
+        } catch (fallbackError) {
+          console.error("Error getting fallback similar content:", fallbackError);
+          throw fallbackError; // انتقال خطا به بلوک catch بیرونی
         }
       }
     } catch (error) {

@@ -11,6 +11,7 @@ import {
   Shield,
   Lock
 } from "lucide-react";
+import CinemaNewsSlider from "../cinema-news/CinemaNewsSlider";
 
 const Footer = () => {
   return (
@@ -27,7 +28,7 @@ const Footer = () => {
             <p className="text-text-secondary text-sm mb-4">
               Xraynama یک پلتفرم رایگان برای پخش آنلاین و دانلود انیمیشن، فیلم، سریال و مستندهای خارجی با کیفیت بالا است.
             </p>
-            <div className="flex space-x-2 space-x-reverse">
+            <div className="flex space-x-2 space-x-reverse mb-4">
               <a 
                 href="#" 
                 className="bg-dark hover:bg-dark-border transition-colors duration-200 w-8 h-8 flex items-center justify-center rounded-full"
@@ -64,6 +65,8 @@ const Footer = () => {
                 <Github className="h-4 w-4" />
               </a>
             </div>
+            {/* اخبار سینما */}
+            <CinemaNewsSlider />
           </div>
           
           <div>

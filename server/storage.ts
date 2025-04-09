@@ -1213,12 +1213,9 @@ export class MemStorage implements IStorage {
     return true;
   }
 
-  // AI recommendation methods
+  // Content recommendation methods
   async getRecommendedContent(userId: number | null, limit: number = 5): Promise<Content[]> {
     try {
-      // استفاده از سرویس هوش مصنوعی برای توصیه محتوا
-      const { aiRecommendationService } = await import('./ai-service');
-      
       // دریافت کاربر
       const user = userId ? await this.getUser(userId) : null;
       
@@ -1231,21 +1228,34 @@ export class MemStorage implements IStorage {
         favorites = await this.getUserFavorites(userId);
       }
       
-      // دریافت همه محتواها، ژانرها و تگ‌ها
+      // دریافت همه محتواها
       const allContent = Array.from(this.contentMap.values());
-      const allGenres = Array.from(this.genresMap.values());
-      const allTags = Array.from(this.tagsMap.values());
       
-      // دریافت توصیه‌ها از سرویس هوش مصنوعی
-      return await aiRecommendationService.getContentRecommendations(
-        user,
-        watchHistory,
-        favorites,
-        allContent,
-        allGenres,
-        allTags,
-        limit
-      );
+      // اگر کاربر وجود دارد و علاقه‌مندی‌ها دارد، محتوای مشابه با علاقه‌مندی‌ها را برگردان
+      if (userId && favorites.length > 0) {
+        // دسته‌بندی محتوا براساس ژانر محتواهای مورد علاقه
+        const favoriteGenreIds = favorites
+          .flatMap(fav => fav.genres || [])
+          .map(g => g.id);
+        
+        const recommendedByGenre = allContent
+          .filter(c => !favorites.some(f => f.id === c.id)) // حذف محتواهایی که قبلاً در علاقه‌مندی‌ها هستند
+          .filter(c => {
+            const contentGenreIds = (c.genres || []).map(g => g.id);
+            return contentGenreIds.some(id => favoriteGenreIds.includes(id));
+          })
+          .sort((a, b) => b.imdbRating - a.imdbRating)
+          .slice(0, limit);
+        
+        if (recommendedByGenre.length > 0) {
+          return recommendedByGenre;
+        }
+      }
+      
+      // در غیر این صورت، محتواهای با بالاترین امتیاز را برگردان
+      return allContent
+        .sort((a, b) => b.imdbRating - a.imdbRating)
+        .slice(0, limit);
     } catch (error) {
       console.error("Error getting AI recommended content:", error);
       // در صورت خطا، محتواهای جدید را برگردان
@@ -1262,24 +1272,27 @@ export class MemStorage implements IStorage {
         throw new Error(`Content with ID ${contentId} not found`);
       }
       
-      // استفاده از سرویس هوش مصنوعی برای یافتن محتواهای مشابه
-      const { aiRecommendationService } = await import('./ai-service');
-      
-      // دریافت همه محتواها، ژانرها و تگ‌ها
+      // دریافت همه محتواها
       const allContent = Array.from(this.contentMap.values());
-      const allGenres = Array.from(this.genresMap.values());
-      const allTags = Array.from(this.tagsMap.values());
       
-      // دریافت محتواهای مشابه از سرویس هوش مصنوعی
-      return await aiRecommendationService.getSimilarContent(
-        contentItem,
-        allContent,
-        allGenres,
-        allTags,
-        limit
-      );
+      // یافتن محتواهای مشابه براساس نوع محتوا
+      const similarByType = allContent
+        .filter(c => c.id !== contentItem.id) // حذف خود محتوا
+        .filter(c => c.type === contentItem.type) // فقط محتوای هم‌نوع
+        .sort((a, b) => (b.imdbRating || 0) - (a.imdbRating || 0)) // مرتب‌سازی بر اساس امتیاز
+        .slice(0, limit);
+      
+      if (similarByType.length > 0) {
+        return similarByType;
+      }
+      
+      // اگر محتوای مشابه براساس نوع یافت نشد، محتواهای با امتیاز بالا را برگردان
+      return allContent
+        .filter(c => c.id !== contentItem.id) // حذف خود محتوا
+        .sort((a, b) => (b.imdbRating || 0) - (a.imdbRating || 0))
+        .slice(0, limit);
     } catch (error) {
-      console.error("Error getting AI similar content:", error);
+      console.error("Error getting similar content:", error);
       
       // در صورت خطا، محتواهای جدید هم‌نوع را برگردان
       const contentItem = await this.getContentById(contentId);

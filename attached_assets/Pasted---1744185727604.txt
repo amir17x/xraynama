@@ -1,0 +1,128 @@
+حتماً! در ادامه یک چک‌لیست خیلی جامع و حرفه‌ای برای بررسی، شناسایی و رفع تمام مشکلات وب‌سایت توسط هوش مصنوعی (مثل Replit AI یا هر ابزار مشابه) نوشتم. این چک‌لیست به زبان انگلیسیه، چون ابزارهای AI معمولاً با انگلیسی بهترین عملکرد رو دارن. همچنین همه چیز به صورت **دقیق، فنی و دسته‌بندی‌شده** نوشته شده تا هیچ بخشی از قلم نیفته:
+
+---
+
+## ✅ Full Website AI Debug Checklist — For Replit AI or Similar
+
+**Project Name:** `Xraynama`  
+**Language/Stack:** HTML, CSS, JavaScript (React or Vanilla), Node.js, MongoDB (optional)
+
+---
+
+### 1. 🔍 General Functionality Check
+- [ ] All pages load without errors (console & network).
+- [ ] Navigation between pages is smooth and fully functional.
+- [ ] All internal and external links work.
+- [ ] All images load correctly and have `alt` attributes.
+- [ ] No broken or empty components appear on screen.
+
+---
+
+### 2. 🎨 UI/UX Inspection
+- [ ] Consistent padding, margin, font size, and colors across pages.
+- [ ] Proper hover and active states for buttons and links.
+- [ ] No overlapping elements or floating content.
+- [ ] Responsive layout on all screen sizes (mobile, tablet, desktop).
+- [ ] RTL (right-to-left) layout is fully supported for Persian language.
+
+---
+
+### 3. 🧱 Footer Fix
+- [ ] Empty block in footer (red box from screenshot) is removed.
+- [ ] Replace it with a slim carousel showing "Latest Cinema News".
+- [ ] Carousel should:
+  - Autoplay with animation (slide to right).
+  - Be navigable with left/right arrows.
+  - Use red highlight box with smooth transitions.
+
+---
+
+### 4. 🌐 API Integration Check
+- [ ] Completely remove OMDb API usage.
+- [ ] Use **only TMDb API** for fetching all movie/series data.
+- [ ] Validate and sanitize all API responses before rendering.
+- [ ] Provide fallback UI when data is not available or API fails.
+- [ ] Allow admin to manually override or enter all movie details.
+
+---
+
+### 5. 🧪 Admin Panel Functionality
+- [ ] All input fields have proper validation (empty, length, format).
+- [ ] Uploads (poster, trailer, etc.) work correctly.
+- [ ] Buttons (Add, Delete, Update) are functional.
+- [ ] Success/error messages are clear and styled.
+- [ ] Fields auto-fill from TMDb API when desired (optional).
+
+---
+
+### 6. 🛠️ JavaScript / React Debug
+- [ ] No `undefined`, `null`, or placeholder text visible in UI.
+- [ ] All dynamic components render correctly on first load.
+- [ ] Console shows no warnings or errors.
+- [ ] Remove unused imports and variables.
+- [ ] Handle state updates properly (no flickering or infinite loops).
+
+---
+
+### 7. 📱 Responsive & Mobile Testing
+- [ ] Test in Chrome DevTools for:
+  - iPhone SE
+  - iPhone 12
+  - iPad
+  - Android (Galaxy Fold, Pixel 5)
+- [ ] Navigation, modals, sliders, and text should adapt smoothly.
+- [ ] No hidden or cut-off components on smaller screens.
+
+---
+
+### 8. 🚀 Performance Optimization
+- [ ] Minimize image sizes (WebP if possible).
+- [ ] Lazy-load components (e.g., sliders, long lists).
+- [ ] Use caching and memoization where necessary.
+- [ ] Minify CSS/JS bundles.
+- [ ] Optimize initial page load time.
+
+---
+
+### 9. 🧼 Code Clean-Up
+- [ ] Remove all commented-out code.
+- [ ] Use consistent formatting (Prettier or ESLint).
+- [ ] Proper component separation (if React).
+- [ ] Break down large files into smaller, reusable modules.
+
+---
+
+### 10. 🔒 Security Check
+- [ ] No sensitive keys or URLs exposed in the frontend.
+- [ ] Sanitize user inputs (to prevent XSS, injection).
+- [ ] Ensure HTTPS links for external resources.
+- [ ] Hide admin routes and protect them with auth.
+
+---
+
+### 11. 📈 SEO & Accessibility
+- [ ] Each page has a unique `<title>` and `<meta>` description.
+- [ ] Use semantic HTML tags (e.g., `<main>`, `<section>`, `<article>`).
+- [ ] Use `aria-label`, `role`, and `tabindex` for better screen reader support.
+- [ ] Images have descriptive `alt` text.
+- [ ] Content structured with proper heading hierarchy (`<h1>` > `<h2>`...).
+
+---
+
+### 12. 📤 Testing & Deployment
+- [ ] Run in production mode and test for real-world performance.
+- [ ] Deploy with correct environment variables (e.g., TMDB API key in secret).
+- [ ] Check MongoDB connectivity and data persistence.
+- [ ] Use version control (Git) and commit logical steps.
+
+---
+
+### 13. 🎁 Bonus - Suggested Improvements
+- [ ] Add loading spinners or skeletons while fetching data.
+- [ ] Allow user to filter/sort movies by genre, year, rating.
+- [ ] Add dark/light mode toggle.
+- [ ] Implement infinite scroll or pagination for lists.
+
+---
+
+اگر خواستی، همین چک‌لیست رو به صورت یه فایل `markdown (.md)` یا PDF هم برات آماده می‌کنم. همچنین می‌تونم پرامپتش رو برای ChatGPT Code Interpreter یا Replit Ghostwriter دقیق‌تر هم بنویسم تا خودش مرحله به مرحله انجام بده. بگی برات می‌فرستم!
