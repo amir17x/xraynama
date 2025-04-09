@@ -66,7 +66,7 @@ const CategoriesPage = () => {
         const response = await apiRequest({ 
           url: `/api/content/genre/${currentCategory}` 
         });
-        if (response) {
+        if (response && Array.isArray(response)) {
           setContent(response as ContentType[]);
         } else {
           setContent([]);
@@ -112,9 +112,17 @@ const CategoriesPage = () => {
     // اعمال فیلتر امتیاز
     if (filters.rating) {
       if (filters.rating === 'بالاترین امتیاز') {
-        result.sort((a, b) => ((b.imdbRating as number) || 0) - ((a.imdbRating as number) || 0));
+        result.sort((a, b) => {
+          const ratingA = typeof a.imdbRating === 'string' ? parseFloat(a.imdbRating) : (a.imdbRating as number) || 0;
+          const ratingB = typeof b.imdbRating === 'string' ? parseFloat(b.imdbRating) : (b.imdbRating as number) || 0;
+          return ratingB - ratingA;
+        });
       } else if (filters.rating === 'پایین‌ترین امتیاز') {
-        result.sort((a, b) => ((a.imdbRating as number) || 0) - ((b.imdbRating as number) || 0));
+        result.sort((a, b) => {
+          const ratingA = typeof a.imdbRating === 'string' ? parseFloat(a.imdbRating) : (a.imdbRating as number) || 0;
+          const ratingB = typeof b.imdbRating === 'string' ? parseFloat(b.imdbRating) : (b.imdbRating as number) || 0;
+          return ratingA - ratingB;
+        });
       }
     }
     
