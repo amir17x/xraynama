@@ -181,8 +181,15 @@ export function FeaturedSlider({ content, isLoading = false }: FeaturedSliderPro
     }));
   };
 
+  // If no content is available
+  if (!content || content.length === 0) {
+    return null;
+  }
+
   // Reset image loaded state when changing slide
   useEffect(() => {
+    if (!content || content.length === 0) return;
+    
     // Pre-load next and previous images
     const preloadIndices = [
       currentIndex,
@@ -190,24 +197,16 @@ export function FeaturedSlider({ content, isLoading = false }: FeaturedSliderPro
       (currentIndex - 1 + content.length) % content.length
     ];
     
-    // If we're changing to an unloaded image, show loading state
-    if (!imagesLoaded[currentIndex]) {
-      // Preload images
-      preloadIndices.forEach(index => {
-        if (!imagesLoaded[index] && content[index]) {
-          // Create an image element to preload
-          const img = document.createElement('img');
-          img.src = content[index].backdrop || content[index].poster;
-          img.onload = () => handleImageLoad(index);
-        }
-      });
-    }
+    // Always preload the images, regardless of loading state
+    preloadIndices.forEach(index => {
+      if (content[index]) {
+        // Create an image element to preload
+        const imgElement = new window.Image(); // استفاده از سازنده استاندارد تصویر
+        imgElement.src = content[index].backdrop || content[index].poster;
+        imgElement.onload = () => handleImageLoad(index);
+      }
+    });
   }, [currentIndex, content, imagesLoaded]);
-
-  // If no content is available
-  if (!content || content.length === 0) {
-    return null;
-  }
 
   const currentContent = content[currentIndex];
   const isBackdropLoaded = imagesLoaded[currentIndex];

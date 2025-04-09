@@ -13,6 +13,71 @@ export class TMDBService {
   }
 
   /**
+   * دریافت فیلم‌های محبوب از TMDB
+   * @param page شماره صفحه
+   * @param limit تعداد نتایج
+   * @returns لیست فیلم‌های محبوب
+   */
+  async getPopularMovies(page: number = 1, limit: number = 10) {
+    try {
+      if (!this.apiKey || !this.accessToken) {
+        throw new Error("TMDB API key or access token is not available");
+      }
+
+      const response = await axios.get(`${this.baseUrl}/movie/popular`, {
+        headers: {
+          'Authorization': `Bearer ${this.accessToken}`,
+          'Content-Type': 'application/json'
+        },
+        params: {
+          api_key: this.apiKey,
+          language: 'fa-IR',
+          page,
+          include_adult: false
+        }
+      });
+
+      if (response.data && response.data.results) {
+        // پردازش و بهبود نتایج
+        const movies = response.data.results
+          .slice(0, limit)
+          .map((movie: any) => {
+            return {
+              id: movie.id,
+              title: movie.title,
+              original_title: movie.original_title,
+              poster_path: movie.poster_path ? `https://image.tmdb.org/t/p/w500${movie.poster_path}` : null,
+              backdrop_path: movie.backdrop_path ? `https://image.tmdb.org/t/p/original${movie.backdrop_path}` : null,
+              overview: movie.overview,
+              release_date: movie.release_date,
+              vote_average: movie.vote_average,
+              vote_count: movie.vote_count,
+              popularity: movie.popularity,
+              genre_ids: movie.genre_ids
+            };
+          });
+        
+        return {
+          page: response.data.page,
+          total_pages: response.data.total_pages,
+          total_results: response.data.total_results,
+          results: movies
+        };
+      }
+
+      return {
+        page: 1,
+        total_pages: 0,
+        total_results: 0,
+        results: []
+      };
+    } catch (error) {
+      console.error("Error fetching popular movies from TMDB:", error);
+      throw error;
+    }
+  }
+
+  /**
    * توصیه محتوا با توجه به ترجیحات کاربر
    * @param userId شناسه کاربر
    * @param watchHistory تاریخچه تماشا
@@ -571,10 +636,14 @@ export class TMDBService {
     // در این پیاده‌سازی ساده، محتواها را بر اساس سال انتشار و میزان بازدید مرتب می‌کنیم
     return [...allContent]
       .sort((a, b) => {
-        // ابتدا بر اساس میزان بازدید (اگر وجود داشته باشد)
-        if (a.viewCount && b.viewCount) {
-          return b.viewCount - a.viewCount;
+        // ابتدا بر اساس میزان بازدید یا محبوبیت (اگر وجود داشته باشد)
+        const aPopularity = (a as any).viewCount || (a as any).popularity || 0;
+        const bPopularity = (b as any).viewCount || (b as any).popularity || 0;
+        
+        if (aPopularity !== bPopularity) {
+          return bPopularity - aPopularity;
         }
+        
         // سپس بر اساس سال انتشار
         return b.year - a.year;
       })
