@@ -323,6 +323,142 @@ export class TMDBService {
   }
 
   /**
+   * دریافت سریال‌ها با استفاده از discover TV API (با فیلترهای پیشرفته)
+   * @param options گزینه‌های فیلتر
+   * @param page شماره صفحه
+   * @param language کد زبان (مثال: fa-IR، en-US)
+   * @returns نتایج فیلتر شده
+   */
+  async discoverTV(options: {
+    sort_by?: string;
+    first_air_date_year?: number;
+    with_genres?: string | number[];
+    with_networks?: string | number[];
+    with_keywords?: string | number[];
+    vote_average_gte?: number;
+    vote_average_lte?: number;
+    with_runtime_gte?: number;
+    with_runtime_lte?: number;
+  }, page: number = 1, language?: string) {
+    try {
+      if (!this.apiKey || !this.accessToken) {
+        throw new Error("TMDB API key or access token is not available");
+      }
+
+      // تنظیم کد زبان معتبر
+      const validatedLanguage = this.validateLanguage(language);
+      
+      console.log(`[TMDB] Discovering TV series with filters, page ${page}, language ${validatedLanguage}`);
+
+      // تبدیل آرایه‌ها به رشته با جداکننده کاما
+      const prepareParams = () => {
+        const params: any = {
+          language: validatedLanguage,
+          page,
+          include_adult: false,
+          ...options
+        };
+  
+        // تبدیل آرایه‌ها به رشته
+        if (Array.isArray(params.with_genres)) {
+          params.with_genres = params.with_genres.join(',');
+        }
+        if (Array.isArray(params.with_networks)) {
+          params.with_networks = params.with_networks.join(',');
+        }
+        if (Array.isArray(params.with_keywords)) {
+          params.with_keywords = params.with_keywords.join(',');
+        }
+        
+        return params;
+      };
+      
+      let response;
+      
+      // استفاده از کش برای بهبود عملکرد و کاهش درخواست‌ها به API خارجی
+      if (this.useCache) {
+        try {
+          const params = prepareParams();
+          
+          // دریافت اطلاعات از کش یا TMDB API
+          const data = await tmdbCacheService.getOrFetch(
+            `/discover/tv`,
+            params,
+            this.apiKey,
+            this.accessToken
+          );
+          
+          response = { data };
+        } catch (cacheError) {
+          console.error(`[TMDB] Cache error for discover TV series, falling back to direct API call:`, cacheError);
+          
+          // در صورت خطا در کش، مستقیم از TMDB درخواست کن
+          const params = prepareParams();
+          params.api_key = this.apiKey;
+          
+          response = await axios.get(`${this.baseUrl}/discover/tv`, {
+            headers: {
+              'Authorization': `Bearer ${this.accessToken}`,
+              'Content-Type': 'application/json'
+            },
+            params
+          });
+        }
+      } else {
+        // حالت بدون کش
+        const params = prepareParams();
+        params.api_key = this.apiKey;
+        
+        response = await axios.get(`${this.baseUrl}/discover/tv`, {
+          headers: {
+            'Authorization': `Bearer ${this.accessToken}`,
+            'Content-Type': 'application/json'
+          },
+          params
+        });
+      }
+
+      if (response.data && response.data.results) {
+        // پردازش و بهبود نتایج
+        const tvSeries = response.data.results.map((series: any) => {
+          return {
+            id: series.id,
+            name: series.name,
+            original_name: series.original_name,
+            poster_path: series.poster_path ? `https://image.tmdb.org/t/p/w500${series.poster_path}` : null,
+            backdrop_path: series.backdrop_path ? `https://image.tmdb.org/t/p/original${series.backdrop_path}` : null,
+            overview: series.overview,
+            first_air_date: series.first_air_date,
+            vote_average: series.vote_average,
+            vote_count: series.vote_count,
+            popularity: series.popularity,
+            genre_ids: series.genre_ids
+          };
+        });
+        
+        console.log(`[TMDB] Discover found ${tvSeries.length} TV series matching the filters`);
+        
+        return {
+          page: response.data.page,
+          total_pages: response.data.total_pages,
+          total_results: response.data.total_results,
+          results: tvSeries
+        };
+      }
+
+      return {
+        page: 1,
+        total_pages: 0,
+        total_results: 0,
+        results: []
+      };
+    } catch (error) {
+      console.error("Error discovering TV series from TMDB:", error);
+      throw error;
+    }
+  }
+
+  /**
    * جستجوی جامع با استفاده از هر سه روش جستجو
    * @param query متن جستجو
    * @param filters فیلترهای اضافی برای discover

@@ -1,0 +1,70 @@
+برای ایجاد یک **پرامپت دقیق و جامع** که به هوش مصنوعی کمک کند تا 50 فیلم، سریال و مستند را به دیتابیس MongoDB وارد کند و اطلاعات کامل آنها را در سایت نمایش دهد، می‌توانید از این دستورالعمل استفاده کنید:
+
+---
+
+### 🔴 Prompt for Importing 50 Movies, Series, and Documentaries into MongoDB and Displaying on Website
+
+```
+You are a web developer working on a movie/series/documentary website. I need you to perform the following tasks:
+
+1. 📦 **Import 50 Movies, Series, and Documentaries into MongoDB:**
+   - Create a MongoDB collection named `content` (or appropriate name) to store the following details for each movie, series, and documentary:
+     - **Title** (string)
+     - **Genre** (array of strings)
+     - **Release Year** (number)
+     - **Rating/Score** (number, between 0 and 10)
+     - **Tags** (array of strings, e.g., "Action", "Drama", "Sci-Fi")
+     - **Description** (string)
+     - **Duration** (number of minutes, for movies or episodes for series)
+     - **Language** (string)
+     - **Cover Image URL** (string)
+     - **Trailer URL** (string)
+     - **Director/Creator** (string)
+     - **Cast** (array of strings)
+     - **Country of Origin** (string)
+   - Use **sample data** for these 50 items. Ensure the data reflects real movies, series, and documentaries (you can use sample titles like "Star Wars", "The Crown", "Planet Earth", etc.).
+
+2. 🌐 **Sync with Website:**
+   - Ensure that once the data is entered into MongoDB, it is **automatically synced** with the website.
+   - Display the movies, series, and documentaries in relevant sections (e.g., "Trending", "Popular", "New Releases", etc.) on the site.
+   - Ensure that each content piece has its own dedicated **details page** that shows all the relevant information (rating, genre, tags, description, etc.).
+
+3. ⚙️ **Display Full Content Information on Content Page:**
+   - When opening the content page for any movie, series, or documentary, ensure all relevant information is visible:
+     - Title, Genre, Rating/Score, Tags, Description, Duration, Language, Cover Image, Director/Creator, Cast, Country of Origin, etc.
+     - The content page should have a user-friendly and attractive layout with clearly labeled sections (e.g., "Cast", "Rating", "Genres", etc.).
+     - Ensure the **rating system** works properly (if it's linked to TMDB or user ratings).
+
+4. 🛠 **Content Management in Admin Panel:**
+   - Integrate a **Content Management System (CMS)** where the admin can view, add, update, or delete movies, series, and documentaries.
+   - The admin should be able to **manage all content** through the CMS and update data directly in MongoDB.
+   - Ensure that when the admin updates any content in the CMS, the website is automatically synced, and the new data is visible to users.
+
+5. 📝 **Test Data Display:**
+   - Ensure the correct display of all imported content on the website, making sure that:
+     - All information is **accurately pulled from MongoDB** and displayed on the content page.
+     - The layout is visually appealing and responsive.
+     - The website can handle **dynamic content updates** efficiently without any delays or errors.
+
+6. 🔄 **Synchronization:**
+   - Ensure proper synchronization between MongoDB and the website such that any new content added to MongoDB is reflected in real-time on the site.
+   - Ensure that if content is updated or deleted from MongoDB, the website updates accordingly.
+
+Once these tasks are completed, provide confirmation that:
+- The data is correctly stored in MongoDB.
+- The content is properly synced and displayed on the website.
+- The content management features work as expected in the admin panel.
+- The site is functioning smoothly with the newly added content.
+```
+
+---
+
+### 📝 نکات اضافی:
+
+- اگر نیاز به **افزودن دیتابیس** از طریق API مانند TMDB داشتید، حتماً درخواست‌ها و کدهای مربوطه باید با API هماهنگ شوند و اطلاعات به‌طور خودکار وارد MongoDB شوند.
+- اگر **دسته‌بندی خاصی** برای فیلم‌ها دارید (مثلاً بر اساس ژانر یا سال انتشار)، باید آن را در طراحی سایت و در سیستم مدیریت محتوا در نظر بگیرید.
+- در صورت امکان، از **سیستم کشینگ** برای بهبود سرعت بارگذاری سایت و نمایش سریع‌تر محتوا استفاده کنید.
+
+---
+
+این پرامپت دقیقاً به هوش مصنوعی کمک می‌کند تا 50 فیلم، سریال و مستند را در MongoDB وارد کند و به‌طور کامل روی سایت نمایش دهد، با امکان مدیریت و هماهنگ‌سازی داده‌ها بین دیتابیس و سایت!
