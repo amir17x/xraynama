@@ -19,6 +19,13 @@ interface PortalOverrideProps {
  * کامپوننت PortalOverride بهبود یافته برای نمایش محتوا به صورت popup
  * این کامپوننت با ایجاد پورتال در body صفحه، از مشکلات overflow و z-index جلوگیری می‌کند
  * نسخه بهبود یافته با پشتیبانی از اسکرول و سربرگ/پانویس چسبان
+ * 
+ * مدیریت z-index:
+ * - هدر سایت: z-index: 100
+ * - پرتال‌ها و منوهای کشویی: z-index: 150
+ * - wrapper بیرونی پرتال: z-index: 140
+ * 
+ * این مقادیر باید همواره با هم هماهنگ باشند تا منوهای کشویی بالاتر از سایر عناصر قرار گیرند
  */
 export function PortalOverride({ 
   children, 
@@ -45,6 +52,7 @@ export function PortalOverride({
       setTimeout(() => {
         if (ref.current) {
           ref.current.style.opacity = '1';
+          ref.current.style.transform = 'translateY(5px)';
         }
       }, 10);
     }
@@ -61,6 +69,15 @@ export function PortalOverride({
         // تنظیم موقعیت عمودی (همیشه زیر عنصر trigger)
         ref.current.style.position = 'fixed';
         ref.current.style.top = `${rect.bottom + offsetY}px`;
+        
+        // افزودن انیمیشن بهتر
+        ref.current.style.transform = 'translateY(0)';
+        ref.current.style.opacity = '0';
+        
+        // برای منوهای کوچکتر با ارتفاع اجباری، منو را اندکی بالاتر نمایش می‌دهیم
+        if (forceMaxHeight && maxHeight < 400) {
+          ref.current.style.top = `${rect.bottom + offsetY - 5}px`;
+        }
         
         // تنظیم حداقل عرض منو
         if (minWidth) {
@@ -114,8 +131,8 @@ export function PortalOverride({
           ref.current.style.right = 'auto';
         }
         
-        // اطمینان از z-index بالا
-        ref.current.style.zIndex = '9999';
+        // اطمینان از z-index بالا تر از هدر
+        ref.current.style.zIndex = '150';
       }
     };
     
@@ -145,17 +162,20 @@ export function PortalOverride({
   if (!mounted || !isOpen) return null;
   
   return createPortal(
-    <div className="fixed inset-0 z-40 pointer-events-none" onClick={onClose}>
+    <div className="fixed inset-0 z-[140] pointer-events-none" onClick={onClose}>
       <div 
         ref={ref} 
-        className="pointer-events-auto shadow-lg transition-opacity duration-200 opacity-0"
+        className="pointer-events-auto shadow-xl transition-opacity duration-200 opacity-0"
         onClick={(e) => e.stopPropagation()}
         style={{
           overflow: 'hidden',
           display: 'flex', 
           flexDirection: 'column',
           borderRadius: '0.5rem',
-          animation: 'dropdown-fade-in 0.3s ease-out'
+          animation: 'dropdown-fade-in 0.25s ease-out',
+          boxShadow: '0 5px 20px -5px rgba(0, 191, 255, 0.2), 0 0 10px rgba(0, 0, 0, 0.6)', 
+          border: '1px solid rgba(0, 191, 255, 0.2)',
+          transition: 'transform 0.2s ease-out, opacity 0.2s ease-out'
         }}
       >
         {/* هدر چسبان (در صورت وجود) */}

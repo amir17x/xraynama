@@ -1,7 +1,24 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useRef } from "react";
 import { Link, useLocation } from "wouter";
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
+import {
+  Search,
+  Heart,
+  Menu,
+  Film,
+  Home,
+  PlayCircle,
+  TrendingUp,
+  Filter,
+  UserCircle,
+  Clock,
+  List,
+  Settings,
+  LogOut,
+  User,
+} from "lucide-react";
+import { Input } from "@/components/ui/input";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -9,32 +26,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {
-  Search,
-  Heart,
-  User,
-  Menu,
-  LogOut,
-  UserCircle,
-  Clock,
-  List,
-  Film,
-  Home,
-  PlayCircle,
-  TrendingUp,
-  Calendar,
-  Globe,
-  Flag,
-  Users,
-  Star,
-  Filter,
-  Info,
-  Tag,
-  Award,
-  FileText,
-  Settings,
-} from "lucide-react";
-import { Input } from "@/components/ui/input";
+import { NotificationsMenu } from "@/components/common/NotificationsMenu";
+import { UserProfileMenu } from "@/components/common/UserProfileMenu";
 
 const Header = () => {
   const [location, navigate] = useLocation();
@@ -57,7 +50,7 @@ const Header = () => {
   };
 
   return (
-    <header className="sticky top-0 z-50 bg-dark-lighter/80 backdrop-blur-md border-b border-dark-border">
+    <header className="sticky top-0 z-[100] bg-dark-lighter/80 backdrop-blur-md border-b border-dark-border">
       <div className="container mx-auto px-4 md:px-6">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
@@ -134,6 +127,11 @@ const Header = () => {
               <Search className="h-5 w-5 text-blue-500" />
             </button>
 
+            {/* Notification Menu */}
+            <div className="ml-2">
+              <NotificationsMenu />
+            </div>
+
             {/* Favorites Link */}
             {user && (
               <Link href="/profile?tab=favorites">
@@ -143,88 +141,8 @@ const Header = () => {
               </Link>
             )}
 
-            {/* User Menu / Auth Button */}
-            {user ? (
-              <div className="relative" ref={dropdownMenuRef}>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="icon" className="relative z-50 text-white hover:text-blue-400 glassmorphic-icon">
-                      <UserCircle className="h-6 w-6" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="min-w-[200px] bg-dark-card border border-blue-900/50 backdrop-blur-lg z-40 rounded-lg shadow-xl">
-                    <div className="p-3 flex items-center border-b border-blue-900/30">
-                      <div className="w-10 h-10 bg-blue-900/40 rounded-full flex items-center justify-center mr-3">
-                        {user.avatar ? (
-                          <img src={user.avatar} alt={user.name || user.username} className="w-full h-full rounded-full object-cover" />
-                        ) : (
-                          <UserCircle className="h-6 w-6 text-blue-500" />
-                        )}
-                      </div>
-                      <div>
-                        <div className="text-sm font-medium text-white">
-                          {user.name || user.username}
-                        </div>
-                        <div className="text-xs text-gray-400">@{user.username}</div>
-                      </div>
-                    </div>
-                    <div className="p-2">
-                      <DropdownMenuItem asChild className="rounded-md my-1 hover:bg-blue-900/20 focus:bg-blue-900/20">
-                        <Link href="/profile" className="cursor-pointer">
-                          <a className="flex items-center py-1 px-2">
-                            <User className="ml-2 h-4 w-4 text-blue-500" />
-                            <span>پروفایل</span>
-                          </a>
-                        </Link>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem asChild className="rounded-md my-1 hover:bg-blue-900/20 focus:bg-blue-900/20">
-                        <Link href="/profile?tab=favorites" className="cursor-pointer">
-                          <a className="flex items-center py-1 px-2">
-                            <Heart className="ml-2 h-4 w-4 text-blue-500" />
-                            <span>علاقه‌مندی‌ها</span>
-                          </a>
-                        </Link>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem asChild className="rounded-md my-1 hover:bg-blue-900/20 focus:bg-blue-900/20">
-                        <Link href="/profile?tab=playlists" className="cursor-pointer">
-                          <a className="flex items-center py-1 px-2">
-                            <List className="ml-2 h-4 w-4 text-blue-500" />
-                            <span>پلی‌لیست‌ها</span>
-                          </a>
-                        </Link>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem asChild className="rounded-md my-1 hover:bg-blue-900/20 focus:bg-blue-900/20">
-                        <Link href="/profile?tab=history" className="cursor-pointer">
-                          <a className="flex items-center py-1 px-2">
-                            <Clock className="ml-2 h-4 w-4 text-blue-500" />
-                            <span>تاریخچه تماشا</span>
-                          </a>
-                        </Link>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem asChild className="rounded-md my-1 hover:bg-blue-900/20 focus:bg-blue-900/20">
-                        <Link href="/profile?tab=settings" className="cursor-pointer">
-                          <a className="flex items-center py-1 px-2">
-                            <Settings className="ml-2 h-4 w-4 text-blue-500" />
-                            <span>تنظیمات</span>
-                          </a>
-                        </Link>
-                      </DropdownMenuItem>
-                    </div>
-                    <DropdownMenuSeparator className="bg-blue-900/30 mx-2" />
-                    <div className="p-2">
-                      <DropdownMenuItem onClick={handleLogout} className="cursor-pointer rounded-md hover:bg-red-900/20 focus:bg-red-900/20 py-1 px-2">
-                        <LogOut className="ml-2 h-4 w-4 text-red-500" />
-                        <span className="text-red-400">خروج</span>
-                      </DropdownMenuItem>
-                    </div>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </div>
-            ) : (
-              <Button asChild variant="default" size="sm" className="bg-blue-700 hover:bg-blue-600 text-white">
-                <Link href="/auth/login">ورود / ثبت‌نام</Link>
-              </Button>
-            )}
+            {/* User Profile Menu - Using New Component */}
+            <UserProfileMenu user={user ? {...user, id: String(user.id)} : null} />
 
             {/* Mobile Menu Button */}
             <button

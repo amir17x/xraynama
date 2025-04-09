@@ -17,6 +17,12 @@ interface PortalContextMenuProps {
 /**
  * کامپوننت منوی کانتکست پرتال برای نمایش منوهای بازشونده
  * به‌صورت پویا موقعیت منو را نسبت به عنصر مرجع تنظیم می‌کند
+ * 
+ * مدیریت z-index:
+ * - هدر سایت: z-index: 100
+ * - پرتال‌ها و منوهای کشویی: z-index: 150
+ * 
+ * این مقادیر باید همواره با هم هماهنگ باشند تا منوهای کشویی بالاتر از سایر عناصر قرار گیرند
  */
 export function PortalContextMenu({
   children,
@@ -161,7 +167,7 @@ export function PortalContextMenu({
     <div
       ref={menuRef}
       className={cn(
-        'fixed z-50 rounded-lg shadow-lg transition-opacity duration-200',
+        'fixed z-[150] rounded-lg shadow-lg transition-opacity duration-200',
         'bg-[#00142c]/95 backdrop-blur-xl border border-[#00BFFF]/20',
         className
       )}
