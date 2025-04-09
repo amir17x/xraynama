@@ -195,15 +195,15 @@ export function ContentCard({
                   alt={content.title}
                   onLoad={handleImageLoad}
                   className={cn(
-                    "w-full h-full object-cover transform transition-all duration-500 ease-out group-hover:scale-105",
+                    "w-full h-full object-cover transform transition-all duration-500 ease-out hover:scale-105",
                     imageLoaded ? "opacity-100" : "opacity-0"
                   )}
                 />
               )}
               
               {/* اضافه کردن یک لایه دائمی برای جلوگیری از چشمک زدن */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/30 to-transparent opacity-30 transition-opacity duration-300 group-hover:opacity-100"></div>
-              <div className="shimmer-effect opacity-0 group-hover:opacity-20 transition-opacity duration-300"></div>
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/30 to-transparent opacity-30 transition-opacity duration-300 hover:opacity-100"></div>
+              <div className="shimmer-effect opacity-0 hover:opacity-20 transition-opacity duration-300"></div>
             </div>
             
             {/* Year Badge */}
@@ -324,15 +324,15 @@ export function ContentCard({
                 alt={content.title} 
                 onLoad={handleImageLoad}
                 className={cn(
-                  "w-full h-full object-cover transform transition-all duration-500 ease-out group-hover:scale-105 filter group-hover:brightness-110",
+                  "w-full h-full object-cover transform transition-all duration-500 ease-out hover:scale-105 filter hover:brightness-110",
                   imageLoaded ? "opacity-100" : "opacity-0"
                 )}
               />
             )}
             
             {/* اضافه کردن یک لایه دائمی برای جلوگیری از چشمک زدن */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/30 to-transparent opacity-30 transition-opacity duration-300 group-hover:opacity-100"></div>
-            <div className="shimmer-effect opacity-0 group-hover:opacity-20 transition-opacity duration-300"></div>
+            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/30 to-transparent opacity-30 transition-opacity duration-300 hover:opacity-100"></div>
+            <div className="shimmer-effect opacity-0 hover:opacity-20 transition-opacity duration-300"></div>
           </div>
           
           {/* Year Badge */}

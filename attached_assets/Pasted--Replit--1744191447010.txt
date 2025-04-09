@@ -1,0 +1,67 @@
+برای درخواست طراحی این بخش‌ها به هوش مصنوعی در Replit، می‌توانید از پرامپت زیر استفاده کنید که شامل بخش‌های هدر، طراحی کارت هنرمندان، طراحی گلاس‌مورفیسم برای اپلیکیشن، و بخش دانلود اپ به‌صورت حرفه‌ای و جذاب است:
+
+---
+
+### 🔴 Prompt for Header Design, Artist Cards, Glassmorphism, and App Download Page
+
+```
+You are tasked with enhancing the design of a movie/entertainment website. The website needs a fresh, modern, and visually attractive design. Follow the specifications below to implement these features:
+
+1. **Header Section:**
+   - In the header, there are two buttons for navigating to the **"Artists"** and **"Directors & Actors"** sections. These pages currently do not have designs. 
+   - You need to design these pages as follows:
+     - **"Artists" Page (Directors & Actors)**
+       - Display a **grid layout** of artist cards with **images** and **names** underneath. 
+       - For each artist (director/actor), show their **photo** in a circular frame, and underneath the photo, display their **name in English**.
+       - When users hover over the card, show a **short description** or biography of the artist (tooltip-style or reveal).
+     - Make sure the **page layout** is responsive and visually attractive, following modern design trends like **flat design** with rounded corners and subtle animations.
+
+2. **App Download Section with Glassmorphism:**
+   - Create a **beautiful Glassmorphism UI** for a page where users can **download the site’s app**. The app should be available for **Windows, Android, and iOS**.
+   - Use the **Glassmorphism design** style, which includes frosted glass effects, blurred backgrounds, soft shadows, and semi-transparent overlays.
+   - The app download page should contain:
+     - **Visually appealing background** with soft gradients or blurred elements to create the Glassmorphism effect.
+     - Large **app download buttons** for Windows, Android, and iOS with icons for each platform.
+     - **Short description** of the app with highlighted **key features** of the app such as:
+       - **Seamless Streaming**: Watch movies and shows with no interruptions.
+       - **Multi-Platform Support**: Available for Windows, Android, and iOS.
+       - **User-Friendly Interface**: Easy navigation and personalized content.
+       - **Offline Mode**: Download content and watch it offline.
+       - **High-Quality Video**: Watch in HD or even 4K.
+     - Make sure the app download buttons are **clearly labeled**, using **custom icons** (Windows icon, Android icon, and iOS icon).
+     - The description should include why this app is **unique** and how it provides a **premium experience**.
+     - Use clean and modern typography, and add animations for hover effects on the download buttons.
+
+3. **User-Centric Design**:
+   - For both the **Artist Cards** and **App Download Section**, focus on creating an **engaging user experience** by keeping the interface clean, intuitive, and visually immersive.
+   - **Animations** should be subtle but noticeable, for example, smooth transitions when hovering over cards or clicking on buttons.
+   - Consider using a **light and dark theme** toggle for different user preferences in both the Artist section and App download page.
+   - Ensure **mobile responsiveness**, meaning everything adjusts perfectly on mobile devices, including font sizes, images, and buttons.
+
+4. **Styling Specifications:**
+   - Use **rounded corners** for buttons, cards, and containers to make the design modern and clean.
+   - **Text styling** should be bold and clear, with emphasis on important features of the app (like **"Seamless Streaming"**, **"High-Quality Video"**).
+   - **Icons** for platforms (Windows, Android, iOS) should be clear and consistent, placed neatly next to the download buttons.
+   - Ensure **spacing and padding** are consistent across sections to make everything look balanced and well-organized.
+
+5. **Additional Features:**
+   - For the **Artists Page**, consider adding a **search bar** at the top so users can easily find specific actors or directors.
+   - The **App Download Page** should include **social proof** in the form of user ratings or testimonials, highlighting the app's effectiveness or popularity. For instance: 
+     - "Loved by 1 million+ users!"
+     - "Rated 4.8/5 based on 100K reviews."
+
+6. **Final Touches:**
+   - The overall aesthetic should be modern, sleek, and high-end. The use of **smooth animations** when transitioning between sections or when interacting with elements will improve the visual experience.
+   - Ensure that **all elements** on both pages are perfectly aligned, including text, images, and buttons.
+
+---
+
+### ✅ Expected Outcomes:
+- The **artist cards** should appear neatly arranged with clean visual design and hover interactions.
+- The **Glassmorphism page** should be eye-catching, with smooth gradients, blurred elements, and a user-friendly download section.
+- The **app download page** should stand out as visually appealing and functional with easy-to-understand features, attractive download buttons, and a modern interface.
+- **Everything should be responsive**, meaning the site should look equally good on mobile, tablet, and desktop.
+
+---
+
+این پرامپت به هوش مصنوعی کمک می‌کند که طراحی صفحات هنرمندان و اپلیکیشن را به‌طور حرفه‌ای انجام دهد و طراحی جذاب و زیبا مطابق با نیاز شما تولید شود.

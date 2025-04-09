@@ -1,0 +1,117 @@
+مطمئناً! این پرامپت را به هوش مصنوعی بدهید تا صفحه اول سایت به‌طور کامل از ابتدا طراحی شود و ساختار قبلی کاملاً حذف شود:
+
+---
+
+### 🔴 **Redesign Homepage with Glassmorphism Style and Complete Cleanup of Previous Code**
+
+```
+You are tasked with redesigning the homepage of the website. The goal is to apply a sleek and elegant glassmorphism style to the page, but before you begin, **all the previous code and structure of the homepage should be fully cleared out**. The existing homepage code should be read and then completely removed to ensure that no remnants of the previous design remain. This will allow for a fresh and modern approach to the redesign.
+
+#### **1. Clean up Previous Code:**
+   - **Read the existing code** for the homepage to ensure that you understand the layout and structure of the current page.
+   - **Remove all old code** from the homepage to prevent any leftover elements or styles from interfering with the new design.
+   - Ensure that no old HTML, CSS, or JavaScript related to the homepage is left behind.
+   - After the old code is removed, proceed with the fresh design and structure of the homepage as described below.
+
+#### **2. Glassmorphism Style Guidelines:**
+   - **Background:** Use semi-transparent, blurred backgrounds that give a frosted glass effect.
+   - **Card Design:** Each movie card should have a frosted glass effect with subtle blur and transparency. Ensure the cards are visually distinct and pop from the background.
+   - **Typography:** Use clean, modern fonts with slight shadows to make the text stand out on semi-transparent backgrounds.
+   - **Color Scheme:** Soft gradients with a hint of color, but maintaining an elegant feel. Shades of blue, white, and light grays work well for glassmorphism designs.
+   - **Shadows and Borders:** Utilize soft, blurred shadows around elements to create depth and emphasize the frosted glass look.
+
+#### **3. Movie Card Design:**
+   - **Card Layout:**
+     - Each card should display a movie poster as the background.
+     - Text: The movie title should be prominent in a large, bold font with a subtle drop shadow.
+     - Overlay: A light gradient or dark overlay to improve readability of the text over the poster.
+     - Description: A brief, concise description of the movie (2-3 lines).
+     - Rating: Display the average rating in a corner of the card, styled with a circular background for visual distinction.
+   - **Hover Effects:**
+     - When users hover over the movie card, the card should slightly zoom in or scale up to create an interactive feel.
+     - The overlay opacity should increase, making the movie title and rating more prominent.
+
+   - **Example HTML Layout for Movie Cards:**
+     ```html
+     <div class="movie-card">
+         <img class="card-background" src="movie-poster.jpg" alt="Movie Title" />
+         <div class="card-overlay">
+             <h3 class="movie-title">Movie Title</h3>
+             <p class="movie-description">This is a brief description of the movie...</p>
+             <div class="rating">8.7</div>
+         </div>
+     </div>
+     ```
+
+#### **4. Integration with Other Sections:**
+   - **Navigation Section:** Keep the navigation buttons consistent with the glassmorphism style, with transparent backgrounds and subtle shadows.
+   - **Other Sections:** Apply similar styling to other homepage sections like genres, featured films, or trending content. Ensure that each section has consistent margins, padding, and alignment.
+
+#### **5. Responsiveness:**
+   - Ensure that the homepage design is fully responsive and adapts to mobile and tablet sizes. The glassmorphism effect should still be present but adjusted for smaller screens.
+   - On mobile, movie cards should stack vertically with reduced image size but maintain the same visual style.
+   
+#### **6. Final Design Considerations:**
+   - **Minimalistic Animations:** Add minimal animations for elements that appear when users scroll down the page (e.g., fade-in for movie cards or other content).
+   - **Consistency:** Ensure all elements (buttons, cards, images) follow the same style for smooth visual flow.
+   - **Accessibility:** Ensure that contrast levels are high enough for readability. Add focus states to interactive elements for accessibility.
+
+#### **7. Example of CSS for Glassmorphism Effect:**
+   ```css
+   .movie-card {
+       position: relative;
+       background: rgba(255, 255, 255, 0.1);
+       backdrop-filter: blur(10px);
+       border-radius: 15px;
+       box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+       overflow: hidden;
+       transition: transform 0.3s ease, box-shadow 0.3s ease;
+   }
+   
+   .movie-card:hover {
+       transform: scale(1.05);
+       box-shadow: 0px 6px 10px rgba(0, 0, 0, 0.15);
+   }
+   
+   .card-overlay {
+       position: absolute;
+       bottom: 10px;
+       left: 10px;
+       right: 10px;
+       background: rgba(0, 0, 0, 0.5);
+       padding: 15px;
+       border-radius: 10px;
+   }
+   
+   .movie-title {
+       font-size: 1.5em;
+       color: white;
+       text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.6);
+   }
+   
+   .rating {
+       background-color: rgba(0, 255, 0, 0.7);
+       border-radius: 50%;
+       padding: 5px 15px;
+       color: white;
+       font-weight: bold;
+   }
+   ```
+
+#### **8. Result:**
+   - A modern, sleek, and highly interactive homepage design that maintains the integrity of the original page but adds a fresh, engaging, and elegant visual aesthetic.
+   - The movie cards and sections should integrate seamlessly with the overall design and maintain functionality and aesthetics across all device types.
+   - A user-friendly, responsive layout with beautiful hover effects, smooth animations, and clear, readable text.
+
+---
+
+### ✅ **Expected Outcome:**
+   - A fresh, modern homepage with a fully clean slate. All the previous code and structure should be removed, allowing for a new design to be implemented from scratch.
+   - The homepage will have a clean and elegant glassmorphism style with consistent design across all sections.
+   - The page will be fully responsive and provide a smooth, interactive experience for users.
+
+```
+
+---
+
+این پرامپت به هوش مصنوعی کمک می‌کند که طراحی صفحه اصلی سایت را از ابتدا و با حفظ تمامی معیارهای گلاسمورفیسم انجام دهد و از بروز مشکلات گذشته جلوگیری کند.

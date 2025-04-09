@@ -1,0 +1,37 @@
+[vite] connecting...
+[vite] connected.
+Warning: Encountered two children with the same key, &#x60;1744016853&#x60;. Keys should be unique so that components maintain their identity across updates. Non-unique keys may cause children to be duplicated and/or omitted — the behavior is unsupported and could change in a future version.
+    at div
+    at div
+    at div
+    at div
+    at section
+    at main
+    at div
+    at HomePage (https://2333f0a3-c678-4c7f-baea-c930e8c92c23-00-mbha2elkk2ri.sisko.repl.co:5000/src/pages/home-page.tsx?t=1744192317899:45:37)
+    at Route (https://2333f0a3-c678-4c7f-baea-c930e8c92c23-00-mbha2elkk2ri.sisko.repl.co:5000/@fs/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=c42bfb0b:323:16)
+    at Switch (https://2333f0a3-c678-4c7f-baea-c930e8c92c23-00-mbha2elkk2ri.sisko.repl.co:5000/@fs/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=c42bfb0b:379:17)
+    at Router
+    at LoadingProvider (https://2333f0a3-c678-4c7f-baea-c930e8c92c23-00-mbha2elkk2ri.sisko.repl.co:5000/src/contexts/LoadingContext.tsx:21:35)
+    at AuthProvider (https://2333f0a3-c678-4c7f-baea-c930e8c92c23-00-mbha2elkk2ri.sisko.repl.co:5000/src/hooks/use-auth.tsx:34:32)
+    at QueryClientProvider (https://2333f0a3-c678-4c7f-baea-c930e8c92c23-00-mbha2elkk2ri.sisko.repl.co:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@tanstack_react-query.js?v=c42bfb0b:2805:3)
+    at App
+at div
+at div
+at div
+at div
+at section
+at main
+at div
+at HomePage (https://2333f0a3-c678-4c7f-baea-c930e8c92c23-00-mbha2elkk2ri.sisko.repl.co:5000/src/pages/home-page.tsx?t=1744192317899:45:37)
+at Route (https://2333f0a3-c678-4c7f-baea-c930e8c92c23-00-mbha2elkk2ri.sisko.repl.co:5000/@fs/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=c42bfb0b:323:16)
+at Switch (https://2333f0a3-c678-4c7f-baea-c930e8c92c23-00-mbha2elkk2ri.sisko.repl.co:5000/@fs/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=c42bfb0b:379:17)
+at Router
+at LoadingProvider (https://2333f0a3-c678-4c7f-baea-c930e8c92c23-00-mbha2elkk2ri.sisko.repl.co:5000/src/contexts/LoadingContext.tsx:21:35)
+at AuthProvider (https://2333f0a3-c678-4c7f-baea-c930e8c92c23-00-mbha2elkk2ri.sisko.repl.co:5000/src/hooks/use-auth.tsx:34:32)
+at QueryClientProvider (https://2333f0a3-c678-4c7f-baea-c930e8c92c23-00-mbha2elkk2ri.sisko.repl.co:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@tanstack_react-query.js?v=c42bfb0b:2805:3)
+at App
+at t.value (https://2333f0a3-c678-4c7f-baea-c930e8c92c23-00-mbha2elkk2ri.sisko.repl.co:5000/__replco/static/devtools/eruda/3.2.3/eruda.js:2:17465)
+at new t (https://2333f0a3-c678-4c7f-baea-c930e8c92c23-00-mbha2elkk2ri.sisko.repl.co:5000/__replco/static/devtools/eruda/3.2.3/eruda.js:2:12630)
+at t.value (https://2333f0a3-c678-4c7f-baea-c930e8c92c23-00-mbha2elkk2ri.sisko.repl.co:5000/__replco/static/devtools/eruda/3.2.3/eruda.js:2:32766)
+at https://2333f0a3-c678-4c7f-baea-c930e8c92c23-00-mbha2elkk2ri.sisko.repl.co:5000/__replco/static/devtools/eruda/3.2.3/eruda.js:2:34400
