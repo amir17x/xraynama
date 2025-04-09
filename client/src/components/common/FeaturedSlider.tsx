@@ -206,7 +206,7 @@ export function FeaturedSlider({ content, isLoading = false }: FeaturedSliderPro
         imgElement.onload = () => handleImageLoad(index);
       }
     });
-  }, [currentIndex, content, imagesLoaded]);
+  }, [currentIndex, content]);
 
   const currentContent = content[currentIndex];
   const isBackdropLoaded = imagesLoaded[currentIndex];
