@@ -1,0 +1,164 @@
+برای درخواست مستند‌سازی کامل و جامع از TMDB API به هوش مصنوعی، پرامپت زیر را می‌توانید استفاده کنید. این پرامپت به‌طور دقیق نحوه دریافت اطلاعات فیلم‌ها، سریال‌ها، مستندها، امتیازها، ژانرها، کشورها و سایر اطلاعات مرتبط با محتوا از TMDB را شرح می‌دهد:
+
+---
+
+### 🔴 **TMDB API Documentation - Detailed Guide for Retrieving Movie, TV Series, and Documentary Data**
+
+```
+You are tasked with creating a detailed and comprehensive guide for integrating and using the TMDB (The Movie Database) API to retrieve movie, TV series, and documentary information for a website. Follow the specifications below to ensure all required data is retrieved, formatted, and stored efficiently.
+
+#### **1. Introduction to TMDB API**:
+   - TMDB API provides access to a large database of movies, TV shows, and documentaries, including details such as title, genres, ratings, country of origin, and more.
+   - You will use the **TMDB API Key** to authenticate and interact with their services.
+
+#### **2. API Authentication**:
+   - You need to sign up for an API key from the TMDB API website (https://www.themoviedb.org/documentation/api).
+   - Once you have your API key, use it in the API requests to authenticate.
+
+#### **3. API Endpoints**:
+   The following are the most useful endpoints to retrieve information:
+
+   - **Movie Endpoint**: `GET /movie/{movie_id}`
+   - **TV Series Endpoint**: `GET /tv/{tv_id}`
+   - **Discover Endpoint**: `GET /discover/movie`, `GET /discover/tv`
+   - **Search Endpoint**: `GET /search/movie`, `GET /search/tv`
+   
+   Here’s an example API request:
+   ```
+   https://api.themoviedb.org/3/movie/{movie_id}?api_key={api_key}&language=en-US
+   ```
+
+#### **4. Retrieving Movie, TV, and Documentary Information**:
+
+   1. **Basic Information for Movies, TV Series, and Documentaries**:
+      - Title: `title` (For movies) or `name` (For TV series)
+      - Overview/Description: `overview`
+      - Release Date: `release_date` (Movies) or `first_air_date` (TV series)
+      - Poster Image URL: `poster_path`
+      - Backdrop Image URL: `backdrop_path`
+      - Runtime: `runtime` (For movies)
+      - Seasons: `seasons` (For TV series)
+
+      Example Request for Movie:
+      ```javascript
+      const response = await fetch(`https://api.themoviedb.org/3/movie/{movie_id}?api_key={api_key}&language=en-US`);
+      const data = await response.json();
+      console.log(data.title); // Movie Title
+      console.log(data.overview); // Movie Overview
+      console.log(data.release_date); // Release Date
+      console.log(data.poster_path); // Poster Image
+      ```
+
+   2. **Genres**:
+      - Genres are provided as an array of objects. For instance, a movie can belong to multiple genres (e.g., action, adventure).
+      - Genres are accessible under `genres` in the response data.
+      
+      Example:
+      ```javascript
+      console.log(data.genres); // [{ "id": 28, "name": "Action" }, { "id": 12, "name": "Adventure" }]
+      ```
+
+   3. **Rating/Score**:
+      - The rating score can be retrieved from `vote_average` (average rating) and `vote_count` (total number of votes).
+      - Example:
+      ```javascript
+      console.log(data.vote_average); // Rating score (e.g., 7.8)
+      console.log(data.vote_count); // Total number of votes
+      ```
+
+   4. **Country of Origin**:
+      - For movies and TV shows, the country of origin is available under `production_countries`.
+      - Example:
+      ```javascript
+      console.log(data.production_countries); // [{ "iso_3166_1": "US", "name": "United States of America" }]
+      ```
+
+   5. **Spoken Languages**:
+      - The languages spoken in the film or TV series can be found under `spoken_languages`.
+      - Example:
+      ```javascript
+      console.log(data.spoken_languages); // [{ "iso_639_1": "en", "name": "English" }]
+      ```
+
+#### **5. Searching for Movies, TV Shows, and Documentaries**:
+   - **Search for Movies**:
+     Use the `/search/movie` endpoint to search for a movie by title, genre, release year, etc.
+     Example Request:
+     ```javascript
+     const searchQuery = 'Inception';
+     const response = await fetch(`https://api.themoviedb.org/3/search/movie?api_key={api_key}&query=${searchQuery}&language=en-US`);
+     const data = await response.json();
+     console.log(data.results); // Search results
+     ```
+   
+   - **Search for TV Shows**:
+     Similar to movie search, use `/search/tv` for TV shows.
+     Example:
+     ```javascript
+     const searchQuery = 'Breaking Bad';
+     const response = await fetch(`https://api.themoviedb.org/3/search/tv?api_key={api_key}&query=${searchQuery}&language=en-US`);
+     const data = await response.json();
+     console.log(data.results); // Search results for TV shows
+     ```
+
+#### **6. Storing and Managing Data in MongoDB**:
+   - Once you retrieve the data, store it in MongoDB.
+   - You can store each movie, TV series, or documentary in a collection with fields like:
+     - `title`, `overview`, `release_date`, `genres`, `rating`, `country_of_origin`, `spoken_languages`, etc.
+   - For example, create a document schema for movies:
+     ```javascript
+     const movieSchema = new mongoose.Schema({
+         title: String,
+         overview: String,
+         release_date: Date,
+         genres: [String],
+         rating: Number,
+         country_of_origin: String,
+         spoken_languages: [String],
+         poster_image: String,
+     });
+     ```
+
+   - **Example of saving movie data to MongoDB**:
+     ```javascript
+     const movie = new Movie({
+         title: data.title,
+         overview: data.overview,
+         release_date: data.release_date,
+         genres: data.genres.map(genre => genre.name),
+         rating: data.vote_average,
+         country_of_origin: data.production_countries[0].name,
+         spoken_languages: data.spoken_languages.map(language => language.name),
+         poster_image: `https://image.tmdb.org/t/p/w500${data.poster_path}`,
+     });
+     
+     movie.save().then(() => console.log("Movie saved!"));
+     ```
+
+#### **7. Displaying Data on the Website**:
+   - After saving the data, display it on your website. For example:
+     - Display movie titles and ratings in a list format.
+     - Show the poster images as thumbnails.
+     - Link to individual pages with more detailed information about each title.
+
+   - Example of rendering a movie card:
+     ```html
+     <div class="movie-card">
+         <img src="https://image.tmdb.org/t/p/w500${movie.poster_image}" alt="${movie.title}" />
+         <h3>${movie.title}</h3>
+         <p>Rating: ${movie.rating}</p>
+         <p>${movie.overview}</p>
+     </div>
+     ```
+
+---
+
+### ✅ **Expected Outcomes**:
+   - A fully integrated TMDB API system that retrieves and displays movie, TV show, and documentary data.
+   - A database (MongoDB) that stores all relevant data for easy management.
+   - A user-friendly interface displaying rich media (poster images, ratings, genres, etc.) for each item.
+   - Detailed and organized API integration that can easily be expanded as new features are needed.
+
+---
+
+این پرامپت به شما کمک می‌کند تا مستندات دقیقی برای استفاده از TMDB API ایجاد کنید، که می‌توانید برای توسعه سایت خود از آن استفاده کنید.

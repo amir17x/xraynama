@@ -203,6 +203,7 @@ export class TMDBService {
     vote_average_lte?: number;
     with_runtime_gte?: number;
     with_runtime_lte?: number;
+    vote_count_gte?: number; // تعداد آرای حداقل
   }, page: number = 1, language?: string) {
     try {
       if (!this.apiKey || !this.accessToken) {
@@ -339,6 +340,7 @@ export class TMDBService {
     vote_average_lte?: number;
     with_runtime_gte?: number;
     with_runtime_lte?: number;
+    vote_count_gte?: number; // تعداد آرای حداقل
   }, page: number = 1, language?: string) {
     try {
       if (!this.apiKey || !this.accessToken) {

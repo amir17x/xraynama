@@ -93,7 +93,7 @@ export function useRecommendedContent(options?: UseApiQueryOptions<any>) {
  */
 export function useContentByType(type: string, options?: UseApiQueryOptions<any>) {
   return useApiQuery(
-    ['/api/content/type', type],
+    ['/api/content/types', type],
     options
   );
 }

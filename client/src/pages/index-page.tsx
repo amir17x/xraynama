@@ -234,28 +234,28 @@ const FeaturedContent: React.FC<{
 const IndexPage: React.FC = () => {
   // Fetch movies (type: movie)
   const { data: movies, isLoading: moviesLoading } = useQuery<ContentType[]>({
-    queryKey: ['/api/content/type/movie'],
+    queryKey: ['/api/content/types/movie'],
     retry: false,
     staleTime: 1000 * 60 * 5, // 5 minutes
   });
 
   // Fetch series (type: series)
   const { data: series, isLoading: seriesLoading } = useQuery<ContentType[]>({
-    queryKey: ['/api/content/type/series'],
+    queryKey: ['/api/content/types/series'],
     retry: false,
     staleTime: 1000 * 60 * 5, // 5 minutes
   });
 
   // Fetch animations (type: animation)
   const { data: animations, isLoading: animationsLoading } = useQuery<ContentType[]>({
-    queryKey: ['/api/content/type/animation'],
+    queryKey: ['/api/content/types/animation'],
     retry: false,
     staleTime: 1000 * 60 * 5, // 5 minutes
   });
 
   // Fetch documentaries (type: documentary)
   const { data: documentaries, isLoading: documentariesLoading } = useQuery<ContentType[]>({
-    queryKey: ['/api/content/type/documentary'],
+    queryKey: ['/api/content/types/documentary'],
     retry: false,
     staleTime: 1000 * 60 * 5, // 5 minutes
   });

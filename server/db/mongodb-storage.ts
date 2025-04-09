@@ -1400,6 +1400,12 @@ export class MongoDBStorage implements IStorage {
       poster: mongoContent.poster,
       backdrop: mongoContent.backdrop,
       imdbRating: mongoContent.imdbRating,
+      director: mongoContent.director || null,
+      actors: mongoContent.actors || [],
+      country: mongoContent.country || null,
+      languages: mongoContent.languages || null,
+      hasPersianDubbing: mongoContent.hasPersianDubbing || false,
+      hasPersianSubtitle: mongoContent.hasPersianSubtitle || false,
       createdAt: mongoContent.createdAt,
       updatedAt: mongoContent.updatedAt
     };

@@ -36,6 +36,12 @@ export interface ContentDocument extends Document {
   poster: string;
   backdrop?: string | null;
   imdbRating?: string | null;
+  director?: string;
+  actors?: string[];
+  country?: string;
+  languages?: string;
+  hasPersianDubbing?: boolean;
+  hasPersianSubtitle?: boolean;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -166,6 +172,12 @@ const contentSchema = new Schema<ContentDocument>({
   poster: { type: String, required: true },
   backdrop: { type: String, default: null },
   imdbRating: { type: String, default: null },
+  director: { type: String, default: null },
+  actors: { type: [String], default: [] },
+  country: { type: String, default: null },
+  languages: { type: String, default: null },
+  hasPersianDubbing: { type: Boolean, default: false },
+  hasPersianSubtitle: { type: Boolean, default: false },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now }
 });
