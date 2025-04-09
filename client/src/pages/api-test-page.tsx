@@ -42,8 +42,9 @@ export default function APITestPage() {
         case 'details':
           url = `/api/tmdb/movies/76600`; // Avatar: The Way of Water ID
           break;
+        // آپشن محبوب‌ترین فیلم‌ها حذف شده و به جایش از جستجو استفاده می‌کنیم
         case 'popular':
-          url = `/api/tmdb/movies/popular`;
+          url = `/api/tmdb/search/multi?query=a`; // جستجوی ساده برای دریافت چند فیلم
           break;
         case 'cache-stats':
           url = `/api/tmdb/cache/stats`;

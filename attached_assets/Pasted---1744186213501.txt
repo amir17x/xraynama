@@ -1,0 +1,62 @@
+آفرین کارت خیلی حرفه‌ای و دقیق داره پیش می‌ره! 👏
+
+با توجه به شرایطی که گفتی (پروژه در حال توسعه است، هنوز بخش‌هایی داره حذف یا اضافه می‌شه، می‌خوای دسته‌بندی فایل‌ها انجام بشه بدون ایجاد نسخه تکراری و با قابلیت برگشت کامل)، این یه **پرامپت خیلی حرفه‌ای و امن** هست که می‌تونی به Replit AI بدی تا برات به بهترین و ایمن‌ترین شکل فایل‌ها رو دسته‌بندی کنه:
+
+---
+
+### 🔐 Super Safe Prompt for Organizing Files with Restore Point (English)
+
+```
+You are a professional full-stack developer and file organizer. I’m currently developing this project, and I want you to do the following steps **safely and cleanly**:
+
+1. ✅ First Step: Create a Full Restore Point
+   - Create a complete backup of the current project folder before doing anything.
+   - Name the backup folder something like: `_backup_before_organizing_<DATE>` and place it outside the working directory.
+
+2. 📂 Organize Files (Carefully):
+   - Move (not copy) the files to a new clean and optimized folder structure.
+   - DO NOT duplicate any file. If a file is moved, delete the original after the move is confirmed successful.
+   - Follow a typical structure like:
+     ├── public/
+     │   └── assets/ (images, icons, fonts)
+     ├── src/
+     │   ├── components/
+     │   ├── pages/
+     │   ├── styles/
+     │   ├── api/
+     │   └── main.js or App.js
+     ├── .env
+     ├── package.json
+     └── README.md
+
+3. 🔎 Safety Rules:
+   - Never delete or overwrite anything without having a backup.
+   - After organizing, test if all imports and file paths are still valid.
+   - Print a full summary of what was moved and to where.
+
+4. ⚠️ Important Notes:
+   - Keep original file timestamps if possible.
+   - Do NOT move `.env` or configuration files to subfolders.
+   - If a file is unused or seems broken, mark it with a `_TO_REVIEW` suffix, but **do not delete it**.
+
+Once completed, output a report showing:
+- Which files were moved where
+- Any issues detected
+- How to restore if needed
+
+Everything should be clean, fast, and ready for further development and future deployment.
+```
+
+---
+
+### ✳️ نکات فارسی برای اطمینان بیشتر:
+
+- همه فایل‌ها منتقل بشن، نه کپی.
+- از فایل‌های سیستمی مثل `.env` و `package.json` حتماً در جای خودشون بمونن.
+- اگر فایلی مشکوک به بلااستفاده بودن بود، حذف نشه؛ فقط برچسب بخوره.
+- بعد از انتقال مسیر ایمپورت‌ها بررسی بشه (تا پروژه crash نکنه).
+- بکاپ حتماً بیرون از پوشه اصلی پروژه ذخیره بشه.
+
+---
+
+اگه خواستی می‌تونم همین ساختار رو در قالب یه اسکریپت `Node.js` برات بنویسم که به صورت خودکار این کارو بکنه. فقط بگو بخوای دستی انجام بشه یا هوشمند اتوماتیک 😊

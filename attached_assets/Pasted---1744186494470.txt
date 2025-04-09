@@ -1,0 +1,43 @@
+برای حذف بخش **محبوب‌ترین فیلم‌ها در جهان** از صفحه و پاک کردن کدهای مربوطه، می‌تونی از این پرامپت استفاده کنی تا هوش مصنوعی دقیقا بخش مورد نظر رو حذف کنه و کدهای مربوطه رو پاک کنه:
+
+---
+
+### 🔴 Prompt for Removing Popular Movies Section (TMDB) and Deleting the Related Code
+
+```
+You are a web developer working on a movie-related website. I need you to perform the following tasks carefully:
+
+1. 🔥 **Remove the Popular Movies Section:**
+   - Locate the part of the website where the "Popular Movies" section (based on TMDB's popularity rankings) is displayed.
+   - Remove any HTML, CSS, and JavaScript code that renders this section.
+   - Make sure to remove any related API calls to TMDB that are fetching popular movies.
+   - If there's any state or variable used to store the popular movies, remove that as well.
+
+2. ✂️ **Clean Up the Code:**
+   - After removing the section, ensure that all unused functions, components, and variables related to the popular movies are deleted from the codebase.
+   - If there are imports related to the popular movies API (for example, calls to TMDB's "popular" endpoint), remove them from the code.
+   - Double-check that there are no references to the "popular movies" data or section anywhere in the codebase.
+
+3. 🔄 **Test and Verify:**
+   - Ensure the website still works as expected after removing the section. There should be no errors in the console.
+   - Check the layout of the page to ensure no empty spaces or broken UI elements where the popular movies section used to be.
+   - Test other parts of the website to ensure they still function correctly (especially other API calls or sections that were not affected).
+
+4. 📄 **Remove Unnecessary Styles:**
+   - If there were specific styles (CSS classes or stylesheets) used only for the popular movies section, remove them.
+   - Ensure that removing the section does not affect other sections of the website's styling.
+
+Once completed, output a confirmation that the "Popular Movies" section has been successfully removed, and all related code has been cleaned up without leaving any broken links, empty sections, or errors.
+```
+
+---
+
+### ✳️ نکات اضافی:
+
+- اگر بخش "محبوب‌ترین فیلم‌ها" به‌صورت داینامیک با استفاده از JavaScript و API TMDB بارگذاری می‌شد، تمام درخواست‌های API که مربوط به این بخش هستند باید حذف شوند.
+- بعد از حذف بخش، اطمینان حاصل کن که در صورت نیاز، از بخش‌های دیگر مانند نوار ناوبری یا منو چیزی حذف نشه.
+- حتماً با تست وب‌سایت، مطمئن شو که هیچ تغییر منفی‌ای در عملکرد باقی نمانده.
+
+---
+
+این پرامپت دقیقاً به هوش مصنوعی کمک می‌کنه که این بخش رو به‌طور کامل از کد حذف کنه و کدهای اضافی رو پاک کنه، بدون اینکه مشکلی به‌وجود بیاد!

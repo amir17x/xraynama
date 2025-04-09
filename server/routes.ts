@@ -875,23 +875,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // TMDB API ها
   // ===================================
 
-  // دریافت فیلم‌های محبوب TMDB
-  app.get("/api/tmdb/movies/popular", async (req, res, next) => {
-    try {
-      const { tmdbService } = await import('./tmdb-service');
-      const limit = req.query.limit ? parseInt(req.query.limit as string) : 10;
-      const page = req.query.page ? parseInt(req.query.page as string) : 1;
-      
-      const movies = await tmdbService.getPopularMovies(page, limit);
-      res.json(movies);
-    } catch (error) {
-      console.error("Error fetching popular movies from TMDB:", error);
-      res.status(500).json({ 
-        error: "خطا در دریافت فیلم‌های محبوب", 
-        message: "متأسفانه در حال حاضر امکان دریافت فیلم‌های محبوب وجود ندارد. لطفاً بعداً دوباره تلاش کنید."
-      });
-    }
-  });
+  // مسیر API محبوب‌ترین فیلم‌های TMDB حذف شده است
 
   // دریافت جزئیات فیلم از TMDB
   app.get("/api/tmdb/movies/:id", async (req, res, next) => {

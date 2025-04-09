@@ -120,11 +120,12 @@ export function useTMDBCacheStats(options?: UseApiQueryOptions<any>) {
 
 /**
  * هوک ساده‌شده برای دریافت فیلم‌های محبوب TMDB
+ * توجه: این متد دیگر از API محبوب‌ترین فیلم‌ها استفاده نمی‌کند و به جای آن از جستجوی چند منظوره استفاده می‌کند
  */
 export function usePopularMovies(options?: UseApiQueryOptions<any> & { page?: number, limit?: number }) {
   const { page, limit, ...queryOptions } = options || {};
   return useApiQuery(
-    ['/api/tmdb/movies/popular', { page, limit }],
+    ['/api/tmdb/search/multi', { query: 'a', page, limit }], // از جستجوی ساده برای دریافت چند فیلم استفاده می‌کنیم
     queryOptions
   );
 }

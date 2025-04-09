@@ -11,7 +11,6 @@ import { Button } from '@/components/ui/button';
 import { ChevronUp, Play, Heart, Download, AlertCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import FeaturedContentSection from '@/components/content/FeaturedContentSection';
-import PopularMoviesSection from '@/components/tmdb/PopularMoviesSection';
 import { useAuth } from '@/hooks/use-auth';
 
 export default function HomePage() {
@@ -116,9 +115,6 @@ export default function HomePage() {
           icon="award"
           moreLink="/top-imdb"
         />
-        
-        {/* فیلم‌های محبوب TMDB */}
-        <PopularMoviesSection />
         
         <div className="container mx-auto px-4 py-8">
           {/* Latest Movies */}
