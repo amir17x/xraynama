@@ -29,13 +29,13 @@ export function SearchBar() {
     e.preventDefault();
     if (query.trim()) {
       // Navigate to search page with the query
-      navigate(`/all-content?q=${encodeURIComponent(query)}`);
+      navigate(`/search?q=${encodeURIComponent(query)}`);
     }
   };
 
   const handleAdvancedSearch = () => {
-    // Navigate to all-content page with advanced search UI
-    navigate('/all-content?advanced=true');
+    // Navigate to search/advanced page
+    navigate('/search/advanced');
   };
 
   return (
@@ -72,7 +72,7 @@ export function AdvancedSearchButton() {
   const [, navigate] = useLocation();
   
   const handleAdvancedSearch = () => {
-    navigate('/all-content?advanced=true');
+    navigate('/search/advanced');
   };
   
   return (
