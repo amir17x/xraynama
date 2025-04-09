@@ -1,14 +1,13 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link } from 'wouter';
 import { ContentType } from '@/types';
-import { Play, Download, Heart, Share2, ChevronLeft, Image } from 'lucide-react';
+import { Play, Download, Heart, Share2, Image } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { apiRequest, queryClient } from '@/lib/queryClient';
 import { useAuth } from '@/hooks/use-auth';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import { CarouselButton } from './CarouselButton';
-import { useInView } from '@/hooks/use-in-view';
 
 interface FeaturedSliderProps {
   content: ContentType[];
@@ -19,18 +18,14 @@ export function FeaturedSlider({ content, isLoading = false }: FeaturedSliderPro
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isFavorite, setIsFavorite] = useState(false);
   const [isAddingToFavorites, setIsAddingToFavorites] = useState(false);
-  const [imagesLoaded, setImagesLoaded] = useState<Record<number, boolean>>({});
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const { user } = useAuth();
   const { toast } = useToast();
-  const [sliderRef, isVisible] = useInView<HTMLElement>({
-    threshold: 0.1,
-    triggerOnce: false
-  });
+  const sliderRef = useRef<HTMLElement | null>(null);
 
   // Auto-rotate slider items
   useEffect(() => {
-    if (content.length <= 1) return;
+    if (!content || content.length <= 1) return;
     
     // Start auto-rotation
     intervalRef.current = setInterval(() => {
@@ -43,10 +38,19 @@ export function FeaturedSlider({ content, isLoading = false }: FeaturedSliderPro
         clearInterval(intervalRef.current);
       }
     };
-  }, [content.length]);
+  }, [content]);
+
+  // Debug log
+  useEffect(() => {
+    if (content && content.length > 0) {
+      console.log(`Current content: ${content[currentIndex]?.title}, content length: ${content.length}`);
+    }
+  }, [currentIndex, content]);
 
   // Reset auto-rotation when manually changing slides
   const resetInterval = () => {
+    if (!content || content.length <= 1) return;
+    
     if (intervalRef.current) {
       clearInterval(intervalRef.current);
     }
@@ -57,21 +61,26 @@ export function FeaturedSlider({ content, isLoading = false }: FeaturedSliderPro
   };
 
   const handlePrevious = () => {
+    if (!content || content.length <= 1) return;
     setCurrentIndex(prev => (prev - 1 + content.length) % content.length);
     resetInterval();
   };
 
   const handleNext = () => {
+    if (!content || content.length <= 1) return;
     setCurrentIndex(prev => (prev + 1) % content.length);
     resetInterval();
   };
 
   const handleGoToIndex = (index: number) => {
+    if (!content || content.length <= 1) return;
     setCurrentIndex(index);
     resetInterval();
   };
 
   const handleAddToFavorites = async () => {
+    if (!content || content.length === 0) return;
+    
     if (!user) {
       toast({
         title: "لطفا وارد شوید",
@@ -116,11 +125,14 @@ export function FeaturedSlider({ content, isLoading = false }: FeaturedSliderPro
   };
 
   const handleShareContent = () => {
+    if (!content || content.length === 0) return;
+    const currentContent = content[currentIndex];
+    
     if (navigator.share) {
       navigator.share({
-        title: content[currentIndex].title,
-        text: content[currentIndex].description,
-        url: window.location.origin + '/content/' + content[currentIndex].id,
+        title: currentContent.title,
+        text: currentContent.description,
+        url: window.location.origin + '/content/' + currentContent.id,
       })
       .catch((error) => {
         console.log('Error sharing:', error);
@@ -129,9 +141,9 @@ export function FeaturedSlider({ content, isLoading = false }: FeaturedSliderPro
       // Fallback for browsers that don't support the Web Share API
       toast({
         title: "اشتراک‌گذاری",
-        description: "کپی شد: " + window.location.origin + '/content/' + content[currentIndex].id,
+        description: "کپی شد: " + window.location.origin + '/content/' + currentContent.id,
       });
-      navigator.clipboard.writeText(window.location.origin + '/content/' + content[currentIndex].id);
+      navigator.clipboard.writeText(window.location.origin + '/content/' + currentContent.id);
     }
   };
 
@@ -173,74 +185,32 @@ export function FeaturedSlider({ content, isLoading = false }: FeaturedSliderPro
     );
   }
 
-  // Handler for image loading
-  const handleImageLoad = (index: number) => {
-    setImagesLoaded(prev => ({
-      ...prev,
-      [index]: true
-    }));
-  };
-
-  // Reset image loaded state when changing slide
-  useEffect(() => {
-    if (!content || content.length === 0) return;
-    
-    // Pre-load next and previous images
-    const preloadIndices = [
-      currentIndex,
-      (currentIndex + 1) % content.length,
-      (currentIndex - 1 + content.length) % content.length
-    ];
-    
-    // Always preload the images, regardless of loading state
-    preloadIndices.forEach(index => {
-      if (content[index]) {
-        // Create an image element to preload
-        const imgElement = new window.Image(); // استفاده از سازنده استاندارد تصویر
-        imgElement.src = content[index].backdrop || content[index].poster;
-        imgElement.onload = () => handleImageLoad(index);
-      }
-    });
-  }, [currentIndex, content]);
-  
-  // If no content is available
+  // If no content is available, return null after all hooks
   if (!content || content.length === 0) {
     return null;
   }
 
+  // Safely get current content
   const currentContent = content[currentIndex];
-  const isBackdropLoaded = imagesLoaded[currentIndex];
 
   return (
     <section 
       ref={sliderRef} 
-      className={cn(
-        "content-section-glass mb-12 overflow-hidden backdrop-blur-xl transition-opacity duration-500",
-        isVisible ? "opacity-100" : "opacity-0"
-      )}
+      className="content-section-glass mb-12 overflow-hidden backdrop-blur-xl"
     >
       <div className="relative h-[500px] md:h-[550px] rounded-xl overflow-hidden">
         {/* Featured background image */}
         <div className="absolute inset-0">
-          {/* Placeholder loader */}
-          <div 
-            className={cn(
-              "absolute inset-0 bg-card/30 flex items-center justify-center transition-opacity duration-500",
-              isBackdropLoaded ? "opacity-0" : "opacity-100"
-            )}
-          >
+          {/* Simple structure to avoid errors */}
+          <div className="absolute inset-0 bg-card/30">
             <div className="shimmer-effect w-full h-full absolute"></div>
-            <Image className="w-16 h-16 text-white/20" />
           </div>
           
+          {/* Image without animations */}
           <img 
             src={currentContent.backdrop || currentContent.poster} 
-            className={cn(
-              "w-full h-full object-cover transition-opacity duration-500",
-              isBackdropLoaded ? "opacity-100" : "opacity-0"
-            )}
+            className="w-full h-full object-cover z-10"
             alt={currentContent.title}
-            onLoad={() => handleImageLoad(currentIndex)}
           />
           
           {/* Glassmorphism overlay */}
@@ -327,7 +297,7 @@ export function FeaturedSlider({ content, isLoading = false }: FeaturedSliderPro
           </div>
         </div>
         
-        {/* Navigation arrows - استفاده از کامپوننت استاندارد CarouselButton */}
+        {/* Navigation arrows */}
         <CarouselButton
           direction="right"
           onClick={handlePrevious}
