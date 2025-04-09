@@ -189,24 +189,24 @@ const reviews = [
 // FAQ items
 const faqItems = [
   {
-    question: 'Is the app free to download and use?',
-    answer: 'Yes, downloading and installing the app is completely free. Basic content is available without subscription, while premium content requires a subscription plan. We offer multiple subscription tiers to suit different needs and budgets.'
+    question: 'آیا دانلود و استفاده از اپلیکیشن رایگان است؟',
+    answer: 'بله، دانلود و نصب اپلیکیشن کاملاً رایگان است. محتوای پایه بدون نیاز به اشتراک در دسترس است، درحالی که محتوای ویژه نیازمند خرید اشتراک است. ما سطوح مختلف اشتراک را برای نیازها و بودجه‌های متفاوت ارائه می‌دهیم.'
   },
   {
-    question: 'Can I download content for offline viewing?',
-    answer: 'Yes, the app allows you to download your favorite movies and shows for offline viewing. Premium subscribers can download in higher quality and have more storage space for downloaded content.'
+    question: 'آیا می‌توانم محتوا را برای تماشای آفلاین دانلود کنم؟',
+    answer: 'بله، اپلیکیشن به شما امکان دانلود فیلم‌ها و سریال‌های مورد علاقه برای تماشای آفلاین را می‌دهد. مشترکین ویژه می‌توانند با کیفیت بالاتر دانلود کنند و فضای ذخیره‌سازی بیشتری برای محتوای دانلود شده دارند.'
   },
   {
-    question: 'How many devices can I use with one account?',
-    answer: 'Basic accounts can stream on one device at a time, while Premium subscribers can enjoy simultaneous streaming on up to 4 devices. All accounts can be installed on unlimited devices, but streaming limits apply.'
+    question: 'با یک حساب کاربری چند دستگاه می‌توانم استفاده کنم؟',
+    answer: 'حساب‌های پایه می‌توانند همزمان روی یک دستگاه پخش کنند، درحالی که مشترکین ویژه می‌توانند از پخش همزمان روی تا ۴ دستگاه لذت ببرند. تمام حساب‌ها می‌توانند روی دستگاه‌های نامحدود نصب شوند، اما محدودیت پخش همزمان اعمال می‌شود.'
   },
   {
-    question: 'What video quality is supported?',
-    answer: 'The app supports various quality levels from SD (480p) to Ultra HD (4K). The maximum quality you can stream depends on your subscription plan, device capabilities, and internet connection speed.'
+    question: 'چه کیفیت‌های ویدیویی پشتیبانی می‌شود؟',
+    answer: 'اپلیکیشن از سطوح مختلف کیفیت از SD (480p) تا Ultra HD (4K) پشتیبانی می‌کند. حداکثر کیفیت پخش به نوع اشتراک، قابلیت‌های دستگاه و سرعت اینترنت شما بستگی دارد.'
   },
   {
-    question: 'How do I cancel my subscription?',
-    answer: 'You can easily cancel your subscription through the app\'s settings menu. Go to Account > Subscription > Cancel Subscription. Your access will continue until the end of your current billing period.'
+    question: 'چگونه اشتراک خود را لغو کنم؟',
+    answer: 'شما می‌توانید به راحتی اشتراک خود را از طریق منوی تنظیمات اپلیکیشن لغو کنید. به حساب کاربری > اشتراک > لغو اشتراک بروید. دسترسی شما تا پایان دوره فعلی پرداخت ادامه خواهد داشت.'
   }
 ];
 
@@ -269,15 +269,15 @@ const PlatformCard = ({ platform }: { platform: typeof platforms[0] }) => {
             
             <div className="flex flex-col space-y-3 mt-auto">
               <Button className={`w-full bg-gradient-to-r ${platform.color} hover:opacity-90 text-white font-medium border-0`}>
-                <Download className="mr-2 h-4 w-4" />
-                <span>Download Now</span>
+                <Download className="ml-2 h-4 w-4" />
+                <span>اکنون دانلود کنید</span>
               </Button>
               
               <div className="text-center">
-                <span className="text-xs text-white/60">Scan to download</span>
+                <span className="text-xs text-white/60">برای دانلود اسکن کنید</span>
                 <div className="mt-2 w-24 h-24 mx-auto bg-white rounded-lg p-2 shadow-glow shadow-white/10">
                   <div className="w-full h-full bg-gray-200 rounded flex items-center justify-center">
-                    <span className="text-xs text-gray-500">QR Code</span>
+                    <span className="text-xs text-gray-500">کد QR</span>
                   </div>
                 </div>
               </div>
@@ -288,8 +288,8 @@ const PlatformCard = ({ platform }: { platform: typeof platforms[0] }) => {
           <div className="md:col-span-2 flex flex-col">
             <div className="glassmorphism-inner p-5 rounded-xl mb-6">
               <h4 className="text-lg font-medium text-white mb-4 flex items-center">
-                <Sparkles className="w-5 h-5 mr-2 text-blue-400" />
-                Key Features
+                <Sparkles className="w-5 h-5 ml-2 text-blue-400" />
+                امکانات اصلی
               </h4>
               <ul className="space-y-2">
                 {platform.features.map((feature, idx) => (
@@ -303,8 +303,8 @@ const PlatformCard = ({ platform }: { platform: typeof platforms[0] }) => {
             
             <div className="glassmorphism-inner p-5 rounded-xl mb-6">
               <h4 className="text-lg font-medium text-white mb-3 flex items-center">
-                <CircleSlash2 className="w-5 h-5 mr-2 text-red-400" />
-                System Requirements
+                <CircleSlash2 className="w-5 h-5 ml-2 text-red-400" />
+                نیازمندی‌های سیستم
               </h4>
               <p className="text-white/70">{platform.requirements}</p>
             </div>
@@ -312,7 +312,7 @@ const PlatformCard = ({ platform }: { platform: typeof platforms[0] }) => {
             {/* Screenshot placeholder */}
             <div className="h-40 bg-gradient-to-r from-blue-900/30 to-purple-900/30 rounded-xl overflow-hidden flex items-center justify-center relative mt-auto">
               <Play className="h-10 w-10 text-white/80" />
-              <span className="absolute bottom-3 left-3 text-sm text-white/60 bg-black/30 px-2 py-1 rounded">App Preview</span>
+              <span className="absolute bottom-3 left-3 text-sm text-white/60 bg-black/30 px-2 py-1 rounded">پیش‌نمایش اپلیکیشن</span>
             </div>
           </div>
         </div>
@@ -327,13 +327,13 @@ const FeaturesSection = () => {
     <div className="mb-16">
       <div className="text-center mb-10">
         <Badge variant="outline" className="mb-3 px-4 py-1.5 border-blue-500/20 bg-blue-500/10 text-blue-400">
-          Powerful Features
+          امکانات قدرتمند
         </Badge>
         <h2 className="text-3xl md:text-4xl font-bold mb-3 bg-clip-text text-transparent bg-gradient-to-r from-white to-blue-200">
-          Everything You Need For Perfect Streaming
+          همه آنچه برای پخش ایده‌آل نیاز دارید
         </h2>
         <p className="text-lg text-white/70 max-w-3xl mx-auto">
-          Our app brings together cutting-edge technology and a user-friendly interface to deliver the ultimate entertainment experience.
+          اپلیکیشن ما فناوری پیشرفته و رابط کاربری آسان را با هم ترکیب کرده تا تجربه سرگرمی بی‌نظیری را ارائه دهد.
         </p>
       </div>
       
@@ -371,11 +371,11 @@ const ReviewsSection = () => {
     <div className="mb-16">
       <div className="text-center mb-10">
         <Badge variant="outline" className="mb-3 px-4 py-1.5 border-yellow-500/20 bg-yellow-500/10 text-yellow-400">
-          <Star className="w-4 h-4 mr-2 fill-yellow-400" /> 4.8 Average Rating
+          <Star className="w-4 h-4 ml-2 fill-yellow-400" /> میانگین امتیاز 4.8
         </Badge>
-        <h2 className="text-3xl md:text-4xl font-bold mb-3">What Our Users Say</h2>
+        <h2 className="text-3xl md:text-4xl font-bold mb-3">نظرات کاربران ما</h2>
         <p className="text-lg text-white/70 max-w-3xl mx-auto">
-          Join millions of satisfied users who've made Xraynama their go-to entertainment app
+          به میلیون‌ها کاربر راضی بپیوندید که ایکس‌رینما را به عنوان اپلیکیشن سرگرمی اصلی خود انتخاب کرده‌اند
         </p>
       </div>
       
@@ -421,7 +421,7 @@ const ReviewsSection = () => {
             {/* Badge */}
             <div className="absolute top-6 right-6">
               <Badge className="bg-white/10 hover:bg-white/20 border-white/5 text-white/70">
-                Verified User
+                کاربر تایید شده
               </Badge>
             </div>
           </div>
@@ -430,8 +430,8 @@ const ReviewsSection = () => {
       
       <div className="mt-8 text-center">
         <Button variant="outline" className="border-white/20 hover:border-white/30 hover:bg-white/5">
-          <Star className="mr-2 h-4 w-4" />
-          Read More Reviews
+          <Star className="ml-2 h-4 w-4" />
+          مشاهده نظرات بیشتر
         </Button>
       </div>
     </div>
@@ -443,8 +443,8 @@ const FAQSection = () => {
   return (
     <div className="mb-16 glassmorphism-card p-8 rounded-xl border border-white/5">
       <div className="text-center mb-8">
-        <h2 className="text-2xl md:text-3xl font-bold mb-3">Frequently Asked Questions</h2>
-        <p className="text-white/70">Everything you need to know about our app</p>
+        <h2 className="text-2xl md:text-3xl font-bold mb-3">پرسش‌های متداول</h2>
+        <p className="text-white/70">همه آنچه نیاز دارید درباره اپلیکیشن ما بدانید</p>
       </div>
       
       <Accordion type="single" collapsible className="w-full">
@@ -468,10 +468,10 @@ const StatsSection = () => {
   return (
     <div className="mb-16 grid grid-cols-2 md:grid-cols-4 gap-6">
       {[
-        { icon: <UserPlus className="h-8 w-8 text-blue-400" />, value: '5M+', label: 'Active Users' },
-        { icon: <HdmiPort className="h-8 w-8 text-purple-400" />, value: '1080p+', label: 'HD Quality' },
-        { icon: <Clock className="h-8 w-8 text-emerald-400" />, value: '24/7', label: 'Support' },
-        { icon: <Award className="h-8 w-8 text-amber-400" />, value: '#1', label: 'Streaming App' },
+        { icon: <UserPlus className="h-8 w-8 text-blue-400" />, value: '5M+', label: 'کاربر فعال' },
+        { icon: <HdmiPort className="h-8 w-8 text-purple-400" />, value: '1080p+', label: 'کیفیت HD' },
+        { icon: <Clock className="h-8 w-8 text-emerald-400" />, value: '24/7', label: 'پشتیبانی' },
+        { icon: <Award className="h-8 w-8 text-amber-400" />, value: '#1', label: 'اپلیکیشن پخش' },
       ].map((stat, index) => (
         <div key={index} className="glassmorphism-card p-6 rounded-xl border border-white/5 text-center">
           <div className="mx-auto w-16 h-16 rounded-full flex items-center justify-center bg-white/5 mb-4">
@@ -509,8 +509,8 @@ export default function AppPage() {
   
   return (
     <SectionLayout 
-      title="Xraynama App"
-      description="Experience unlimited entertainment on any device, anywhere, anytime"
+      title="اپلیکیشن ایکس‌رینما"
+      description="تجربه سرگرمی بی‌محدود روی هر دستگاه، در هر مکان، در هر زمان"
       icon={<Smartphone className="h-8 w-8" />}
     >
       {/* Hero Section with Glassmorphism */}
@@ -534,30 +534,30 @@ export default function AppPage() {
         <div className="relative z-20 p-8 md:p-16 flex flex-col md:flex-row items-center h-full">
           <div className="md:w-1/2 md:pr-10 mb-10 md:mb-0">
             <Badge variant="outline" className="mb-5 px-4 py-1.5 border-blue-500/20 bg-blue-500/10 text-blue-400">
-              <Wifi className="w-4 h-4 mr-2" /> Online & Offline Streaming
+              <Wifi className="w-4 h-4 ml-2" /> پخش آنلاین و آفلاین
             </Badge>
             
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight">
-              <span className="text-white">Your Entertainment,</span>
+              <span className="text-white">سرگرمی شما،</span>
               <span className="block bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-cyan-300">
-                Anywhere, Anytime
+                هر جا، هر زمان
               </span>
             </h1>
             
             <p className="text-xl text-white/80 mb-8 leading-relaxed">
-              Download the Xraynama app and transform any device into your personal cinema. 
-              Stream in 4K, download for offline viewing, and synchronize across all your devices.
+              اپلیکیشن ایکس‌رینما را دانلود کنید و هر دستگاه را به سینمای شخصی خود تبدیل کنید.
+              پخش با کیفیت 4K، دانلود برای تماشای آفلاین و همگام‌سازی بین تمام دستگاه‌های خود.
             </p>
             
             <div className="flex flex-wrap gap-4">
               <Button size="lg" className="bg-gradient-to-r from-blue-500 to-cyan-400 hover:opacity-90 text-white border-0 shadow-glow shadow-blue-500/20">
-                <Download className="mr-2 h-5 w-5" />
-                <span>Download Now</span>
+                <Download className="ml-2 h-5 w-5" />
+                <span>دانلود اپلیکیشن</span>
               </Button>
               
               <Button size="lg" variant="outline" className="border-white/20 hover:border-white/40 hover:bg-white/5">
-                <Play className="mr-2 h-5 w-5" />
-                <span>Watch Demo</span>
+                <Play className="ml-2 h-5 w-5" />
+                <span>مشاهده نسخه آزمایشی</span>
               </Button>
             </div>
             
@@ -583,7 +583,7 @@ export default function AppPage() {
                   ))}
                 </div>
                 <p className="text-sm text-white/60">
-                  Rated 4.8 by 2M+ users
+                  امتیاز 4.8 از بیش از 2 میلیون کاربر
                 </p>
               </div>
             </div>
@@ -657,11 +657,11 @@ export default function AppPage() {
         <div className="text-center mb-10">
           <Badge variant="outline" className="mb-3 px-4 py-1.5 border-blue-500/20 bg-blue-500/10 text-blue-400">
             <Download className="w-4 h-4 mr-2" />
-            Multi-Platform
+            چند پلتفرمی
           </Badge>
-          <h2 className="text-3xl md:text-4xl font-bold mb-3">Download For Your Device</h2>
+          <h2 className="text-3xl md:text-4xl font-bold mb-3">دانلود برای دستگاه شما</h2>
           <p className="text-lg text-white/70 max-w-3xl mx-auto">
-            Our app is available on all major platforms to ensure you always have access to your favorite content
+            اپلیکیشن ما روی تمام پلتفرم‌های اصلی در دسترس است تا همیشه به محتوای مورد علاقه خود دسترسی داشته باشید
           </p>
         </div>
         
@@ -704,25 +704,25 @@ export default function AppPage() {
         
         <div className="relative z-10">
           <Badge variant="outline" className="mb-5 px-4 py-1.5 border-blue-500/20 bg-blue-500/10 text-blue-400">
-            Join 5M+ Users
+            بیش از ۵ میلیون کاربر
           </Badge>
           
           <h2 className="text-3xl md:text-4xl font-bold mb-6">
-            Ready for the Ultimate Streaming Experience?
+            آماده تجربه پخش فوق‌العاده هستید؟
           </h2>
           
           <p className="text-xl text-white/80 mb-8 max-w-3xl mx-auto">
-            Download Xraynama now and enjoy unlimited access to thousands of movies, TV shows, and exclusive content
+            اپلیکیشن ایکس‌رینما را اکنون دانلود کنید و از دسترسی نامحدود به هزاران فیلم، سریال و محتوای اختصاصی لذت ببرید
           </p>
           
           <div className="flex flex-wrap justify-center gap-4">
             <Button size="lg" className="bg-gradient-to-r from-blue-500 to-cyan-400 hover:opacity-90 text-white border-0 shadow-glow shadow-blue-500/20">
-              <Download className="mr-2 h-5 w-5" />
-              <span>Get Started Now</span>
+              <Download className="ml-2 h-5 w-5" />
+              <span>همین حالا شروع کنید</span>
             </Button>
             
             <Button size="lg" variant="outline" className="border-white/20 hover:border-white/40 hover:bg-white/5">
-              <span>Learn More</span>
+              <span>اطلاعات بیشتر</span>
             </Button>
           </div>
         </div>

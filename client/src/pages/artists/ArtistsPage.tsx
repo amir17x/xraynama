@@ -370,8 +370,8 @@ export default function ArtistsPage() {
   
   return (
     <SectionLayout 
-      title="Artists"
-      description="Explore the world of cinema through its most talented actors, directors, and composers"
+      title="هنرمندان"
+      description="دنیای سینما را از طریق بازیگران، کارگردانان و آهنگسازان با استعداد آن کشف کنید"
       icon={<Users className="h-8 w-8" />}
     >
       {/* هنرمند برجسته */}
@@ -388,7 +388,7 @@ export default function ArtistsPage() {
             <Search className="h-4 w-4 absolute top-3 right-3 text-[#00BFFF]" />
             <Input
               type="text"
-              placeholder="Search artist..."
+              placeholder="جستجوی هنرمند..."
               className="pl-3 pr-10 py-2 bg-card/30 border-[#00BFFF]/20 focus:border-[#00BFFF]/60"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
@@ -402,10 +402,10 @@ export default function ArtistsPage() {
             className="w-full md:w-auto"
           >
             <TabsList className="grid grid-cols-4 w-full md:w-auto bg-card/30">
-              <TabsTrigger value="all">All</TabsTrigger>
-              <TabsTrigger value="actor">Actors</TabsTrigger>
-              <TabsTrigger value="director">Directors</TabsTrigger>
-              <TabsTrigger value="composer">Composers</TabsTrigger>
+              <TabsTrigger value="all">همه</TabsTrigger>
+              <TabsTrigger value="actor">بازیگران</TabsTrigger>
+              <TabsTrigger value="director">کارگردانان</TabsTrigger>
+              <TabsTrigger value="composer">آهنگسازان</TabsTrigger>
             </TabsList>
           </Tabs>
         </div>
@@ -425,9 +425,9 @@ export default function ArtistsPage() {
           <div className="text-[#00BFFF] mb-3">
             <Search className="h-16 w-16 mx-auto opacity-40" />
           </div>
-          <h3 className="text-xl font-bold mb-2">No artists found</h3>
+          <h3 className="text-xl font-bold mb-2">هنرمندی یافت نشد</h3>
           <p className="text-muted-foreground">
-            Try adjusting your search or filter criteria
+            جستجو یا فیلترهای خود را تغییر دهید
           </p>
         </div>
       )}
@@ -441,11 +441,11 @@ export default function ArtistsPage() {
                   variant="default" 
                   className="bg-gradient-to-r from-[#00BFFF] to-[#0077ff] hover:from-[#00a6ff] hover:to-[#005ed9] text-white shadow-lg shadow-blue-500/20"
                 >
-                  Load More Artists
+                  هنرمندان بیشتر
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
-                <p>Discover more actors, directors and composers</p>
+                <p>کشف بازیگران، کارگردانان و آهنگسازان بیشتر</p>
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>

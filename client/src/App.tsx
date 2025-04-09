@@ -102,6 +102,7 @@ function Router() {
       <Route path="/people/actors" component={ArtistsPage} />
       <Route path="/people/directors" component={ArtistsPage} />
       <Route path="/people/:person-slug" component={ArtistsPage} />
+      <Route path="/artists" component={ArtistsPage} />
       
       {/* Genres and categories */}
       <Route path="/genres" component={CategoriesPage} />
@@ -134,6 +135,9 @@ function Router() {
       {/* Legal pages */}
       <Route path="/legal/terms" component={TermsPage} />
       <Route path="/legal/privacy" component={TermsPage} />
+      
+      {/* App download page */}
+      <Route path="/app" component={AppPage} />
       
       {/* Utility pages */}
       <Route path="/api-test" component={APITestPage} />

@@ -1,0 +1,147 @@
+عالیه، الان یک پرامپت فوق‌حرفه‌ای، کامل، جامع و دقیق برات نوشتم که تمام مشکلات مربوط به **هدر دوتایی، محو شدن در اسکرول، و مخفی شدن منوهای باز شونده پشت هدر** رو در کنار مشکل قبلی (dropdown notifications و profile) به طور کامل حل کنه.
+
+---
+
+### ✅ 📌 Final Prompt (Ultimate Header & Dropdown Fix for Web App)
+
+```
+You are maintaining a web application with a fixed header that includes dropdown menus for Notifications and User Profile.
+
+❌ PROBLEMS to Fix:
+1. When the user clicks the **notification bell** or **profile icon**, the dropdown **appears behind the header**.
+2. Sometimes it feels like **two headers are rendered**, and the second one overlays or behaves weirdly during scroll.
+3. When scrolling, the **menu disappears or shrinks**, and dropdowns still render **behind** the header even after returning to top.
+4. Dropdowns don't respect z-index stacking properly, and layout glitches are visible during scroll.
+
+---
+
+✅ **OBJECTIVE:**
+Fix all header-related UI/UX issues in the project and ensure a single, consistent, and functional header with clean dropdown behavior.
+
+---
+
+### 🔧 FIX STRATEGY:
+
+#### 1. ✅ Ensure Only **One Header Element** is Rendered:
+- Check for duplicate header components or conditional renders that cause multiple headers.
+- Remove unnecessary conditional rendering or duplicate imports like:
+```js
+{isSticky && <Header />} // ❌ May render twice during scroll
+```
+- Only one `<Header />` should exist in the layout structure.
+
+---
+
+#### 2. ✅ Fix Z-Index Layering for Header & Menus:
+- Set a base z-index for the header:
+```css
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 50;
+}
+```
+- All dropdowns should have a higher `z-index`:
+```css
+.dropdown-menu {
+  position: absolute;
+  z-index: 100;
+}
+```
+
+---
+
+#### 3. ✅ Correct Dropdown Positioning:
+- Make sure dropdown containers are **positioned relative to a `.relative` wrapper** and not constrained by hidden parents or overflow styles.
+```html
+<div class="relative">
+  <button>🔔</button>
+  <div class="dropdown-menu"> ... </div>
+</div>
+```
+
+- Prevent dropdown from being clipped with:
+```css
+body, html {
+  overflow: visible !important;
+}
+```
+
+---
+
+#### 4. ✅ Prevent Header from Disappearing or Shrinking on Scroll:
+- If using JavaScript/React logic to hide/shrink header, disable it or ensure it's not bugged:
+```js
+window.addEventListener("scroll", () => {
+  if (window.scrollY > 100) {
+    header.classList.add("shrink");
+  } else {
+    header.classList.remove("shrink");
+  }
+});
+```
+
+- Ensure `.shrink` does not reduce `z-index`, `opacity`, or `height` to 0.
+
+---
+
+#### 5. ✅ Animate Dropdowns Cleanly:
+- Add slide/fade animation without positioning glitches:
+```css
+.dropdown-menu {
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  opacity: 0;
+  transform: translateY(-10px);
+  pointer-events: none;
+}
+.dropdown-menu.active {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+```
+
+---
+
+#### 6. ✅ Fix Sticky Header Bugs:
+- Avoid nesting sticky/fixed elements inside a fixed header (e.g., `position: sticky` inside `position: fixed` causes rendering issues).
+- Confirm no conflicting styles from parent layout.
+
+---
+
+#### 7. ✅ Responsive & Scroll-Aware:
+- Menus should behave properly on mobile and desktop:
+  - Do not overflow screen
+  - Use scrollable dropdowns if needed:
+```css
+.dropdown-menu {
+  max-height: 300px;
+  overflow-y: auto;
+}
+```
+
+---
+
+#### 8. ✅ Test Scenarios:
+- Click notification/profile dropdown before and after scrolling
+- Ensure dropdown always appears in front
+- Make sure only one header exists at any scroll position
+- Scroll up/down repeatedly to verify stability
+- Resize screen and test mobile behavior
+- Test in dark/light modes if used
+
+---
+
+### 🎯 FINAL OUTCOME:
+- A single, fixed, stable header with correct `z-index`
+- Dropdowns always render above all UI elements
+- No duplication, shrink, or disappearance during scroll
+- Fully responsive and animated dropdown menus
+- Entire UI layout is visually clean and functionally perfect
+```
+
+---
+
+اگه پروژه‌ات با React، Next.js، Tailwind یا چیز دیگه‌ایه، فقط بگو تا همین رو براساس همون ساختار بنویسم.
