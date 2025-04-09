@@ -1,0 +1,84 @@
+The error you're encountering is due to **rendering more hooks than in the previous render**, which is against React's rules of hooks. Specifically, it happens when the number of hooks in a component differs between renders. Here's a breakdown of what might be causing the issue and how you can fix it:
+
+### Common Causes of the Issue:
+1. **Conditional Hooks**: Hooks should not be used inside conditions, loops, or any place where their execution can change on re-renders. In your case, it seems like `useEffect` or other hooks might be conditionally rendered or executed based on some state or props.
+   
+2. **State Changes During Render**: Sometimes, state updates during the render cycle (like inside the `useEffect`) can trigger re-renders that cause a different number of hooks to be run.
+
+### How to Fix the Issue:
+1. **Check Hook Execution**: Ensure that all hooks are called unconditionally, meaning they should not depend on any conditions or logic that might cause them to be skipped or added on certain renders. This includes both `useEffect` and any other hooks you're using.
+   
+2. **Correct `useEffect` Placement**: In the code snippet you've provided, it looks like you're using `useEffect` at the top level of the component. However, you need to make sure that it doesn't get conditionally skipped. For instance:
+
+   ```jsx
+   useEffect(() => {
+     if (!content || content.length === 0) return;
+     // other logic here
+   }, [content]); // Ensure dependencies are correct
+   ```
+
+   The above code is okay if `content` is always defined, and the `useEffect` runs only when `content` changes.
+
+3. **Rearrange Conditional Logic**: If you're using any state or conditional logic inside the render, move the logic outside the render to avoid the conditional hook execution. For example, make sure that `useEffect` runs consistently every time, like this:
+
+   ```jsx
+   // Ensuring hooks are always called in the same order
+   const contentLoaded = content && content.length > 0;
+
+   useEffect(() => {
+     if (!contentLoaded) return;
+     // your logic
+   }, [contentLoaded]);
+   ```
+
+4. **Fix Dynamic Hook Rendering**: Ensure that hooks like `useEffect`, `useState`, etc., are not being called inside any conditional blocks. Example of incorrect pattern:
+
+   ```jsx
+   if (someCondition) {
+     useEffect(() => {
+       // logic
+     }, []);
+   }
+   ```
+
+   This would cause the number of hooks to vary between renders. You should refactor it so that hooks are always executed in the same order.
+
+5. **Investigate Component Re-renders**: If your component is re-rendering in a way that the hooks are conditionally triggered, try to optimize the rendering behavior by using `useMemo`, `useCallback`, or React's `React.memo` to prevent unnecessary re-renders.
+
+### Example Refactored Code:
+Here’s a quick example of refactoring the component to avoid conditional hook rendering:
+
+```jsx
+const FeaturedSlider = ({ content }) => {
+  const [imageLoaded, setImageLoaded] = useState(false);
+
+  useEffect(() => {
+    if (!content || content.length === 0) return;
+
+    // Reset image loaded state when changing slide
+    setImageLoaded(false);
+  }, [content]); // Only re-run when content changes
+
+  return (
+    <div>
+      {/* Render your slider and manage the image loading state */}
+      {content.map((item) => (
+        <div key={item.id}>
+          <img
+            src={item.imageUrl}
+            alt={item.title}
+            onLoad={() => setImageLoaded(true)} // Handle image load
+          />
+        </div>
+      ))}
+    </div>
+  );
+};
+```
+
+### In Summary:
+- Ensure all hooks are called unconditionally, without any conditions that can change during re-renders.
+- Check that you're not conditionally running `useEffect` or other hooks.
+- Optimize the component’s render to avoid unnecessary re-renders using `useMemo`, `useCallback`, or `React.memo` when needed.
+
+If you follow these guidelines, it should resolve the issue of **rendering more hooks than in the previous render**.

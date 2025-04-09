@@ -181,11 +181,6 @@ export function FeaturedSlider({ content, isLoading = false }: FeaturedSliderPro
     }));
   };
 
-  // If no content is available
-  if (!content || content.length === 0) {
-    return null;
-  }
-
   // Reset image loaded state when changing slide
   useEffect(() => {
     if (!content || content.length === 0) return;
@@ -207,6 +202,11 @@ export function FeaturedSlider({ content, isLoading = false }: FeaturedSliderPro
       }
     });
   }, [currentIndex, content]);
+  
+  // If no content is available
+  if (!content || content.length === 0) {
+    return null;
+  }
 
   const currentContent = content[currentIndex];
   const isBackdropLoaded = imagesLoaded[currentIndex];

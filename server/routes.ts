@@ -4,6 +4,7 @@ import { storage } from "./storage";
 import { setupAuth } from "./auth";
 import { setupAdminRoutes } from "./admin";
 import { User } from '@shared/schema';
+import { TMDBService } from "./tmdb-service";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // ===================================

@@ -1,0 +1,93 @@
+Here's a detailed and technical prompt for your website and MongoDB database synchronization, focusing on user data, movie information, and images, based on the discussions so far:
+
+---
+
+**Prompt for Database and Website Synchronization**
+
+1. **Database Schema Design and Data Storage**:
+    - Create a **User Schema** to store essential user information, including:
+      - `user_id`: Unique identifier (e.g., MongoDB ObjectId or custom slug).
+      - `username`: User's display name.
+      - `email`: User's email address.
+      - `password_hash`: Hashed password for security.
+      - `profile_picture`: URL to the user's profile image (can be stored as a link to a cloud service or on the server).
+      - `watchlist`: Array of movie IDs or slugs the user has added to their watchlist.
+      - `favorites`: Array of movie IDs or slugs the user has marked as favorites.
+      - `history`: Array of movie IDs or slugs representing the user’s watched content.
+      - `settings`: User-specific settings like language preference, theme (dark/light mode), etc.
+      - `reviews`: Array of user reviews, each containing `movie_id`, `rating`, `comment`, and `date`.
+
+    - Create a **Movie Schema** to store movie-related data:
+      - `movie_id`: Unique identifier (slug or MongoDB ObjectId).
+      - `title`: Movie title.
+      - `description`: Detailed description of the movie.
+      - `release_date`: Date when the movie was released.
+      - `rating`: Average user rating.
+      - `genres`: Array of genres associated with the movie.
+      - `poster_url`: URL to the movie's poster image.
+      - `backdrop_url`: URL to the movie's backdrop image.
+      - `tmdb_id`: External ID from TMDB (if applicable).
+      - `tags`: Array of tags related to the movie (e.g., action, drama).
+      - `duration`: Movie duration in minutes.
+      - `director`: List of directors (can be referenced from another collection if needed).
+      - `cast`: List of actors (can be referenced from another collection).
+      - `similar_movies`: Array of IDs for similar movies.
+      - `reviews`: Array of reviews associated with the movie.
+
+    - Create a **TMDB Cache Schema** to store data fetched from the TMDB API:
+      - `endpoint`: URL endpoint (e.g., `/movies/popular`).
+      - `data`: Cached data returned by the API.
+      - `timestamp`: Timestamp of when the data was fetched.
+      - `valid_until`: Date/time until the data is valid (e.g., 24 hours from the timestamp).
+
+2. **Data Synchronization and API Design**:
+    - **Real-time Synchronization**:
+      - Use **Socket.IO** to establish real-time communication between the front-end and back-end to synchronize changes such as updates to user watchlists, favorites, and movie details.
+      - Implement **Optimistic UI Updates** to provide instant feedback to users when interacting with the UI, while waiting for the server to confirm the operation (e.g., adding a movie to the watchlist).
+      
+    - **Caching Mechanism**:
+      - Implement a **smart caching system** using MongoDB to cache responses from the TMDB API (e.g., movie lists, genres, popular movies, etc.) for up to 24 hours to reduce redundant API calls and improve response time.
+      - Ensure that once data is cached, it can be served quickly from the database until it expires or is invalidated.
+      - Use **cache invalidation** to refresh data when necessary (e.g., when content is updated or when 24 hours have passed).
+      
+    - **API Endpoints**:
+      - For syncing and interacting with user data:
+        - `/api/users/:user_id`: Fetch user data.
+        - `/api/users/:user_id/watchlist`: Get and update the user's watchlist.
+        - `/api/users/:user_id/favorites`: Get and update the user's favorites.
+        - `/api/users/:user_id/history`: Fetch and update the user's watch history.
+        - `/api/users/:user_id/reviews`: Fetch and post user reviews for movies.
+
+      - For syncing and interacting with movie data:
+        - `/api/movies/:movie_id`: Fetch movie details.
+        - `/api/movies/:movie_id/similar`: Fetch a list of similar movies based on the provided movie ID.
+        - `/api/movies/:movie_id/reviews`: Get and post reviews for a specific movie.
+        - `/api/movies/:movie_id/rating`: Fetch the rating for a movie and allow users to submit a rating.
+        
+      - **TMDB Syncing**:
+        - `/api/tmdb/cache/stats`: Check the status of the cached data.
+        - `/api/tmdb/movies/popular`: Fetch popular movies, and update the cache accordingly.
+
+    - **Error Handling and Logging**:
+      - Implement an **API error handler** middleware to catch and log errors at the backend, ensuring smooth operation and clear debugging messages for all API interactions.
+      - Use a logging system (e.g., `winston` or `morgan`) for logging critical application events, such as API failures, cache misses, and database errors.
+      - Implement **retry mechanisms** for API requests and database interactions that may fail temporarily.
+
+3. **Frontend Data Synchronization**:
+    - Ensure that the frontend (React) uses **React Query** for efficient state management, caching, and fetching of data.
+    - Implement **Skeleton Loaders** for loading states when waiting for data from the backend (e.g., when fetching movie details or user data).
+    - Use **Shimmer Effects** to improve user experience during loading of dynamic data such as movie lists, reviews, and user interactions.
+    - Ensure synchronization between the frontend and backend by using **Socket.IO** for real-time updates (e.g., when the user adds or removes a movie from the watchlist).
+
+4. **File Handling (Images and Media)**:
+    - Store images (e.g., movie posters, user profile pictures) either on a cloud storage service (like AWS S3, Google Cloud Storage) or locally, depending on the scale and requirements.
+    - Ensure that images are linked in the movie schema (`poster_url`, `backdrop_url`) and can be dynamically updated based on user interactions.
+    - Implement automatic image updates by fetching from TMDB or allowing the user to upload custom images for movies or profiles.
+
+5. **Scheduled Data Fetching**:
+    - Set up a scheduled task (e.g., using **Cron Jobs**) to regularly fetch fresh data from TMDB and update the database. This ensures that the cached content is periodically refreshed with the latest available data.
+    - Ensure that the scheduled task checks for content validity and synchronizes the database with any new or updated movie information.
+
+---
+
+This prompt covers the essential technical steps for synchronizing the data between your website and MongoDB database, ensuring smooth operations, and enhancing the user experience. It focuses on the core aspects like user data, movie information, caching, error handling, and efficient API communication.
