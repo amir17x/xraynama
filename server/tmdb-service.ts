@@ -24,6 +24,8 @@ export class TMDBService {
         throw new Error("TMDB API key or access token is not available");
       }
 
+      console.log(`[TMDB] Fetching popular movies page ${page}, limit ${limit}`);
+
       const response = await axios.get(`${this.baseUrl}/movie/popular`, {
         headers: {
           'Authorization': `Bearer ${this.accessToken}`,
@@ -57,6 +59,8 @@ export class TMDBService {
             };
           });
         
+        console.log(`[TMDB] Successfully fetched ${movies.length} popular movies`);
+        
         return {
           page: response.data.page,
           total_pages: response.data.total_pages,
@@ -73,6 +77,387 @@ export class TMDBService {
       };
     } catch (error) {
       console.error("Error fetching popular movies from TMDB:", error);
+      throw error;
+    }
+  }
+  
+  /**
+   * جستجوی فیلم‌ها بر اساس متن
+   * @param query متن جستجو
+   * @param page شماره صفحه
+   * @returns نتایج جستجو
+   */
+  async searchMovies(query: string, page: number = 1) {
+    try {
+      if (!this.apiKey || !this.accessToken) {
+        throw new Error("TMDB API key or access token is not available");
+      }
+
+      console.log(`[TMDB] Searching movies with query: "${query}", page ${page}`);
+
+      const response = await axios.get(`${this.baseUrl}/search/movie`, {
+        headers: {
+          'Authorization': `Bearer ${this.accessToken}`,
+          'Content-Type': 'application/json'
+        },
+        params: {
+          api_key: this.apiKey,
+          language: 'fa-IR',
+          query,
+          page,
+          include_adult: false
+        }
+      });
+
+      if (response.data && response.data.results) {
+        // پردازش و بهبود نتایج
+        const movies = response.data.results.map((movie: any) => {
+          return {
+            id: movie.id,
+            title: movie.title,
+            original_title: movie.original_title,
+            poster_path: movie.poster_path ? `https://image.tmdb.org/t/p/w500${movie.poster_path}` : null,
+            backdrop_path: movie.backdrop_path ? `https://image.tmdb.org/t/p/original${movie.backdrop_path}` : null,
+            overview: movie.overview,
+            release_date: movie.release_date,
+            vote_average: movie.vote_average,
+            vote_count: movie.vote_count,
+            popularity: movie.popularity,
+            genre_ids: movie.genre_ids
+          };
+        });
+        
+        console.log(`[TMDB] Search found ${movies.length} results for query "${query}"`);
+        
+        return {
+          page: response.data.page,
+          total_pages: response.data.total_pages,
+          total_results: response.data.total_results,
+          results: movies
+        };
+      }
+
+      return {
+        page: 1,
+        total_pages: 0,
+        total_results: 0,
+        results: []
+      };
+    } catch (error) {
+      console.error(`Error searching movies from TMDB with query "${query}":`, error);
+      throw error;
+    }
+  }
+
+  /**
+   * دریافت فیلم‌ها با استفاده از discover API (با فیلترهای پیشرفته)
+   * @param options گزینه‌های فیلتر
+   * @param page شماره صفحه
+   * @returns نتایج فیلتر شده
+   */
+  async discoverMovies(options: {
+    sort_by?: string;
+    primary_release_year?: number;
+    with_genres?: string | number[];
+    with_people?: string | number[];
+    with_keywords?: string | number[];
+    vote_average_gte?: number;
+    vote_average_lte?: number;
+    with_runtime_gte?: number;
+    with_runtime_lte?: number;
+  }, page: number = 1) {
+    try {
+      if (!this.apiKey || !this.accessToken) {
+        throw new Error("TMDB API key or access token is not available");
+      }
+
+      console.log(`[TMDB] Discovering movies with filters, page ${page}`);
+
+      // تبدیل آرایه‌ها به رشته با جداکننده کاما
+      const params: any = {
+        api_key: this.apiKey,
+        language: 'fa-IR',
+        page,
+        include_adult: false,
+        ...options
+      };
+
+      // تبدیل آرایه‌ها به رشته
+      if (Array.isArray(params.with_genres)) {
+        params.with_genres = params.with_genres.join(',');
+      }
+      if (Array.isArray(params.with_people)) {
+        params.with_people = params.with_people.join(',');
+      }
+      if (Array.isArray(params.with_keywords)) {
+        params.with_keywords = params.with_keywords.join(',');
+      }
+
+      const response = await axios.get(`${this.baseUrl}/discover/movie`, {
+        headers: {
+          'Authorization': `Bearer ${this.accessToken}`,
+          'Content-Type': 'application/json'
+        },
+        params
+      });
+
+      if (response.data && response.data.results) {
+        // پردازش و بهبود نتایج
+        const movies = response.data.results.map((movie: any) => {
+          return {
+            id: movie.id,
+            title: movie.title,
+            original_title: movie.original_title,
+            poster_path: movie.poster_path ? `https://image.tmdb.org/t/p/w500${movie.poster_path}` : null,
+            backdrop_path: movie.backdrop_path ? `https://image.tmdb.org/t/p/original${movie.backdrop_path}` : null,
+            overview: movie.overview,
+            release_date: movie.release_date,
+            vote_average: movie.vote_average,
+            vote_count: movie.vote_count,
+            popularity: movie.popularity,
+            genre_ids: movie.genre_ids
+          };
+        });
+        
+        console.log(`[TMDB] Discover found ${movies.length} movies matching the filters`);
+        
+        return {
+          page: response.data.page,
+          total_pages: response.data.total_pages,
+          total_results: response.data.total_results,
+          results: movies
+        };
+      }
+
+      return {
+        page: 1,
+        total_pages: 0,
+        total_results: 0,
+        results: []
+      };
+    } catch (error) {
+      console.error("Error discovering movies from TMDB:", error);
+      throw error;
+    }
+  }
+
+  /**
+   * جستجوی جامع با استفاده از هر سه روش جستجو
+   * @param query متن جستجو
+   * @param filters فیلترهای اضافی برای discover
+   * @param externalId شناسه خارجی (اختیاری)
+   * @param externalSource منبع شناسه (اختیاری)
+   * @param page شماره صفحه
+   * @returns نتایج جستجو از هر سه روش
+   */
+  async searchAllContent(
+    query: string, 
+    filters: Record<string, any> = {}, 
+    externalId?: string, 
+    externalSource?: string, 
+    page: number = 1
+  ) {
+    const results: any = {
+      text_search: null,
+      discover: null,
+      external_id: null
+    };
+    
+    // جستجوی متنی
+    if (query && query.length > 0) {
+      try {
+        results.text_search = await this.searchMovies(query, page);
+      } catch (error) {
+        console.error(`Error in text search for "${query}":`, error);
+        results.text_search = { error: "جستجوی متنی با خطا مواجه شد" };
+      }
+    }
+    
+    // جستجو با فیلتر (discover)
+    if (Object.keys(filters).length > 0) {
+      try {
+        results.discover = await this.discoverMovies(filters, page);
+      } catch (error) {
+        console.error("Error in discover search:", error);
+        results.discover = { error: "جستجو با فیلتر با خطا مواجه شد" };
+      }
+    }
+    
+    // جستجو با شناسه خارجی
+    if (externalId && externalSource) {
+      try {
+        results.external_id = await this.findByExternalId(externalId, externalSource);
+      } catch (error) {
+        console.error(`Error in external ID search for ${externalId}:`, error);
+        results.external_id = { error: "جستجو با شناسه خارجی با خطا مواجه شد" };
+      }
+    }
+    
+    return results;
+  }
+
+  /**
+   * جستجوی محتوا با استفاده از شناسه‌های خارجی
+   * @param externalId شناسه خارجی
+   * @param externalSource منبع شناسه (imdb_id, tvdb_id, facebook_id, twitter_id, instagram_id)
+   * @returns نتایج یافته شده
+   */
+  async findByExternalId(externalId: string, externalSource: string) {
+    try {
+      if (!this.apiKey || !this.accessToken) {
+        throw new Error("TMDB API key or access token is not available");
+      }
+
+      console.log(`[TMDB] Finding content with external ID: ${externalId} (source: ${externalSource})`);
+
+      const response = await axios.get(`${this.baseUrl}/find/${externalId}`, {
+        headers: {
+          'Authorization': `Bearer ${this.accessToken}`,
+          'Content-Type': 'application/json'
+        },
+        params: {
+          api_key: this.apiKey,
+          language: 'fa-IR',
+          external_source: externalSource
+        }
+      });
+
+      if (response.data) {
+        console.log(`[TMDB] Find results for external ID ${externalId}: ` +
+          `${response.data.movie_results?.length || 0} movies, ` +
+          `${response.data.tv_results?.length || 0} TV shows, ` +
+          `${response.data.person_results?.length || 0} people`);
+        
+        // پردازش نتایج فیلم‌ها
+        if (response.data.movie_results) {
+          response.data.movie_results = response.data.movie_results.map((movie: any) => ({
+            ...movie,
+            poster_path: movie.poster_path ? `https://image.tmdb.org/t/p/w500${movie.poster_path}` : null,
+            backdrop_path: movie.backdrop_path ? `https://image.tmdb.org/t/p/original${movie.backdrop_path}` : null
+          }));
+        }
+        
+        // پردازش نتایج سریال‌ها
+        if (response.data.tv_results) {
+          response.data.tv_results = response.data.tv_results.map((tv: any) => ({
+            ...tv,
+            poster_path: tv.poster_path ? `https://image.tmdb.org/t/p/w500${tv.poster_path}` : null,
+            backdrop_path: tv.backdrop_path ? `https://image.tmdb.org/t/p/original${tv.backdrop_path}` : null
+          }));
+        }
+        
+        // پردازش نتایج افراد
+        if (response.data.person_results) {
+          response.data.person_results = response.data.person_results.map((person: any) => ({
+            ...person,
+            profile_path: person.profile_path ? `https://image.tmdb.org/t/p/w500${person.profile_path}` : null
+          }));
+        }
+        
+        return response.data;
+      }
+
+      return {
+        movie_results: [],
+        tv_results: [],
+        person_results: [],
+        tv_episode_results: [],
+        tv_season_results: []
+      };
+    } catch (error) {
+      console.error(`Error finding content by external ID ${externalId}:`, error);
+      throw error;
+    }
+  }
+
+  /**
+   * دریافت جزئیات فیلم با استفاده از append_to_response برای گرفتن اطلاعات بیشتر در یک درخواست
+   * @param movieId شناسه فیلم در TMDB
+   * @returns جزئیات فیلم به همراه اطلاعات تکمیلی
+   */
+  async getMovieDetails(movieId: number) {
+    try {
+      if (!this.apiKey || !this.accessToken) {
+        throw new Error("TMDB API key or access token is not available");
+      }
+
+      console.log(`[TMDB] Fetching details for movie ID ${movieId}`);
+
+      const response = await axios.get(`${this.baseUrl}/movie/${movieId}`, {
+        headers: {
+          'Authorization': `Bearer ${this.accessToken}`,
+          'Content-Type': 'application/json'
+        },
+        params: {
+          api_key: this.apiKey,
+          language: 'fa-IR',
+          append_to_response: 'videos,images,credits,similar,recommendations'
+        }
+      });
+
+      if (response.data) {
+        // پردازش و بهبود نتایج
+        const movie = response.data;
+        
+        const processedMovie = {
+          id: movie.id,
+          title: movie.title,
+          original_title: movie.original_title,
+          tagline: movie.tagline,
+          overview: movie.overview,
+          release_date: movie.release_date,
+          runtime: movie.runtime,
+          status: movie.status,
+          vote_average: movie.vote_average,
+          vote_count: movie.vote_count,
+          popularity: movie.popularity,
+          budget: movie.budget,
+          revenue: movie.revenue,
+          genres: movie.genres,
+          production_companies: movie.production_companies,
+          production_countries: movie.production_countries,
+          spoken_languages: movie.spoken_languages,
+          poster_path: movie.poster_path ? `https://image.tmdb.org/t/p/w500${movie.poster_path}` : null,
+          backdrop_path: movie.backdrop_path ? `https://image.tmdb.org/t/p/original${movie.backdrop_path}` : null,
+          
+          // اطلاعات تکمیلی که با append_to_response گرفته شده‌اند
+          videos: movie.videos?.results || [],
+          images: {
+            backdrops: movie.images?.backdrops?.map((img: any) => ({
+              ...img,
+              file_path: img.file_path ? `https://image.tmdb.org/t/p/original${img.file_path}` : null
+            })) || [],
+            posters: movie.images?.posters?.map((img: any) => ({
+              ...img,
+              file_path: img.file_path ? `https://image.tmdb.org/t/p/w500${img.file_path}` : null
+            })) || []
+          },
+          credits: {
+            cast: movie.credits?.cast || [],
+            crew: movie.credits?.crew || []
+          },
+          similar: movie.similar?.results?.map((similar: any) => ({
+            id: similar.id,
+            title: similar.title,
+            poster_path: similar.poster_path ? `https://image.tmdb.org/t/p/w500${similar.poster_path}` : null,
+            vote_average: similar.vote_average
+          })) || [],
+          recommendations: movie.recommendations?.results?.map((rec: any) => ({
+            id: rec.id,
+            title: rec.title,
+            poster_path: rec.poster_path ? `https://image.tmdb.org/t/p/w500${rec.poster_path}` : null,
+            vote_average: rec.vote_average
+          })) || []
+        };
+        
+        console.log(`[TMDB] Successfully fetched details for movie "${processedMovie.title}"`);
+        
+        return processedMovie;
+      }
+
+      throw new Error("Invalid response format from TMDB");
+    } catch (error) {
+      console.error(`Error fetching movie details from TMDB for ID ${movieId}:`, error);
       throw error;
     }
   }

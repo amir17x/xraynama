@@ -66,6 +66,194 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     }
   });
+  
+  // TMDB Movie Details with Additional Data
+  app.get("/api/tmdb/movies/:id", async (req, res, next) => {
+    try {
+      const { tmdbService } = await import('./tmdb-service');
+      const movieId = parseInt(req.params.id);
+      
+      if (isNaN(movieId)) {
+        return res.status(400).json({ 
+          error: "شناسه فیلم نامعتبر است", 
+          message: "لطفاً یک شناسه فیلم معتبر وارد کنید."
+        });
+      }
+      
+      const movieDetails = await tmdbService.getMovieDetails(movieId);
+      res.json(movieDetails);
+    } catch (error) {
+      console.error(`Error fetching movie details from TMDB for ID ${req.params.id}:`, error);
+      res.status(500).json({ 
+        error: "خطا در دریافت جزئیات فیلم", 
+        message: "متأسفانه در حال حاضر امکان دریافت جزئیات فیلم وجود ندارد. لطفاً بعداً دوباره تلاش کنید."
+      });
+    }
+  });
+  
+  // TMDB Search Movies by Text
+  app.get("/api/tmdb/search/movies", async (req, res, next) => {
+    try {
+      const { tmdbService } = await import('./tmdb-service');
+      const query = req.query.query as string;
+      const page = req.query.page ? parseInt(req.query.page as string) : 1;
+      
+      if (!query || query.trim().length === 0) {
+        return res.status(400).json({ 
+          error: "عبارت جستجو الزامی است",
+          message: "لطفاً یک عبارت جستجو وارد کنید." 
+        });
+      }
+      
+      const searchResults = await tmdbService.searchMovies(query, page);
+      res.json(searchResults);
+    } catch (error) {
+      console.error(`Error searching movies from TMDB:`, error);
+      res.status(500).json({ 
+        error: "خطا در جستجوی فیلم‌ها", 
+        message: "متأسفانه در حال حاضر امکان جستجوی فیلم‌ها وجود ندارد. لطفاً بعداً دوباره تلاش کنید."
+      });
+    }
+  });
+
+  // TMDB Discover Movies (search with filters)
+  app.get("/api/tmdb/discover/movies", async (req, res, next) => {
+    try {
+      const { tmdbService } = await import('./tmdb-service');
+      const page = req.query.page ? parseInt(req.query.page as string) : 1;
+      
+      // استخراج پارامترهای فیلتر از query
+      const options: any = {};
+      
+      if (req.query.sort_by) options.sort_by = req.query.sort_by as string;
+      if (req.query.primary_release_year) options.primary_release_year = parseInt(req.query.primary_release_year as string);
+      
+      // پارامترهای با فرمت آرایه که با کاما جدا شده‌اند
+      if (req.query.with_genres) {
+        const genresStr = req.query.with_genres as string;
+        if (genresStr.includes(',')) {
+          options.with_genres = genresStr.split(',').map(g => parseInt(g.trim()));
+        } else {
+          options.with_genres = [parseInt(genresStr)];
+        }
+      }
+      
+      if (req.query.with_people) {
+        const peopleStr = req.query.with_people as string;
+        if (peopleStr.includes(',')) {
+          options.with_people = peopleStr.split(',').map(p => parseInt(p.trim()));
+        } else {
+          options.with_people = [parseInt(peopleStr)];
+        }
+      }
+      
+      // پارامترهای عددی
+      if (req.query.vote_average_gte) options.vote_average_gte = parseFloat(req.query.vote_average_gte as string);
+      if (req.query.vote_average_lte) options.vote_average_lte = parseFloat(req.query.vote_average_lte as string);
+      if (req.query.with_runtime_gte) options.with_runtime_gte = parseInt(req.query.with_runtime_gte as string);
+      if (req.query.with_runtime_lte) options.with_runtime_lte = parseInt(req.query.with_runtime_lte as string);
+      
+      const discoverResults = await tmdbService.discoverMovies(options, page);
+      res.json(discoverResults);
+    } catch (error) {
+      console.error(`Error discovering movies from TMDB:`, error);
+      res.status(500).json({ 
+        error: "خطا در کشف فیلم‌ها با فیلتر", 
+        message: "متأسفانه در حال حاضر امکان کشف فیلم‌ها با فیلترهای انتخابی وجود ندارد. لطفاً بعداً دوباره تلاش کنید."
+      });
+    }
+  });
+
+  // TMDB Search API - جامع (ترکیب تمام روش‌های جستجو)
+  app.get("/api/tmdb/unified-search", async (req, res, next) => {
+    try {
+      const { tmdbService } = await import('./tmdb-service');
+      const query = req.query.query as string || '';
+      const page = req.query.page ? parseInt(req.query.page as string) : 1;
+      const externalId = req.query.external_id as string;
+      const externalSource = req.query.external_source as string || 'imdb_id';
+      
+      // استخراج فیلترهای موجود برای روش discover
+      const filters: any = {};
+      
+      if (req.query.sort_by) filters.sort_by = req.query.sort_by as string;
+      if (req.query.primary_release_year) filters.primary_release_year = parseInt(req.query.primary_release_year as string);
+      if (req.query.with_genres) {
+        const genresStr = req.query.with_genres as string;
+        if (genresStr.includes(',')) {
+          filters.with_genres = genresStr.split(',').map(g => parseInt(g.trim()));
+        } else {
+          filters.with_genres = [parseInt(genresStr)];
+        }
+      }
+      
+      if (req.query.with_people) {
+        const peopleStr = req.query.with_people as string;
+        if (peopleStr.includes(',')) {
+          filters.with_people = peopleStr.split(',').map(p => parseInt(p.trim()));
+        } else {
+          filters.with_people = [parseInt(peopleStr)];
+        }
+      }
+      
+      if (req.query.vote_average_gte) filters.vote_average_gte = parseFloat(req.query.vote_average_gte as string);
+      if (req.query.vote_average_lte) filters.vote_average_lte = parseFloat(req.query.vote_average_lte as string);
+      if (req.query.with_runtime_gte) filters.with_runtime_gte = parseInt(req.query.with_runtime_gte as string);
+      if (req.query.with_runtime_lte) filters.with_runtime_lte = parseInt(req.query.with_runtime_lte as string);
+      
+      // جستجوی جامع
+      const searchResults = await tmdbService.searchAllContent(
+        query, 
+        filters,
+        externalId,
+        externalSource,
+        page
+      );
+      
+      res.json(searchResults);
+    } catch (error) {
+      console.error(`Error in unified TMDB search:`, error);
+      res.status(500).json({ 
+        error: "خطا در جستجوی جامع", 
+        message: "متأسفانه در حال حاضر امکان جستجوی جامع وجود ندارد. لطفاً بعداً دوباره تلاش کنید."
+      });
+    }
+  });
+
+  // TMDB Find by External ID (IMDb, etc.)
+  app.get("/api/tmdb/find/:external_id", async (req, res, next) => {
+    try {
+      const { tmdbService } = await import('./tmdb-service');
+      const externalId = req.params.external_id;
+      const externalSource = req.query.external_source as string || 'imdb_id';
+      
+      if (!externalId || externalId.trim().length === 0) {
+        return res.status(400).json({ 
+          error: "شناسه خارجی الزامی است",
+          message: "لطفاً یک شناسه خارجی معتبر وارد کنید." 
+        });
+      }
+      
+      // بررسی اعتبار منبع خارجی
+      const validSources = ['imdb_id', 'tvdb_id', 'facebook_id', 'twitter_id', 'instagram_id'];
+      if (!validSources.includes(externalSource)) {
+        return res.status(400).json({ 
+          error: "منبع خارجی نامعتبر است",
+          validSources,
+          message: "لطفاً یک منبع خارجی معتبر وارد کنید."
+        });
+      }
+      
+      const findResults = await tmdbService.findByExternalId(externalId, externalSource);
+      res.json(findResults);
+    } catch (error) {
+      console.error(`Error finding content by external ID ${req.params.external_id}:`, error);
+      res.status(500).json({ 
+        error: "خطا در جستجوی محتوا با شناسه خارجی", 
+        message: "متأسفانه در حال حاضر امکان جستجوی محتوا با شناسه خارجی وجود ندارد. لطفاً بعداً دوباره تلاش کنید."
+      });
+    }
+  });
 
   // Content recommendation routes with AI
   app.get("/api/content/recommended", async (req, res, next) => {

@@ -3,6 +3,7 @@ import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import { MongoDBStorage } from "./db/mongodb-storage";
 import { storage } from "./storage";
+import { apiErrorMiddleware } from "./middleware/api-error-middleware";
 
 // Check if we need to use MongoDB
 const useMongoDb = process.env.MONGODB_URI ? true : false;
@@ -39,6 +40,9 @@ if (useMongoDb) {
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+
+// میدلور تبدیل پاسخ‌های HTML به JSON برای API ها
+app.use(apiErrorMiddleware);
 
 // Optimized logging middleware - only applied to API routes to reduce overhead
 app.use("/api", (req, res, next) => {

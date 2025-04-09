@@ -54,6 +54,7 @@ import AdminCategories from "@/pages/admin/Categories";
 import AdminStatistics from "@/pages/admin/Statistics";
 import LoadingTestPage from "@/pages/loading-test-page";
 import ToastTestPage from "@/pages/toast-test-page";
+import APITestPage from "@/pages/api-test-page";
 
 function Router() {
   return (
@@ -94,6 +95,7 @@ function Router() {
       <Route path="/faq" component={FAQPage} />
       <Route path="/loading-test" component={LoadingTestPage} />
       <Route path="/toast-test" component={ToastTestPage} />
+      <Route path="/api-test" component={APITestPage} />
       
       {/* Admin pages - protected with AdminRoute */}
       <AdminRoute path="/admin/dashboard" component={AdminDashboard} />

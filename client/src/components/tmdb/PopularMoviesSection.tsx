@@ -189,6 +189,16 @@ export default function PopularMoviesSection() {
                   <img
                     src={movie.poster_path}
                     alt={movie.title}
+                    loading="lazy"
+                    onError={(e) => {
+                      // در صورت خطا در بارگذاری تصویر، نمایش آیکون فیلم
+                      const target = e.target as HTMLImageElement;
+                      target.style.display = 'none';
+                      target.parentElement!.classList.add('bg-card/80', 'flex', 'items-center', 'justify-center');
+                      const icon = document.createElement('div');
+                      icon.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-muted-foreground"><path d="M2 2v20"/><path d="M22 2v20"/><path d="M7 2v20"/><path d="M17 2v20"/><path d="M2 12h20"/><path d="M2 7h5"/><path d="M2 17h5"/><path d="M17 17h5"/><path d="M17 7h5"/></svg>';
+                      target.parentElement!.appendChild(icon);
+                    }}
                     className="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
                   />
                 ) : (
