@@ -1,0 +1,102 @@
+Here’s a detailed and technical prompt to achieve the functionality you're asking for, integrating movie content from TMDB API, syncing with the database, and creating a system for adding and updating content in the admin panel:
+
+---
+
+**Prompt for System Design and Functionality:**
+
+We are building a content management system (CMS) that integrates with the TMDB API to retrieve movie data automatically, sync it with a MongoDB database, and allow an admin to add/edit movie content both manually and via automated retrieval from the TMDB API.
+
+**Key Features:**
+
+1. **Sync Content with TMDB API:**
+   - When a movie or content is added via the admin panel, fetch detailed information about that movie from the TMDB API.
+   - The fetched information should include:
+     - **Title** (both original and translated)
+     - **Release date**
+     - **Genres**
+     - **Overview/Plot Summary**
+     - **Poster image URL**
+     - **Backdrop image URL**
+     - **Cast (Actors)**
+     - **Director**
+     - **User Rating**
+     - **TMDB Movie ID**
+     - **Language & Translations** for different locales
+   - Store this data in the MongoDB database, ensuring that content is properly indexed and synced with the API for future reference.
+
+2. **Admin Panel:**
+   - In the admin panel, provide an intuitive interface for adding new content.
+     - Each time an admin adds new movie content, they should be given two options:
+       1. **Get Info from TMDB**: 
+          - This option will fetch all the movie data from the TMDB API and automatically fill the relevant fields in the admin panel, such as title, description, images, and ratings.
+          - The admin will also have the ability to select which language version they want to display (e.g., English, Persian).
+          - **Auto-Populated Fields**: Title (English & Persian), Poster, Backdrop, Cast, Director, Ratings, and Genre.
+       2. **Manual Entry**: 
+          - Admin should be able to manually input all fields, such as movie title, genre, actors, etc., in case the movie info from TMDB is insufficient or unavailable.
+   - **Backend Implementation**: 
+     - When an admin chooses **Get Info from TMDB**, the backend should make an API call to TMDB using the movie title or TMDB ID (if known).
+     - Retrieve data, and if available, populate the movie fields. If any data is unavailable or incorrect, allow the admin to adjust it manually.
+   
+3. **Database Synchronization:**
+   - All movie data (from both manual input and TMDB API) should be stored in the MongoDB database with the following structure:
+     - **Movie Schema** should include:
+       - Movie title (both English and Persian)
+       - Genre
+       - Overview/Plot summary
+       - Poster & backdrop images (URL)
+       - Cast (array of actors with their names and character names)
+       - Director (name and TMDB ID)
+       - Rating (average user rating from TMDB)
+       - Release date
+       - TMDB ID (for tracking and syncing with TMDB)
+       - Last updated timestamp (to track when data was last synced)
+   - Ensure that the database schema allows for fast queries on popular attributes like genres, actors, and ratings.
+
+4. **Backend API for Content Management:**
+   - Implement an API route for admin users to add or update movie content. This API should:
+     - Accept parameters for title, genre, description, rating, cast, and images.
+     - If **Get Info from TMDB** is used, it should fetch and pre-fill the information.
+     - If there’s a mismatch between the data in the database and TMDB, the admin can manually override the values.
+   - When an admin chooses to **manually update** a movie, their changes should be saved and reflected in the database.
+
+5. **Automatic Update from TMDB:**
+   - Implement a scheduled job (Cron job) that periodically checks for any changes or updates from TMDB. If a movie's data has changed on TMDB (e.g., rating update, cast changes), this should automatically update the relevant fields in the MongoDB database.
+   - Ensure that TMDB data updates are tracked, so admins can be notified when significant changes occur to the movie data.
+
+6. **Admin Panel UI/UX:**
+   - The admin panel should have the following interface for movie content creation:
+     - **Movie Title**: Editable for both English and Persian versions.
+     - **Genre**: Dropdown or multi-select option to choose movie genres.
+     - **Overview/Plot Summary**: Editable field for movie description.
+     - **Poster and Backdrop Images**: Admin can upload or fetch image URLs from TMDB API.
+     - **Cast and Director**: Fetch from TMDB or manually enter.
+     - **User Ratings**: Automatically fetched from TMDB (if available).
+     - **Release Date**: Editable or fetched from TMDB.
+     - **Language Option**: Admin selects the language of the content (e.g., Persian, English).
+     - **Get Info from TMDB Button**: When clicked, automatically fetches movie data from TMDB.
+   
+   The UI should be user-friendly, with fields clearly labeled, and the **Get Info from TMDB** button should be easily accessible. Additionally, an option to **sync movie info** manually should also be available.
+
+7. **Error Handling and Notifications:**
+   - If the TMDB API fails or if there is an error while fetching movie data, display an error message to the admin.
+   - Provide feedback to the admin when the data has been successfully added or updated.
+   - Allow admins to review the fetched information before final submission.
+
+8. **Logging and Auditing:**
+   - Implement logging for all actions taken in the admin panel, particularly for the retrieval and submission of movie data.
+   - This will help track who made changes to movie data, and when the data was last updated.
+
+---
+
+**Expected Workflow Example:**
+
+- **Admin Panel Interaction**:
+  1. The admin clicks "Add New Movie" in the admin panel.
+  2. Admin can either manually enter movie information or click "Get Info from TMDB."
+  3. If they click "Get Info from TMDB," the system will fetch the movie’s data, including the title, description, images, cast, and ratings.
+  4. The admin can review and edit the auto-filled data or manually input any missing details.
+  5. Upon finalizing, the admin submits the movie details, and the data is saved to MongoDB, syncing with the TMDB database where applicable.
+
+---
+
+This design ensures that your website's content is automatically enriched with accurate data from TMDB, can be manually adjusted when needed, and stays synchronized with the latest movie information.

@@ -23,6 +23,7 @@ import TopIMDBPage from "@/pages/top-imdb-page";
 import ForgotPasswordPage from "@/pages/forgot-password";
 import VerifyCodePage from "@/pages/verify-code";
 import ResetPasswordPage from "@/pages/reset-password";
+import RecommendedPage from "@/pages/recommended-page";
 import TestReviews from "@/pages/TestReviews";
 
 // New categorized pages
@@ -139,10 +140,13 @@ function Router() {
       <Route path="/toast-test" component={ToastTestPage} />
       <Route path="/test-reviews" component={TestReviews} />
       
+      {/* Special content pages */}
+      <Route path="/recommended" component={RecommendedPage} />
+      <Route path="/top-imdb" component={TopIMDBPage} />
+      
       {/* Legacy routes maintained for backward compatibility */}
       <Route path="/content/:slug" component={ContentPage} />
       <Route path="/category/:type" component={CategoryPage} />
-      <Route path="/top-imdb" component={TopIMDBPage} />
       <Route path="/profile" component={ProfilePage} />
       
       {/* Admin pages - protected with AdminRoute */}

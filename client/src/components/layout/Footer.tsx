@@ -1,4 +1,5 @@
 import { Link } from 'wouter';
+import CinemaNewsSlider from '@/components/news/CinemaNewsSlider';
 
 export function Footer() {
   return (
@@ -61,6 +62,11 @@ export function Footer() {
               <li><Link href="/faq" className="hover:text-primary transition-colors">سوالات متداول</Link></li>
             </ul>
           </div>
+        </div>
+        
+        {/* Cinema News Slider */}
+        <div className="mt-8">
+          <CinemaNewsSlider />
         </div>
         
         <div className="border-t border-border mt-8 pt-8 text-center text-muted-foreground">

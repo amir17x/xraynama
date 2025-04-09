@@ -1,0 +1,69 @@
+عالی، بر اساس توضیحات و تصاویرت، اینجا یه پرامپت کامل، دقیق و حرفه‌ای به زبان انگلیسیه که می‌تونی بدی به هر مدل هوش مصنوعی یا تیم توسعه تا تغییرات رو دقیقاً مطابق خواسته‌ات پیاده‌سازی کنن:
+
+---
+
+### 🧠 AI Prompt for Developer (ENGLISH)
+
+You are working on a movie/series streaming platform called **Xraynama**. Below is an exact description of the requested functionalities and changes:
+
+---
+
+### 🔧 Admin Panel Movie Info Auto-Fill (TMDb API)
+
+- **Purpose**: To ease the process of adding new movies by the admin.
+- **Functionality**: When the admin clicks a button in the add/edit movie page (as described before), the platform fetches movie information **only using TMDb API**.
+- **Important Note**: 
+  - This feature is **optional**, not mandatory. The admin can still manually fill all the fields.
+  - **Do not use OMDb API** at all. It must be **completely removed** from the entire project.
+  - Only use **TMDb API** for movie metadata (title, year, runtime, rating, description, director, genre, actors, language, poster, etc).
+- **Subtitle Field**: In the admin panel, the subtitle options should be clearly shown as:
+  - Persian
+  - English
+  - Both
+- The subtitle availability must be manually set or auto-filled via the API if possible.
+
+---
+
+### 🧹 Remove AI-related Features
+
+- All "AI" or "GPT"-related features must be **completely removed** from the platform.
+
+---
+
+### 🧱 Footer Redesign (NEWS BLOCK)
+
+- **Target Location**: Bottom right corner of the footer (marked in the first screenshot with red border).
+- **Remove** the current block with Telegram & Instagram links (second image). Instead:
+- **Add a sleek rectangular block** showing **Latest Cinema News** in an **automated sliding carousel**.
+
+#### 📰 NEWS BLOCK Specs:
+
+- **Design**: Rectangle container (same size as shown in image).
+- **Title**: "آخرین اخبار سینما" (Latest Cinema News in Persian)
+- **Behavior**:
+  - Shows news cards with:
+    - Title
+    - Short excerpt
+    - Date (optional)
+  - Automatically slides **to the right** using a **smooth animation**.
+  - Include **Left/Right navigation buttons** to manually switch between news cards.
+  - Loop through the list in carousel style.
+- **Visuals**:
+  - Use a **red theme** for the block.
+  - Clean, modern animation similar to image sample.
+  - Support responsive layout (mobile & desktop).
+- **Data Source**: Can be static for now or fetched from a defined JSON/DB structure.
+
+---
+
+### ✅ General Notes
+
+- The entire backend is connected to MongoDB via a connection string saved in project secrets.
+- Admin has full manual control but prefers automation where available (like auto-fetching movie data).
+- Avoid combining APIs — use **only TMDb**.
+- All placeholder text like "No info available" must be replaced when data is fetched.
+- Design should stay consistent with current theme of Xraynama.
+
+---
+
+اگر خواستی همین متن رو به فارسی هم می‌تونم برات بنویسم. آماده‌ای اجراش کنی یا چیز دیگه‌ای هم داری که بخوای اضافه شه؟

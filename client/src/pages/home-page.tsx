@@ -8,22 +8,27 @@ import { ContentRow } from '@/components/common/ContentRow';
 import { ContentCard } from '@/components/common/ContentCard';
 import { ContentType } from '@/types';
 import { Button } from '@/components/ui/button';
-import { ChevronUp, Play, Heart, Download } from 'lucide-react';
+import { ChevronUp, Play, Heart, Download, AlertCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import FeaturedContentSection from '@/components/content/FeaturedContentSection';
 import PopularMoviesSection from '@/components/tmdb/PopularMoviesSection';
+import { useAuth } from '@/hooks/use-auth';
 
 export default function HomePage() {
+  // Get authentication status
+  const { isAuthenticated, isLoading: isAuthLoading } = useAuth();
+
   // Get featured content (top-rated)
   const { data: featuredContent, isLoading: isFeaturedLoading } = useQuery<ContentType[]>({
     queryKey: ['/api/content/top-rated', 5],
     staleTime: 1000 * 60 * 5, // 5 minutes
   });
 
-  // Get AI recommended content
+  // Get AI recommended content only for authenticated users
   const { data: recommendedContent, isLoading: isRecommendedLoading } = useQuery<ContentType[]>({
     queryKey: ['/api/content/recommended', 5],
     staleTime: 1000 * 60 * 5, // 5 minutes
+    enabled: isAuthenticated, // Only fetch if user is authenticated
   });
 
   // Get latest movies
@@ -89,16 +94,18 @@ export default function HomePage() {
           />
         </div>
         
-        {/* AI Recommended Content - Personal Recommendations */}
-        <FeaturedContentSection
-          title="پیشنهادهای ویژه برای شما"
-          subtitle="انتخاب‌های هوشمند با استفاده از هوش مصنوعی"
-          content={recommendedContent || []}
-          isLoading={isRecommendedLoading}
-          icon="sparkles"
-          moreLink="/recommended"
-          className="bg-blue-900/30 backdrop-blur-md"
-        />
+        {/* AI Recommended Content - Personal Recommendations - Only for authenticated users */}
+        {isAuthenticated && (
+          <FeaturedContentSection
+            title="پیشنهادهای ویژه برای شما"
+            subtitle="انتخاب‌های هوشمند با استفاده از هوش مصنوعی"
+            content={recommendedContent || []}
+            isLoading={isRecommendedLoading}
+            icon="sparkles"
+            moreLink="/recommended"
+            className="bg-blue-900/30 backdrop-blur-md"
+          />
+        )}
         
         {/* Top Rated Content with new icon-rich component */}
         <FeaturedContentSection

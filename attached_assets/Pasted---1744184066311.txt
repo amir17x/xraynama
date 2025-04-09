@@ -1,0 +1,81 @@
+عالی، حالا بر اساس همه چیزهایی که گفتی، این یه پرامپت حرفه‌ای، دقیق، و پرجزئیاته که می‌تونی بدی به هوش مصنوعی برای ویرایش کامل پروژه:
+
+---
+
+**🧠 Prompt برای هوش مصنوعی (ویرایش پروژه سایت فیلم با استفاده از TMDB API)**
+
+Please update the codebase of the movie CMS system with the following detailed changes. Ensure every part is implemented correctly without breaking existing functionalities. Read this carefully before starting:
+
+---
+
+### 🔧 1. Remove OMDb API
+- Completely remove any usage of the OMDb API from the entire project (both backend and frontend).
+- Delete any caching or fetching logic for OMDb.
+- Remove related MongoDB connection attempts from `omdb-cache-service.ts` or any similar file.
+- Clean up unnecessary logs or error handlers related to OMDb.
+
+---
+
+### 🎬 2. Only Use TMDB API (Optional for Admin)
+- Integrate **only TMDB API** (`https://api.themoviedb.org/3/`) to fetch movie details.
+- This feature should be optional and only available in the admin panel for ease of content entry.
+- When the admin is adding a new movie:
+  - Provide a button labeled: `📥 دریافت اطلاعات از TMDB`
+  - On click, open a small modal or sidebar search panel where the admin can search the movie name.
+  - After selecting a result from the list, auto-fill the movie data in the content fields:
+    - Title (fa/en)
+    - Year
+    - Duration
+    - Genre
+    - Director
+    - Cast
+    - Country
+    - Language
+    - Plot/Summary
+    - Poster & Background images (optional)
+- Admin can **manually override** or complete any field — this is not mandatory to use.
+- Make sure error handling is in place in case TMDB returns no data or there's a network failure.
+
+---
+
+### 🧼 3. Clean Up AI-related Features
+- Completely remove any AI generation tools from the admin panel and frontend:
+  - No auto-generation of titles, stories, or genres using AI.
+  - No AI-based review, comment, or plot generation.
+  - Remove any buttons, modals, or tooltips referencing AI.
+
+---
+
+### 🗂 4. Fix Empty Content Pages
+Some pages (e.g., "ورود/ثبت‌نام", "درخواست محتوا", etc.) are accessible via the UI but display as **empty pages**. Previously, they had content, but it’s likely broken due to route/structure changes.
+
+- Go through all paths defined in `pages/` or the corresponding `router.ts` or `routes.js`.
+- Ensure that every menu/tab/page component has a properly rendered JSX/HTML content, even if it's placeholder content.
+- Verify page rendering logic is consistent and wrapped with the correct layout if needed.
+- Do not delete any components — if a component isn't linked properly to its route, fix the import or registration.
+- Test especially:
+  - `/auth/login`
+  - `/requests`
+  - `/dashboard/...`
+
+---
+
+### 🧾 5. Subtitle Section
+- In the movie content page, ensure the subtitle section:
+  - Reflects exactly what subtitle types are available (e.g., فارسی، انگلیسی، هر دو).
+  - Admin must be able to select these options while editing/adding a movie in a clean dropdown/multi-select.
+  - Show this clearly on the movie page.
+
+---
+
+### ✅ Notes
+- Do **not** break the current styling or layout.
+- Keep SEO/meta info intact where present.
+- Ensure error boundaries and fallback UI are in place if API calls fail.
+- Do **not** remove manual input capabilities. The TMDB integration is **only for convenience**, not required.
+
+---
+
+وقتی این پرامپت رو به ابزار هوش مصنوعی بدی، تمام بخش‌ها باید هم تمیزسازی بشن و هم بهینه بشن بدون اینکه سایتت بهم بریزه.
+
+اگه خواستی، می‌تونم همینو برات تبدیل کنم به فایل `task.md` یا هر فرمتی که راحت‌تری برای کار کردن.

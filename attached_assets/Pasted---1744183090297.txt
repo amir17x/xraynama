@@ -1,0 +1,36 @@
+عالی، حالا بر اساس این اطلاعات جدید، این یه پرامپت کامل، فنی و دقیق هست که می‌تونی بدی به هوش مصنوعی (مثلاً در Replit یا ابزار مشابه) تا بفهمه وضعیت اتصال MongoDB چطوریه و چطور باید با OMDb و TMDB کار کنه:
+
+---
+
+**🔧 Prompt برای ویرایش کد پروژه (با توجه به MongoDB, OMDb, و TMDB):**
+
+I have successfully connected MongoDB to my project and stored the MongoDB URI inside the environment secret (e.g., `MONGODB_URI`). However, I still see connection errors in the terminal related to `ECONNREFUSED 127.0.0.1:27017`. It seems part of the project (like the OMDb cache service) is still trying to connect to MongoDB using the default localhost address, instead of reading from the environment variable.
+
+Please review and fix the MongoDB connection logic, especially in the `omdb-cache-service.ts` file (or similar), and make sure it uses the correct environment variable to connect to the database. It should:
+
+- Read from `process.env.MONGODB_URI`
+- Use an async connection method (like `MongoClient.connect(uri)`)
+- Handle connection errors gracefully and log clear messages
+- Make sure the OMDb cache logic falls back to direct OMDb API calls if MongoDB isn't available (but doesn't crash)
+
+Also, this project uses both **OMDb** and **TMDB** APIs to fetch movie metadata. I want you to implement (or verify) an intelligent fetch strategy where:
+
+1. **TMDB** is used as the **primary** data source (because of better poster images and structured metadata).
+2. **OMDb** is used as a **fallback or supplementary source**, especially to get extra fields like:
+   - IMDb ratings
+   - Rotten Tomatoes scores
+   - Runtime
+   - Awards
+
+When combining results:
+- Use TMDB for images, overviews, genres
+- Use OMDb only to **fill in missing or additional fields**
+- Store combined results in MongoDB (to reduce redundant requests)
+
+Ensure these APIs are used efficiently, cached properly in MongoDB, and updated on interval or via a sync strategy. Also, make sure the `/content/slug/:id` and similar API routes return this merged data correctly to the frontend.
+
+Lastly, check the routing system of the frontend (especially login/register page and footer links). Some pages appear blank (content not loading), probably due to incorrect `Route`, `Page`, or dynamic import paths. Please trace all route/page setups and re-map them correctly so each route renders its content/component properly. Don’t break the design or structure — just fix the routing logic and ensure everything is loaded and styled like before.
+
+---
+
+اگه بخوای می‌تونم همین پرامپت رو برات ترجمه فارسی هم بکنم یا مستقیماً یک نسخه آماده برای ویرایش هوشمند کد (مانند Copilot یا Replit AI) بسازم. بگو چجوری راحت‌تری.

@@ -1,0 +1,105 @@
+برات یه **prompt انگلیسی فنی و دقیق** آماده کردم که باهاش بتونی به یه مدل هوش مصنوعی (مثل GPT-4 یا Copilot) بدی تا از API سایت OMDb به درستی در کنار TMDB استفاده کنه **با پشتیبانی از کش MongoDB** و همچنین در صورت عدم اتصال به Mongo، مستقیم از OMDb دیتا بگیره. توی این پرامپت هم مشکلات مربوط به اتصال MongoDB لحاظ شده، هم مکانیزم fallback توضیح داده شده، هم نحوه ترکیب دیتا از هر دو API. اینم پرامپتت:
+
+---
+
+### ✅ **Prompt: Full OMDb Integration with MongoDB Caching and Fallback to Direct API Calls (in conjunction with TMDB)**
+
+**Goal:**
+Integrate the [OMDb API](https://www.omdbapi.com) into the existing movie content management system, to work **alongside TMDB**. Use **MongoDB for caching OMDb responses** and fallback to **direct API calls if MongoDB is unreachable or returns empty**.
+
+---
+
+### 📌 **Functionality Requirements:**
+
+1. **Use OMDb API via the following endpoint format:**
+   ```
+   http://www.omdbapi.com/?apikey=YOUR_API_KEY&t=TITLE
+   ```
+   Replace `YOUR_API_KEY` with: `d269c56e`
+
+2. **MongoDB caching logic:**
+   - Store OMDb responses into a collection `omdb_cache`.
+   - When a title (or IMDb ID) is requested:
+     - First, check if the response is in MongoDB cache (`findOne` by title or imdbID).
+     - If cache exists, return cached data.
+     - If not found or MongoDB is unreachable, make a **direct HTTP GET** request to the OMDb API.
+
+3. **MongoDB connection error handling:**
+   - If connection fails (e.g., `ECONNREFUSED`, as seen in error logs), log the error.
+   - Automatically fallback to direct OMDb fetch (do **not** crash the app).
+   - Display an alert or error on the admin dashboard if MongoDB is not connected for OMDb caching.
+
+4. **Merge OMDb & TMDB data (combined enrichment):**
+   - Fetch core movie metadata from TMDB (e.g., `title`, `backdrop`, `genres`, `rating`, `overview`).
+   - Augment/merge with additional fields from OMDb like:
+     - `Awards`, `Country`, `DVD`, `BoxOffice`, `Production`, `Rated`, `Writer`, `Metascore`, `imdbRating`
+   - Resulting movie object should include both sets of fields.
+   - For fields with the same name (like `rating`), keep TMDB as primary unless OMDb has more precision (e.g., Metascore vs Vote Average).
+
+5. **Caching structure in MongoDB:**
+   Collection: `omdb_cache`
+   ```json
+   {
+     "_id": ObjectId,
+     "title": "Star Wars",
+     "imdbID": "tt0076759",
+     "omdb_data": { ... }, // full response from OMDb
+     "cached_at": ISODate("...")
+   }
+   ```
+
+6. **Support both `title` and `imdbID` queries.**
+   - If you have `imdbID`, prefer that for OMDb request (higher accuracy).
+   - Otherwise fallback to title-based request (`?t=`).
+
+7. **API Wrapper Structure Example:**
+   - Create a service: `/services/omdbService.js`
+   - Export two functions:
+     - `getOMDbData(title, imdbID)`
+     - `mergeWithTMDB(tmdbData, omdbData)`
+
+---
+
+### 🧠 Example Behavior:
+
+```ts
+const movie = await getMovieDetails('Inception', 'tt1375666');
+
+// Internal flow:
+1. Try fetching OMDb data from Mongo cache (title or IMDb ID).
+2. If not found or MongoDB fails, call OMDb API directly.
+3. If OMDb response is successful, cache it in MongoDB.
+4. Merge TMDB + OMDb fields.
+5. Return merged object to frontend for rendering.
+```
+
+---
+
+### ⚙️ Error Logging & Handling:
+
+- Log errors like:
+  - `MongoNetworkError: connect ECONNREFUSED 127.0.0.1:27017`
+  - Or `MongoServerSelectionError`
+- Show fallback info in logs: `"[omdb-cache] Failed to connect to MongoDB, searching directly from OMDb API"`
+
+---
+
+### 🧪 Testing Instructions:
+
+- Test `title`-based and `imdbID`-based lookups.
+- Simulate MongoDB disconnect and check that fallback works.
+- Confirm cache works by requesting same title twice and inspecting logs.
+- Confirm merged data structure renders on frontend.
+
+---
+
+### 🔒 Notes:
+
+- OMDb API has a free-tier limit (1000 requests/day). Prioritize caching!
+- Add `.env` support for OMDb API key and Mongo URI.
+- Mongo URI should be switchable between local (`mongodb://localhost:27017`) and production (e.g., Mongo Atlas).
+- Do not overwrite TMDB fields unless OMDb has better/missing data.
+
+---
+
+اگر خواستی می‌تونم بر اساس این prompt، کد کامل `omdbService.js` یا route/backend مربوط بهش رو هم برات بنویسم. فقط بگو چقدرشو آماده داری و کجا مونده، تا دقیق همونجا رو برات بزنم.
