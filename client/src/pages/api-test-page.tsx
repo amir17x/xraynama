@@ -46,7 +46,7 @@ export default function APITestPage() {
           url = `/api/tmdb/movies/popular`;
           break;
         case 'cache-stats':
-          url = `/api/tmdb/cache-stats`;
+          url = `/api/tmdb/cache/stats`;
           break;
         default:
           url = `/api/tmdb/unified-search?query=${encodeURIComponent(query)}`;
