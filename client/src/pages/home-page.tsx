@@ -32,25 +32,25 @@ export default function HomePage() {
 
   // Get latest movies
   const { data: latestMovies, isLoading: isMoviesLoading } = useQuery<ContentType[]>({
-    queryKey: ['/api/content/type/movie'],
+    queryKey: ['/api/content/types/movie'],
     staleTime: 1000 * 60 * 5, // 5 minutes
   });
 
   // Get popular series
   const { data: popularSeries, isLoading: isSeriesLoading } = useQuery<ContentType[]>({
-    queryKey: ['/api/content/type/series'],
+    queryKey: ['/api/content/types/series'],
     staleTime: 1000 * 60 * 5, // 5 minutes
   });
 
   // Get animations
   const { data: animations, isLoading: isAnimationsLoading } = useQuery<ContentType[]>({
-    queryKey: ['/api/content/type/animation'],
+    queryKey: ['/api/content/types/animation'],
     staleTime: 1000 * 60 * 5, // 5 minutes
   });
 
   // Get documentaries
   const { data: documentaries, isLoading: isDocumentariesLoading } = useQuery<ContentType[]>({
-    queryKey: ['/api/content/type/documentary'],
+    queryKey: ['/api/content/types/documentary'],
     staleTime: 1000 * 60 * 5, // 5 minutes
   });
 
