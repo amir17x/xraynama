@@ -6,25 +6,85 @@ export class TMDBService {
   private apiKey: string;
   private accessToken: string;
   private baseUrl: string = 'https://api.themoviedb.org/3';
+  private defaultLanguage: string = 'fa-IR'; // زبان پیش‌فرض: فارسی ایران
+  
+  // کدهای زبان پشتیبانی شده بر اساس استاندارد ISO 639-1 + ISO 3166-1
+  private supportedLanguages: Record<string, string> = {
+    'fa-IR': 'فارسی (ایران)',
+    'en-US': 'English (US)',
+    'ar-SA': 'العربية (السعودية)',
+    'fr-FR': 'Français (France)',
+    'de-DE': 'Deutsch (Deutschland)',
+    'es-ES': 'Español (España)',
+    'ru-RU': 'Русский (Россия)',
+    'zh-CN': '中文 (中国)',
+    'ja-JP': '日本語 (日本)',
+    'tr-TR': 'Türkçe (Türkiye)',
+  };
 
   constructor() {
     this.apiKey = process.env.TMDB_API_KEY || '';
     this.accessToken = process.env.TMDB_ACCESS_TOKEN || '';
+  }
+  
+  /**
+   * بررسی و تنظیم پارامتر زبان
+   * @param language کد زبان (مثال: fa-IR، en-US)
+   * @returns کد زبان معتبر
+   */
+  validateLanguage(language?: string): string {
+    // اگر زبان تعیین نشده بود، از زبان پیش‌فرض استفاده کن
+    if (!language) {
+      return this.defaultLanguage;
+    }
+    
+    // بررسی کن که زبان در لیست زبان‌های پشتیبانی شده باشد
+    if (Object.keys(this.supportedLanguages).includes(language)) {
+      return language;
+    }
+    
+    // اگر فقط کد زبان بدون کد کشور داده شده بود (مثلاً 'fa')
+    const langCode = language.split('-')[0].toLowerCase();
+    const matchedLang = Object.keys(this.supportedLanguages).find(key => 
+      key.toLowerCase().startsWith(langCode + '-')
+    );
+    
+    if (matchedLang) {
+      return matchedLang;
+    }
+    
+    // در غیر این صورت به زبان پیش‌فرض برگرد
+    return this.defaultLanguage;
+  }
+  
+  /**
+   * دریافت لیست زبان‌های پشتیبانی شده
+   * @returns لیست زبان‌های پشتیبانی شده
+   */
+  getSupportedLanguages() {
+    return Object.keys(this.supportedLanguages).map(code => ({
+      code,
+      name: this.supportedLanguages[code]
+    }));
   }
 
   /**
    * دریافت فیلم‌های محبوب از TMDB
    * @param page شماره صفحه
    * @param limit تعداد نتایج
+   * @param language کد زبان (مثال: fa-IR، en-US)
    * @returns لیست فیلم‌های محبوب
    */
-  async getPopularMovies(page: number = 1, limit: number = 10) {
+  async getPopularMovies(page: number = 1, limit: number = 10, language?: string) {
     try {
       if (!this.apiKey || !this.accessToken) {
         throw new Error("TMDB API key or access token is not available");
       }
 
-      console.log(`[TMDB] Fetching popular movies page ${page}, limit ${limit}`);
+      // تنظیم کد زبان معتبر
+      const validatedLanguage = this.validateLanguage(language);
+      
+      console.log(`[TMDB] Fetching popular movies page ${page}, limit ${limit}, language ${validatedLanguage}`);
 
       const response = await axios.get(`${this.baseUrl}/movie/popular`, {
         headers: {
@@ -33,7 +93,7 @@ export class TMDBService {
         },
         params: {
           api_key: this.apiKey,
-          language: 'fa-IR',
+          language: validatedLanguage,
           page,
           include_adult: false
         }
@@ -85,15 +145,19 @@ export class TMDBService {
    * جستجوی فیلم‌ها بر اساس متن
    * @param query متن جستجو
    * @param page شماره صفحه
+   * @param language کد زبان (مثال: fa-IR، en-US)
    * @returns نتایج جستجو
    */
-  async searchMovies(query: string, page: number = 1) {
+  async searchMovies(query: string, page: number = 1, language?: string) {
     try {
       if (!this.apiKey || !this.accessToken) {
         throw new Error("TMDB API key or access token is not available");
       }
 
-      console.log(`[TMDB] Searching movies with query: "${query}", page ${page}`);
+      // تنظیم کد زبان معتبر
+      const validatedLanguage = this.validateLanguage(language);
+      
+      console.log(`[TMDB] Searching movies with query: "${query}", page ${page}, language ${validatedLanguage}`);
 
       const response = await axios.get(`${this.baseUrl}/search/movie`, {
         headers: {
@@ -102,7 +166,7 @@ export class TMDBService {
         },
         params: {
           api_key: this.apiKey,
-          language: 'fa-IR',
+          language: validatedLanguage,
           query,
           page,
           include_adult: false
@@ -153,6 +217,7 @@ export class TMDBService {
    * دریافت فیلم‌ها با استفاده از discover API (با فیلترهای پیشرفته)
    * @param options گزینه‌های فیلتر
    * @param page شماره صفحه
+   * @param language کد زبان (مثال: fa-IR، en-US)
    * @returns نتایج فیلتر شده
    */
   async discoverMovies(options: {
@@ -165,18 +230,21 @@ export class TMDBService {
     vote_average_lte?: number;
     with_runtime_gte?: number;
     with_runtime_lte?: number;
-  }, page: number = 1) {
+  }, page: number = 1, language?: string) {
     try {
       if (!this.apiKey || !this.accessToken) {
         throw new Error("TMDB API key or access token is not available");
       }
 
-      console.log(`[TMDB] Discovering movies with filters, page ${page}`);
+      // تنظیم کد زبان معتبر
+      const validatedLanguage = this.validateLanguage(language);
+      
+      console.log(`[TMDB] Discovering movies with filters, page ${page}, language ${validatedLanguage}`);
 
       // تبدیل آرایه‌ها به رشته با جداکننده کاما
       const params: any = {
         api_key: this.apiKey,
-        language: 'fa-IR',
+        language: validatedLanguage,
         page,
         include_adult: false,
         ...options
@@ -248,6 +316,7 @@ export class TMDBService {
    * @param externalId شناسه خارجی (اختیاری)
    * @param externalSource منبع شناسه (اختیاری)
    * @param page شماره صفحه
+   * @param language کد زبان (مثال: fa-IR، en-US)
    * @returns نتایج جستجو از هر سه روش
    */
   async searchAllContent(
@@ -255,18 +324,23 @@ export class TMDBService {
     filters: Record<string, any> = {}, 
     externalId?: string, 
     externalSource?: string, 
-    page: number = 1
+    page: number = 1,
+    language?: string
   ) {
+    // تنظیم کد زبان معتبر
+    const validatedLanguage = this.validateLanguage(language);
+    
     const results: any = {
       text_search: null,
       discover: null,
-      external_id: null
+      external_id: null,
+      language: validatedLanguage
     };
     
     // جستجوی متنی
     if (query && query.length > 0) {
       try {
-        results.text_search = await this.searchMovies(query, page);
+        results.text_search = await this.searchMovies(query, page, validatedLanguage);
       } catch (error) {
         console.error(`Error in text search for "${query}":`, error);
         results.text_search = { error: "جستجوی متنی با خطا مواجه شد" };
@@ -276,7 +350,7 @@ export class TMDBService {
     // جستجو با فیلتر (discover)
     if (Object.keys(filters).length > 0) {
       try {
-        results.discover = await this.discoverMovies(filters, page);
+        results.discover = await this.discoverMovies(filters, page, validatedLanguage);
       } catch (error) {
         console.error("Error in discover search:", error);
         results.discover = { error: "جستجو با فیلتر با خطا مواجه شد" };
@@ -286,7 +360,7 @@ export class TMDBService {
     // جستجو با شناسه خارجی
     if (externalId && externalSource) {
       try {
-        results.external_id = await this.findByExternalId(externalId, externalSource);
+        results.external_id = await this.findByExternalId(externalId, externalSource, validatedLanguage);
       } catch (error) {
         console.error(`Error in external ID search for ${externalId}:`, error);
         results.external_id = { error: "جستجو با شناسه خارجی با خطا مواجه شد" };
@@ -300,15 +374,19 @@ export class TMDBService {
    * جستجوی محتوا با استفاده از شناسه‌های خارجی
    * @param externalId شناسه خارجی
    * @param externalSource منبع شناسه (imdb_id, tvdb_id, facebook_id, twitter_id, instagram_id)
+   * @param language کد زبان (مثال: fa-IR، en-US)
    * @returns نتایج یافته شده
    */
-  async findByExternalId(externalId: string, externalSource: string) {
+  async findByExternalId(externalId: string, externalSource: string, language?: string) {
     try {
       if (!this.apiKey || !this.accessToken) {
         throw new Error("TMDB API key or access token is not available");
       }
 
-      console.log(`[TMDB] Finding content with external ID: ${externalId} (source: ${externalSource})`);
+      // تنظیم کد زبان معتبر
+      const validatedLanguage = this.validateLanguage(language);
+      
+      console.log(`[TMDB] Finding content with external ID: ${externalId} (source: ${externalSource}, language: ${validatedLanguage})`);
 
       const response = await axios.get(`${this.baseUrl}/find/${externalId}`, {
         headers: {
@@ -317,7 +395,7 @@ export class TMDBService {
         },
         params: {
           api_key: this.apiKey,
-          language: 'fa-IR',
+          language: validatedLanguage,
           external_source: externalSource
         }
       });
@@ -373,15 +451,19 @@ export class TMDBService {
   /**
    * دریافت جزئیات فیلم با استفاده از append_to_response برای گرفتن اطلاعات بیشتر در یک درخواست
    * @param movieId شناسه فیلم در TMDB
+   * @param language کد زبان (مثال: fa-IR، en-US)
    * @returns جزئیات فیلم به همراه اطلاعات تکمیلی
    */
-  async getMovieDetails(movieId: number) {
+  async getMovieDetails(movieId: number, language?: string) {
     try {
       if (!this.apiKey || !this.accessToken) {
         throw new Error("TMDB API key or access token is not available");
       }
 
-      console.log(`[TMDB] Fetching details for movie ID ${movieId}`);
+      // تنظیم کد زبان معتبر
+      const validatedLanguage = this.validateLanguage(language);
+      
+      console.log(`[TMDB] Fetching details for movie ID ${movieId}, language ${validatedLanguage}`);
 
       const response = await axios.get(`${this.baseUrl}/movie/${movieId}`, {
         headers: {
@@ -390,7 +472,7 @@ export class TMDBService {
         },
         params: {
           api_key: this.apiKey,
-          language: 'fa-IR',
+          language: validatedLanguage,
           append_to_response: 'videos,images,credits,similar,recommendations'
         }
       });
@@ -471,6 +553,7 @@ export class TMDBService {
    * @param allGenres همه ژانرها
    * @param allTags همه تگ‌ها
    * @param count تعداد محتواهای پیشنهادی
+   * @param language کد زبان (مثال: fa-IR، en-US)
    * @returns لیست محتواهای پیشنهادی
    */
   async getRecommendedContent(
@@ -480,9 +563,15 @@ export class TMDBService {
     allContent: Content[],
     allGenres: Genre[],
     allTags: Tag[],
-    count: number = 5
+    count: number = 5,
+    language?: string
   ): Promise<Content[]> {
     try {
+      // تنظیم کد زبان معتبر
+      const validatedLanguage = this.validateLanguage(language);
+      
+      console.log(`[TMDB] Getting recommended content, language ${validatedLanguage}`);
+      
       // اگر هیچ کاربر یا تاریخچه‌ای وجود ندارد، محتواهای محبوب را برگردان
       if (!userId && watchHistory.length === 0 && favorites.length === 0) {
         return this.getPopularContent(allContent, count);
@@ -514,7 +603,7 @@ export class TMDBService {
             params: {
               api_key: this.apiKey,
               with_genres: preferredGenreIds.join(','),
-              language: 'fa-IR',
+              language: validatedLanguage,
               page: 1
             }
           });
@@ -545,7 +634,7 @@ export class TMDBService {
                 },
                 params: {
                   api_key: this.apiKey,
-                  language: 'fa-IR',
+                  language: validatedLanguage,
                   page: 1
                 }
               });
@@ -590,7 +679,7 @@ export class TMDBService {
                 },
                 params: {
                   api_key: this.apiKey,
-                  language: 'fa-IR',
+                  language: validatedLanguage,
                   page: 1
                 }
               });
@@ -628,7 +717,7 @@ export class TMDBService {
             },
             params: {
               api_key: this.apiKey,
-              language: 'fa-IR',
+              language: validatedLanguage,
               page: 1
             }
           });
@@ -677,6 +766,7 @@ export class TMDBService {
    * @param allGenres همه ژانرها 
    * @param allTags همه تگ‌ها
    * @param count تعداد محتواهای پیشنهادی
+   * @param language کد زبان (مثال: fa-IR، en-US)
    * @returns لیست محتواهای مشابه
    */
   async getSimilarContent(
@@ -684,11 +774,15 @@ export class TMDBService {
     allContent: Content[],
     allGenres: Genre[],
     allTags: Tag[],
-    count: number = 5
+    count: number = 5,
+    language?: string
   ): Promise<Content[]> {
     try {
       // تمام محتواها بجز محتوای فعلی را لیست کن
       const otherContent = allContent.filter(item => item.id !== contentItem.id);
+      
+      // تنظیم کد زبان معتبر
+      const validatedLanguage = this.validateLanguage(language);
       
       // لیست شناسه‌های محتواهای مشابه
       let similarContentIds: number[] = [];
@@ -697,6 +791,8 @@ export class TMDBService {
       if (!this.apiKey || !this.accessToken) {
         throw new Error("TMDB API key or access token is not available");
       }
+      
+      console.log(`[TMDB] Finding similar content for ID ${contentItem.id}, language ${validatedLanguage}`);
       
       // پیدا کردن معادل TMDB برای این محتوا
       const tmdbId = this.mapContentToTMDBId(contentItem, 'movie');
@@ -711,7 +807,7 @@ export class TMDBService {
             },
             params: {
               api_key: this.apiKey,
-              language: 'fa-IR',
+              language: validatedLanguage,
               page: 1
             }
           });
@@ -737,7 +833,7 @@ export class TMDBService {
             },
             params: {
               api_key: this.apiKey,
-              language: 'fa-IR',
+              language: validatedLanguage,
               page: 1
             }
           });
@@ -778,7 +874,7 @@ export class TMDBService {
               params: {
                 api_key: this.apiKey,
                 with_genres: tmdbGenreIds.join(','),
-                language: 'fa-IR',
+                language: validatedLanguage,
                 page: 1,
                 primary_release_year: contentItem.year // محدود به سال انتشار مشابه
               }

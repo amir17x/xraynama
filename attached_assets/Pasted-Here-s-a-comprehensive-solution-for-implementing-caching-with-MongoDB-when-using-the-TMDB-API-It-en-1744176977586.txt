@@ -1,0 +1,176 @@
+Here’s a comprehensive solution for implementing caching with MongoDB when using the TMDB API. It ensures that if the API fails to return data, previously fetched data is stored in the database, preventing redundant requests for the same data.
+
+---
+
+### **TMDB API with MongoDB Caching**
+
+To optimize the usage of the TMDB API and avoid unnecessary repeated API calls, we can implement a caching system using MongoDB. The idea is to store the data fetched from TMDB in MongoDB and use it when the same request is made again, thus reducing redundant calls and improving performance.
+
+### **1. Setting up MongoDB for Caching**
+
+First, make sure you have a MongoDB database ready for storing the cached data. The MongoDB collection will store the TMDB data with an expiration timestamp, so data is refreshed periodically.
+
+#### **MongoDB Schema**
+- **Collection Name:** `tmdb_cache`
+- **Fields:**
+  - `_id`: Unique identifier (e.g., TMDB movie ID or TV show ID).
+  - `data`: JSON object that contains the API response.
+  - `timestamp`: Timestamp when the data was fetched from the TMDB API.
+  - `expires_at`: Timestamp when the cache will expire.
+
+Example document schema:
+
+```javascript
+{
+  "_id": ObjectId("uniqueID"),
+  "tmdb_id": 343611,  // TMDB movie ID
+  "data": { /* API response data */ },
+  "timestamp": ISODate("2025-04-09T00:00:00Z"),
+  "expires_at": ISODate("2025-04-10T00:00:00Z")
+}
+```
+
+### **2. Caching Logic Flow**
+
+1. **Check Cache**: Before making a request to the TMDB API, the system checks if the data exists in MongoDB and if it's still valid (not expired).
+2. **Fetch Data from Cache**: If the data exists and is valid, return the cached data.
+3. **Request from TMDB API**: If the data doesn’t exist or is expired, make a request to the TMDB API to fetch the latest data.
+4. **Store in Cache**: After fetching data from TMDB, store it in MongoDB with the current timestamp and an expiration time (e.g., 24 hours).
+5. **Return Data**: Once data is fetched from either the cache or the API, return the data to the user.
+
+### **3. Implementation Example (Node.js with MongoDB)**
+
+Here’s an example implementation in **Node.js** using the **axios** library for API calls and **mongodb** for database operations.
+
+#### **Install Required Packages**
+
+```bash
+npm install axios mongodb moment
+```
+
+#### **Code Example**
+
+```javascript
+const axios = require('axios');
+const { MongoClient } = require('mongodb');
+const moment = require('moment');
+
+// MongoDB connection URI
+const uri = 'mongodb://localhost:27017';
+const client = new MongoClient(uri);
+
+// TMDB API base URL and API Key
+const tmdbBaseURL = 'https://api.themoviedb.org/3';
+const tmdbApiKey = 'YOUR_API_KEY';
+
+// MongoDB Database and Collection
+const dbName = 'tmdb_cache_db';
+const collectionName = 'tmdb_cache';
+
+// Check Cache Before API Request
+async function getCachedData(tmdbId) {
+  try {
+    await client.connect();
+    const database = client.db(dbName);
+    const collection = database.collection(collectionName);
+
+    // Check if data exists and is not expired
+    const cachedData = await collection.findOne({
+      tmdb_id: tmdbId,
+      expires_at: { $gt: new Date() }  // Ensure data is not expired
+    });
+
+    if (cachedData) {
+      console.log('Data found in cache');
+      return cachedData.data;
+    } else {
+      console.log('Cache expired or data not found. Fetching from TMDB...');
+      const data = await fetchFromTMDB(tmdbId);  // Fetch from TMDB API
+      await cacheData(tmdbId, data);  // Cache the fetched data
+      return data;
+    }
+  } finally {
+    await client.close();
+  }
+}
+
+// Fetch Data from TMDB API
+async function fetchFromTMDB(tmdbId) {
+  const url = `${tmdbBaseURL}/movie/${tmdbId}?api_key=${tmdbApiKey}`;
+  try {
+    const response = await axios.get(url);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching from TMDB:', error);
+    return null;
+  }
+}
+
+// Store Data in MongoDB Cache
+async function cacheData(tmdbId, data) {
+  try {
+    await client.connect();
+    const database = client.db(dbName);
+    const collection = database.collection(collectionName);
+
+    // Set cache expiration time (24 hours)
+    const expiresAt = moment().add(1, 'days').toDate();
+
+    // Store the data in cache, updating if already exists
+    await collection.updateOne(
+      { tmdb_id: tmdbId },
+      {
+        $set: {
+          tmdb_id: tmdbId,
+          data: data,
+          timestamp: new Date(),
+          expires_at: expiresAt
+        }
+      },
+      { upsert: true }  // Insert or update the document
+    );
+
+    console.log('Data cached successfully');
+  } finally {
+    await client.close();
+  }
+}
+
+// Example Function to Get Movie Details
+async function getMovieDetails(movieId) {
+  const data = await getCachedData(movieId);
+  console.log('Movie Data:', data);
+}
+
+// Fetch details for a movie with ID 343611 (Example)
+getMovieDetails(343611);
+```
+
+### **4. Explanation of the Flow**
+
+- **Initial Request**: When a user requests data about a movie (e.g., movie ID `343611`), the system first checks MongoDB for cached data.
+  - If data is found in cache and is still valid (not expired), it returns the cached data.
+  - If the data is not in the cache or has expired, it proceeds to fetch the data from the TMDB API.
+  
+- **Fetching Data from TMDB**: If the cache is not valid or empty, the system makes an API request to TMDB to get the latest data.
+  
+- **Storing Data in MongoDB**: After fetching data from TMDB, the response is stored in the MongoDB cache with a timestamp and an expiration timestamp (e.g., 24 hours later).
+  
+- **Subsequent Requests**: On subsequent requests for the same movie (with the same ID), if the data is still valid (within the cache's expiration time), it will be served from the MongoDB cache.
+
+### **5. Benefits of Using MongoDB for Caching**
+
+- **Reduced Redundant API Calls**: By caching responses in MongoDB, repeated requests for the same data are served directly from the cache, minimizing the number of calls to the TMDB API.
+- **Faster Response Times**: Serving data from the cache reduces latency compared to fetching data from the TMDB API each time.
+- **Improved Resource Utilization**: Prevents unnecessary bandwidth usage and TMDB API call limits, especially when the same data is requested multiple times within a short period.
+
+### **6. Cache Expiration**
+
+The cache expiration is handled by setting an `expires_at` field, which you can customize based on your needs (e.g., 24 hours, 1 hour). If the cache expires, the next time the same data is requested, it will fetch the latest data from TMDB.
+
+---
+
+### **Conclusion**
+
+This caching mechanism using MongoDB improves the performance and efficiency of your system by reducing redundant requests to the TMDB API and storing data locally for faster retrieval. You can fine-tune cache expiration based on the freshness of the data and optimize both the performance and resource utilization of your application.
+
