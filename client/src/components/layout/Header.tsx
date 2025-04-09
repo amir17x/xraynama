@@ -169,9 +169,9 @@ export const Header: React.FC = () => {
                 {/* جستجو در موبایل */}
                 <button 
                   onClick={() => setShowSearchBar(!showSearchBar)}
-                  className="md:hidden p-2 hover:bg-blue-800/40 rounded-full"
+                  className="md:hidden p-2 hover:bg-[#001c3d]/70 rounded-full transition-colors"
                 >
-                  <Search className="w-5 h-5 text-gray-300" />
+                  <Search className="w-5 h-5 text-[#CCDDEE]" />
                 </button>
 
                 {/* اعلان‌ها */}
@@ -181,9 +181,9 @@ export const Header: React.FC = () => {
                       setShowNotifications(!showNotifications);
                       setShowUserMenu(false);
                     }}
-                    className="relative p-2 hover:bg-blue-800/40 rounded-full transition-colors"
+                    className="relative p-2 hover:bg-[#001c3d]/70 rounded-full transition-colors"
                   >
-                    <Bell className="h-5 w-5 text-gray-300" />
+                    <Bell className="h-5 w-5 text-[#CCDDEE]" />
                     <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full">
                       <span className="absolute inset-0 w-full h-full bg-red-500 rounded-full animate-ping opacity-75"></span>
                     </span>
@@ -253,7 +253,7 @@ export const Header: React.FC = () => {
                           setShowUserMenu(!showUserMenu);
                           setShowNotifications(false);
                         }}
-                        className="flex items-center gap-1.5 p-1 px-1.5 rounded-full hover:bg-blue-800/40 transition-colors"
+                        className="flex items-center gap-1.5 p-1 px-1.5 rounded-full hover:bg-[#001c3d]/70 transition-colors"
                       >
                         <Avatar className="w-7 h-7 border border-blue-400/30">
                           <AvatarImage src={user.avatar || undefined} />
@@ -264,7 +264,7 @@ export const Header: React.FC = () => {
                         <span className="hidden sm:inline text-sm text-white font-medium">
                           {user.name || user.username}
                         </span>
-                        <ChevronDown className="w-4 h-4 text-gray-400 hidden sm:inline" />
+                        <ChevronDown className="w-4 h-4 text-[#AABBCC] hidden sm:inline" />
                       </button>
 
                       {/* منوی کاربر */}
@@ -366,12 +366,12 @@ export const Header: React.FC = () => {
                 {/* دکمه منوی موبایل */}
                 <button 
                   onClick={() => setShowMainMenu(!showMainMenu)}
-                  className="md:hidden p-2 rounded-full hover:bg-blue-800/40 transition-colors"
+                  className="md:hidden p-2 rounded-full hover:bg-[#001c3d]/70 transition-colors"
                 >
                   {showMainMenu ? (
-                    <X className="h-5 w-5 text-gray-300" />
+                    <X className="h-5 w-5 text-[#CCDDEE]" />
                   ) : (
-                    <MenuIcon className="h-5 w-5 text-gray-300" />
+                    <MenuIcon className="h-5 w-5 text-[#CCDDEE]" />
                   )}
                 </button>
               </div>
@@ -380,7 +380,7 @@ export const Header: React.FC = () => {
         </div>
 
         {/* منوی ناوبری ثابت */}
-        <div className="w-full bg-[#00142c]/80 backdrop-blur-lg shadow-[0_4px_25px_rgba(0,191,255,0.15)] border-b border-[#00BFFF]/20 py-1 hidden md:block -mt-[1px] rounded-b-xl">
+        <div className="w-full bg-[#00142c]/80 backdrop-blur-lg shadow-[0_4px_25px_rgba(0,191,255,0.15)] border-b border-[#00BFFF]/20 py-1.5 hidden md:block -mt-[1px] rounded-b-xl">
           <div className="max-w-7xl mx-auto px-4 md:px-6">
             <nav className="flex justify-center">
               <ul className="flex items-center justify-between space-x-2 space-x-reverse">
@@ -391,8 +391,8 @@ export const Header: React.FC = () => {
                         className={cn(
                           "flex flex-col items-center gap-1 px-4 py-1 rounded-lg transition-colors cursor-pointer",
                           location === item.href 
-                            ? "text-blue-300" 
-                            : "text-gray-200 hover:text-blue-300"
+                            ? "text-[#00BFFF]" 
+                            : "text-gray-200 hover:text-[#00BFFF]"
                         )}
                       >
                         {item.icon}
