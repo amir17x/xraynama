@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useLocation } from 'wouter';
+import { useLocation, Link } from 'wouter';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -178,13 +178,12 @@ export default function AuthPage() {
                       />
                       
                       <div className="flex items-center justify-between mb-2">
-                        <button
-                          type="button"
+                        <Link
+                          href="/auth/forgot-password"
                           className="text-sm text-primary hover:underline"
-                          onClick={() => navigate('/forgot-password')}
                         >
                           رمز عبور را فراموش کرده‌اید؟
-                        </button>
+                        </Link>
                       </div>
                       
                       <Button 

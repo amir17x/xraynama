@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -10,7 +10,6 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { apiRequest } from "@/lib/queryClient";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { useLocation } from "wouter";
 
 // Zod schema for form validation
 const resetPasswordSchema = z.object({
@@ -36,7 +35,7 @@ export default function ResetPasswordPage() {
     
     if (!email || !token) {
       // Redirect to forgot password page if no email or token is stored
-      setLocation("/forgot-password");
+      setLocation("/auth/forgot-password");
       return;
     }
     

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -10,7 +10,6 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { apiRequest } from "@/lib/queryClient";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { useLocation } from "wouter";
 
 // Zod schema for form validation
 const forgotPasswordSchema = z.object({
@@ -46,7 +45,7 @@ export default function ForgotPasswordPage() {
       
       // Redirect to verify code page after a short delay
       setTimeout(() => {
-        setLocation("/verify-code");
+        setLocation("/auth/verify-code");
       }, 2000);
     },
     onError: (error: Error) => {
